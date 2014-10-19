@@ -1,9 +1,14 @@
 Eine kleine Liste von eventuell nützlichen Informationen:
 
-Overpass API - Language_Guide
+Overpass API - Language_Guide:
 
 http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
 
-Overpass API
+Overpass API:
 
 http://wiki.openstreetmap.org/wiki/Overpass_API
+
+Test driven Python development:
+
+http://www.openp2p.com/pub/a/python/2004/12/02/tdd_pyunit.html
+https://docs.python.org/2/library/unittest.html
