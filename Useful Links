@@ -12,6 +12,10 @@ Hitchhikers Guide to Python:
 
 http://docs.python-guide.org/en/latest/
 
+especially the first paragraph about testing:
+
+http://docs.python-guide.org/en/latest/writing/tests/
+
 Test driven Python development:
 
 http://www.openp2p.com/pub/a/python/2004/12/02/tdd_pyunit.html
