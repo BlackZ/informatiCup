@@ -22,6 +22,10 @@ http://www.openp2p.com/pub/a/python/2004/12/02/tdd_pyunit.html
 http://www.onlamp.com/pub/a/python/2005/02/03/tdd_pyunit2.html
 https://docs.python.org/2/library/unittest.html
 
+Style Guideline for Python:
+
+http://legacy.python.org/dev/peps/pep-0008/
+
 Python-Package Libary
 
 http://www.lfd.uci.edu/~gohlke/pythonlibs/
