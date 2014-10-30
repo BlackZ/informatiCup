@@ -1,7 +1,0 @@
-A Class that contains the SUR (maybe parses the files as well)
-Wrapper class for OSM-Api: Provides the OSM-data (maybe pre structured)
-Compute solution(?)
-Create kml files from results
-Comperator for two solutions (kml files?).
-Set up Project structure, including test structure/test scripts?
-
