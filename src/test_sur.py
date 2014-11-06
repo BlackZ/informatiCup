@@ -8,7 +8,7 @@ Created on Thu Oct 30 13:20:21 2014
 import unittest
 import sur
 
-class TestSurObject(unittest.TestCase):
+class TestSURObject(unittest.TestCase):
   
   def setUp(self):
     self.testString =("0001, 50.9304, 5.33901, access:dog=\"no\"")
@@ -18,23 +18,23 @@ class TestSurObject(unittest.TestCase):
     self.ruleNameString = "access:dog=\"no\""
     self.ruleName = {"access:dog": "no"}
   
-  def test_createSur(self):
-    testSur = sur.SUR(self.id, self.ruleNameString, self.lat, self.long)
-    self.assertIsNotNone(testSur)
-    self.assertEqual(testSur.id, self.id)
-    self.assertEqual(testSur.latitude, self.lat)
-    self.assertEqual(testSur.longitude, self.long)
-    self.assertEqual(testSur.ruleName, self.ruleName)
+  def test_createSUR(self):
+    testSUR = sur.SUR(self.id, self.ruleNameString, self.lat, self.long)
+    self.assertIsNotNone(testSUR)
+    self.assertEqual(testSUR.id, self.id)
+    self.assertEqual(testSUR.latitude, self.lat)
+    self.assertEqual(testSUR.longitude, self.long)
+    self.assertEqual(testSUR.ruleName, self.ruleName)
     
-  def test_parseSur(self):
-    testSur = sur.SUR.fromString(self.testString)
-    self.assertIsNotNone(testSur)
-    self.assertEqual(testSur.id, self.id)
-    self.assertEqual(testSur.latitude, self.lat)
-    self.assertEqual(testSur.longitude, self.long)
-    self.assertEqual(testSur.ruleName, self.ruleName)
+  def test_parseSUR(self):
+    testSUR = sur.SUR.fromString(self.testString)
+    self.assertIsNotNone(testSUR)
+    self.assertEqual(testSUR.id, self.id)
+    self.assertEqual(testSUR.latitude, self.lat)
+    self.assertEqual(testSUR.longitude, self.long)
+    self.assertEqual(testSUR.ruleName, self.ruleName)
     
-  def test_parseSurFromFile(self):
+  def test_parseSURFromFile(self):
     # set up
     testFile = open('../testData/TestData.txt','r')
     ruleName1_2 = {"smoking": "no", "access:dog": "no"}
@@ -44,19 +44,19 @@ class TestSurObject(unittest.TestCase):
     ruleName2 = {"cellphone": "no"}
     
     # do it!
-    testSurs = sur.SUR.fromFile(testFile)
+    testSURs = sur.SUR.fromFile(testFile)
     
     # check first sur
-    self.assertIsNotNone(testSurs)
-    self.assertEqual(testSurs[0].id, self.id)
-    self.assertEqual(testSurs[0].latitude, self.lat)
-    self.assertEqual(testSurs[0].longitude, self.long)
-    self.assertEqual(testSurs[0].ruleName, ruleName1_2)
+    self.assertIsNotNone(testSURs)
+    self.assertEqual(testSURs[0].id, self.id)
+    self.assertEqual(testSURs[0].latitude, self.lat)
+    self.assertEqual(testSURs[0].longitude, self.long)
+    self.assertEqual(testSURs[0].ruleName, ruleName1_2)
     # check second sur
-    self.assertEqual(testSurs[1].id, id2)
-    self.assertEqual(testSurs[1].latitude, lat2)
-    self.assertEqual(testSurs[1].longitude, long2)
-    self.assertEqual(testSurs[1].ruleName, ruleName2)
+    self.assertEqual(testSURs[1].id, id2)
+    self.assertEqual(testSURs[1].latitude, lat2)
+    self.assertEqual(testSURs[1].longitude, long2)
+    self.assertEqual(testSURs[1].ruleName, ruleName2)
 
 
 if __name__ == '__main__':

@@ -10,4 +10,4 @@ import unittest
 if __name__ == '__main__':
   testLoader = unittest.TestLoader()
   suite = testLoader.discover('.')
-  unittest.TextTestRunner(verbosity=2).run(suite)
+  unittest.TextTestRunner(verbosity=3).run(suite)
