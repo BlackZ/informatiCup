@@ -7,7 +7,7 @@ Created on Thu Nov  6 11:46:54 2014
 
 
 import unittest
-#import osm
+import osm
 
 class TestOSMObject(unittest.TestCase):
   
@@ -15,8 +15,11 @@ class TestOSMObject(unittest.TestCase):
     pass
   
   def test_createOSM(self):
-    pass
- #   osm = osm.OSM
+    testOSM = osm.OSM()
+    self.assertIsNotNone(testOSM)
+    testOSM.nodes
+    testOSM.ways
+    testOSM.relations
   
   
 
