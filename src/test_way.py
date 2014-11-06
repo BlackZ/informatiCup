@@ -11,9 +11,9 @@ import osmData
 class TestWayObject(unittest.TestCase):
   
   def setUp(self):
-    self.id=1
-    self.refs=[1,2,3]
-    self.tags={"highway":"residential","name":"Clipstone Street"}
+    self.id = 1
+    self.refs = [1,2,3]
+    self.tags = {"highway":"residential","name":"Clipstone Street"}
     
   
   def test_createWay(self):

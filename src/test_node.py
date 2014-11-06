@@ -12,10 +12,10 @@ import osmData
 class TestNodeObject(unittest.TestCase):
   
   def setUp(self):
-    self.id=1
-    self.lat=0.1
-    self.lon=2.1
-    self.tags={"highway":"traffic_signals"}
+    self.id = 1
+    self.lat = 0.1
+    self.lon = 2.1
+    self.tags = {"highway":"traffic_signals"}
     
   
   def test_createNode(self):

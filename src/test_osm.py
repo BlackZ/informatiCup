@@ -7,21 +7,27 @@ Created on Thu Nov  6 11:46:54 2014
 
 
 import unittest
-import osm
+import osmData
 
 class TestOSMObject(unittest.TestCase):
   
   def setUp(self):
-    pass
+    self.testNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
+    self.testWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
+    self.testRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], {"name":"Tween Pond", "natural":"water"})
   
   def test_createOSM(self):
-    testOSM = osm.OSM()
+    testOSM = osmData.OSM()
     self.assertIsNotNone(testOSM)
-    testOSM.nodes
-    testOSM.ways
-    testOSM.relations
-  
-  
+    self.assertIsNotNone(testOSM.nodes)
+    self.assertIsNotNone(testOSM.ways)
+    self.assertIsNotNone(testOSM.relations)
+    testOSM.addNode(self.testNode)
+    testOSM.addWay(self.testWay)
+    testOSM.addRelation(self.testRelation)
+    self.assertEqual(testOSM.nodes[1], self.testNode)
+    self.assertEqual(testOSM.ways[3], self.testWay)
+    self.assertEqual(testOSM.relations[5], self.testRelation)
 
 
 if __name__ == '__main__':

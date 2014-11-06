@@ -11,16 +11,16 @@ import osmData
 class TestRelationObject(unittest.TestCase):
   
   def setUp(self):
-    self.id=1
-    #todo: array von tripel
-    self.tags=dict()
+    self.id = 1
+    self.members = [("way",8125151,"outer"),("way",249285853,"inner")]
+    self.tags = {"name":"Tween Pond", "natural":"water"}
     
   
   def test_createRelation(self):
-    testRelation = osmData.Node(self.id, self.lat, self.lon, self.tags)
+    testRelation = osmData.Relation(self.id, self.members, self.tags)
     self.assertIsNotNone(testRelation)
     self.assertEqual(testRelation.id, self.id)
-    
+    self.assertEqual(testRelation.members, self.members)
     self.assertEqual(testRelation.tags, self.tags)
   
 
