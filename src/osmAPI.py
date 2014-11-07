@@ -20,7 +20,7 @@ class osmAPI():
     #new code to prevent timeouts
     filename = "map_" + str(boundingBox) + ".xml"
     if (os.path.exists(filename)):
-      self.parseData(open(filename, "r"))
+      return self.parseData(open(filename, "r"))
     else:
       file = open(filename, "w")
       tmp = requests.get(self.osmurl,params=self.getOsmRequestData(boundingBox[0],boundingBox[1],boundingBox[2],boundingBox[3]))
@@ -35,13 +35,14 @@ class osmAPI():
       
       file.close()
       
-      self.parseData(open(filename, "r"))
+      return self.parseData(open(filename, "r"))
       
     #original code
     #return self.parseData(requests.get(self.osmurl,params=self.getOsmRequestData(boundingBox[0],boundingBox[1],boundingBox[2],boundingBox[3])))
   
   def parseData(self, obj):
     osmObj=osmData.OSM()
+    f = open("test.txt", "w")
     
     #needed, when working with xml file
     data = dom.parse(obj)
@@ -49,69 +50,73 @@ class osmAPI():
     #dom = dom.parseString(obj.content)
     
     for node in data.getElementsByTagName('node'):      
-      node_tags = {}
-      if node.hasChildNodes():
-        for element in node.childNodes:
-          if (element.nodeType == dom.Node.TEXT_NODE):
-            pass
-          elif (element.tagName == "tag"):
-            node_tags[element.getAttribute('k').encode('utf-8')] = element.getAttribute('v').encode('utf-8')
-      print node.getAttribute('id'),node.getAttribute('lat'),node.getAttribute('lon')
-      print node_tags
-      print ":::::::::::::::::::::::::::::::"
-      nodeObj=osmData.Node(node.getAttribute('id'), node.getAttribute('lat'), node.getAttribute('lon'), node_tags)
+      node_id = node.getAttribute('id').encode('utf-8')
       
-      osmObj.addNode(nodeObj)
+      if (osmObj.nodes.has_key(node_id)):
+        if len(osmObj.nodes[node_id].tags) == 0:
+          osmObj.nodes[node_id].tags = self.getTags(node)
+      else:
+        node_tags = self.getTags(node)
+        
+        nodeObj=osmData.Node(node_id, node.getAttribute('lat'), node.getAttribute('lon'), node_tags)
+        osmObj.addNode(nodeObj)
       
     for way in data.getElementsByTagName('way'):
-      way_id = way.getAttribute('id')
-      print "ID" + str(way_id)
-      way_refs = []
-      way_tags = {}
-      if way.hasChildNodes():
-        for node in way.childNodes:
-          if (node.nodeType == dom.Node.TEXT_NODE):
-            pass
-          elif (node.tagName == 'nd'):
-            way_refs.append(node.getAttribute('ref').encode( "utf-8" ))
-          elif (node.tagName == 'tag'):
-            way_tags[node.getAttribute('k').encode( "utf-8" )] = node.getAttribute('v').encode( "utf-8" )
-      print way_refs
-      print way_tags
-      print "-------------------------------------------"
-      wayObj = osmData.Way(way_id, way_refs, way_tags)
+      way_id = way.getAttribute('id').encode('utf-8')
       
-      osmObj.addWay(wayObj)
+      if (osmObj.ways.has_key(way_id)):
+        if len(osmObj.ways[way_id].refs) == 0:
+          osmObj.ways[way_id].refs = self.getRefs(way)
+        if len(osmObj.ways[way_id].tags) == 0:
+          osmObj.ways[way_id].tags = self.getTags(way)
+      
+      else:
+        if way.hasChildNodes():
+          way_refs = self.getRefs(way)
+          way_tags = self.getTags(way)
+        
+          wayObj = osmData.Way(way_id, way_refs, way_tags)  
+          osmObj.addWay(wayObj)
     
     for relation in data.getElementsByTagName('relation'):
-      rel_id = relation.getAttribute('id')
-      rel_members = []
-      rel_tags = {}
-      if relation.hasChildNodes():
-        for node in relation.childNodes:
-          if (node.nodeType == dom.Node.TEXT_NODE):
-            pass
-          elif (node.tagName == "member"):
-            type = node.getAttribute('type').encode("utf-8")
-            ref = node.getAttribute('ref').encode("utf-8")
-            role = node.getAttribute('role').encode("utf-8")
-            rel_members.append({"type": type, "ref": ref, "role": role})
-          elif (node.tagName == "tag"):
-            rel_tags[node.getAttribute('k').encode( "utf-8" )] = node.getAttribute('v').encode( "utf-8" )
-            
-      print "ID" + rel_id
-      print rel_members
-      print rel_tags
-      print ";;;;;;;;;;;;;;;;;;;"
-      relObj = osmData.Relation(rel_id, rel_members, rel_tags)
+      rel_id = relation.getAttribute('id').encode('utf-8')
       
-      osmObj.addRelation(relObj)
-      
-    print len(osmObj.nodes)
-    print len(osmObj.ways)
-    print len(osmObj.relations)
+      if (osmObj.relations.has_key(rel_id)):
+        if len(osmObj.relations[rel_id].members) == 0:
+          osmObj.relations[rel_id].refs = self.getMembers(relation)
+        if len(osmObj.relations[rel_id].tags) == 0:
+          osmObj.relations[rel_id].tags = self.getTags(relation)
 
-if __name__ == '__main__':
-  obj=osmAPI()
-  boundingBox=[52.032736,8.486593,52.042113,8.501194]
-  obj.performRequest(boundingBox)
+      else:
+        if relation.hasChildNodes() :
+          rel_members = self.getMembers(relation)
+          rel_tags = self.getTags(relation) 
+
+          relObj = osmData.Relation(rel_id, rel_members, rel_tags)
+          osmObj.addRelation(relObj)
+
+    return osmObj
+
+  def getTags(self, node):
+    tags = {}
+    for element in node.getElementsByTagName('tag'):
+        tags[element.getAttribute('k').encode('utf-8')] = element.getAttribute('v').encode('utf-8')
+    
+    return tags
+  
+  def getRefs(self, node):
+    refs = []
+    for element in node.getElementsByTagName('nd'):
+      refs.append(element.getAttribute('ref').encode( "utf-8" ))
+      
+    return refs
+
+  def getMembers(self, node):
+    members = []
+    for element in node.getElementsByTagName('member'):
+      type = element.getAttribute('type').encode("utf-8")
+      ref = element.getAttribute('ref').encode("utf-8")
+      role = element.getAttribute('role').encode("utf-8")
+      members.append({"type": type, "ref": ref, "role": role})
+      
+    return members
