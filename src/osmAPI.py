@@ -2,9 +2,14 @@
 
 import requests
 import osmData
+
+#for testing
+import os 
+
 from xml.dom.minidom import parse, parseString
 
 class osmAPI():
+  
   def __init__(self):
     self.osmurl='http://overpass-api.de/api/interpreter'
       
@@ -12,7 +17,29 @@ class osmAPI():
     return {'data': '[out:xml][timeout:25];(node[""=""]({minLat},{minLon},{maxLat},{maxLon});way[""=""]({minLat},{minLon},{maxLat},{maxLon});relation[""=""]({minLat},{minLon},{maxLat},{maxLon}););out body;>;out skel qt;'.format(**locals())}
 
   def performRequest(self,boundingBox):
-    return self.parseData(requests.get(self.osmurl,params=self.getOsmRequestData(boundingBox[0],boundingBox[1],boundingBox[2],boundingBox[3])))
+    #new code to prevent timeouts
+    filename = "map_" + str(boundingBox) + ".xml"
+    if (os.path.exists(filename)):
+      pass
+      #self.parseData(open(filename, "r"))
+    else:
+      file = open(filename, "w")
+      tmp = requests.get(self.osmurl,params=self.getOsmRequestData(boundingBox[0],boundingBox[1],boundingBox[2],boundingBox[3]))
+      print tmp.encoding
+      print tmp.ok
+      
+      for block in tmp.iter_content(1024):
+       if not block:
+           break
+
+       file.write(block)
+      
+      file.close()
+      
+      #self.parseData(open(filename, "r"))
+      
+    #original code
+    #return self.parseData(requests.get(self.osmurl,params=self.getOsmRequestData(boundingBox[0],boundingBox[1],boundingBox[2],boundingBox[3])))
   
   def parseData(self, obj):
     osmObj=osmData.OSM()

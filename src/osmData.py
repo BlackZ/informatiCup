@@ -10,7 +10,8 @@ class OSM():
   def __init__(self):
     self.nodes = {}
     self.ways = {}
-    self.relations = {}    
+    self.relations = {}
+    
   def addNode(self, node):
     self.nodes[node.id] = node
     
