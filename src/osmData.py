@@ -8,10 +8,9 @@ Basic class that holds the osm-data (consisting of basing elements)
 class OSM():
   
   def __init__(self):
-    self.nodes = dict()
-    self.ways = dict()
-    self.relations = dict()
-    
+    self.nodes = {}
+    self.ways = {}
+    self.relations = {}    
   def addNode(self, node):
     self.nodes[node.id] = node
     
