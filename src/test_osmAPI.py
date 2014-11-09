@@ -11,22 +11,21 @@ import osmAPI
 class TestOsmAPI(unittest.TestCase):
   def setUp(self):
     self.osmAPIobj=osmAPI.osmAPI()
+    self.boundingBox = [52.032736,8.486593,52.042113,8.501194]
     
   def test_getOsmRequestData(self, ):
-    boundingBox=[52.032736,8.486593,52.042113,8.501194]
-    testObj=self.osmAPIobj.getOsmRequestData(boundingBox[0],boundingBox[1],boundingBox[2],boundingBox[3])
+    testObj=self.osmAPIobj.getOsmRequestData(self.boundingBox[0],self.boundingBox[1],self.boundingBox[2],self.boundingBox[3])
     self.assertIsNotNone(testObj)
     self.assertEqual(testObj.has_key('data'),True)
     self.assertEqual(testObj['data'],'[out:xml][timeout:25];(node[""=""](52.032736,8.486593,52.042113,8.501194);way[""=""](52.032736,8.486593,52.042113,8.501194);relation[""=""](52.032736,8.486593,52.042113,8.501194););out body;>;out skel qt;')
-    
-  def test_performRequest(self):
-    boundingBox=[52.032736,8.486593,52.042113,8.501194]
-    testObj=self.osmAPIobj.performRequest(boundingBox)
-    self.assertIsNotNone(testObj)
+ 
+#This does nothing the next test doesn't do.   
+#  def test_performRequest(self):
+#    testObj=self.osmAPIobj.performRequest(self.boundingBox)
+#    self.assertIsNotNone(testObj)
     
   def test_parseData(self):
-    boundingBox=[52.032736,8.486593,52.042113,8.501194]
-    testObj=self.osmAPIobj.performRequest(boundingBox)
+    testObj=self.osmAPIobj.performRequest(self.boundingBox)
     self.assertIsNotNone(testObj)
     self.assertIsNotNone(testObj.nodes)
     self.assertIsNotNone(testObj.ways)
@@ -45,7 +44,7 @@ class TestOsmAPI(unittest.TestCase):
     way_id = "58717810"
     way_refs_len = 5
     way_tags_len = 6
-    way_name = {}
+    way_name = {} #Why is this here if it is not used?
     self.assertTrue(way_id in testObj.ways)
     self.assertEqual(len(testObj.ways[way_id].refs), way_refs_len)
     self.assertEqual(len(testObj.ways[way_id].tags), way_tags_len)
