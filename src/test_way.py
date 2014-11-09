@@ -22,6 +22,12 @@ class TestWayObject(unittest.TestCase):
     self.assertEqual(testWay.id, self.id)
     self.assertEqual(testWay.refs, self.refs)
     self.assertEqual(testWay.tags, self.tags)
+    
+  def test_createWayFail(self):
+    testWay = osmData.Way(2, self.refs[0:2], self.tags)
+    self.assertNotEqual(testWay.id, self.id)
+    self.assertNotEqual(testWay.refs, self.refs)
+    self.assertEqual(testWay.tags, self.tags)
   
 
 if __name__ == '__main__':

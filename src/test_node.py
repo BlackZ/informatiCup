@@ -25,6 +25,13 @@ class TestNodeObject(unittest.TestCase):
     self.assertEqual(testNode.lat, self.lat)
     self.assertEqual(testNode.lon, self.lon)
     self.assertEqual(testNode.tags, self.tags)
+    
+  def test_createNodeFail(self):
+    testNode = osmData.Node(self.id, self.lon, self.lat, self.tags)
+    self.assertEqual(testNode.id, self.id)
+    self.assertNotEqual(testNode.lat, self.lat)
+    self.assertNotEqual(testNode.lon, self.lon)
+    self.assertEqual(testNode.tags, self.tags)
   
 
 if __name__ == '__main__':

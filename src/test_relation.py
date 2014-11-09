@@ -22,6 +22,13 @@ class TestRelationObject(unittest.TestCase):
     self.assertEqual(testRelation.id, self.id)
     self.assertEqual(testRelation.members, self.members)
     self.assertEqual(testRelation.tags, self.tags)
+    
+  def test_createRelationFail(self):
+    testRelation = osmData.Relation(23, self.members[0], self.tags)
+    self.assertNotEqual(testRelation.id, self.id)
+    self.assertNotEqual(testRelation.members, self.members)
+    self.assertEqual(testRelation.tags, self.tags)
+  
   
 
 if __name__ == '__main__':
