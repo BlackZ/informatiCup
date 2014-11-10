@@ -15,7 +15,8 @@ class TestOSMObject(unittest.TestCase):
     
     self.testNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
     self.testWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
-    self.testRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], {"name":"Tween Pond", "natural":"water"})
+    self.testRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
+                                             {"name":"Tween Pond", "natural":"water"})
     
     self.testOSM = osmData.OSM()
   
@@ -64,7 +65,8 @@ class TestOSMObject(unittest.TestCase):
   def test_addRelationFail(self):
     with self.assertRaises(SystemExit) as errorMessage:
       self.testOSM.addRelation(42)
-    self.assertEqual(errorMessage.exception.code, -1)    
+    self.assertEqual(errorMessage.exception.code, -1)   
+      
 
 if __name__ == '__main__':
   unittest.main()

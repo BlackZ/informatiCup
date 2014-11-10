@@ -29,7 +29,23 @@ class TestRelationObject(unittest.TestCase):
     self.assertNotEqual(testRelation.members, self.members)
     self.assertEqual(testRelation.tags, self.tags)
   
-  
+  def test_isRelationEqual(self):
+    testRelation = osmData.Relation(self.id, self.members, self.tags)
+    #Deliberatly not using the self variables to make sure it is filled with
+    #other objects
+    otherRelation = osmData.Relation(1, 
+                  [("way",8125151,"outer"),("way",249285853,"inner")], 
+                   {"name":"Tween Pond", "natural":"water"})
+    self.assertEqual(testRelation, otherRelation)
+    
+  def test_isRelationNotEqual(self):
+    testRelation = osmData.Relation(self.id, self.members, self.tags)
+    #Deliberatly not using the self variables to make sure it is filled with
+    #other objects
+    otherRelation = osmData.Relation(2, 
+                  [("way",8125151,"outer"),("way",249285853,"inner")], 
+                   {"name":"Tween Pond", "natural":"water"})
+    self.assertNotEqual(testRelation, otherRelation)
 
 if __name__ == '__main__':
   unittest.main()

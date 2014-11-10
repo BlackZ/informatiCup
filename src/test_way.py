@@ -28,6 +28,22 @@ class TestWayObject(unittest.TestCase):
     self.assertNotEqual(testWay.id, self.id)
     self.assertNotEqual(testWay.refs, self.refs)
     self.assertEqual(testWay.tags, self.tags)
+    
+  def test_isWayEqual(self):
+    testWay = osmData.Way(self.id, self.refs, self.tags)
+    #Deliberatly not using the self variables to make sure it is filled with
+    #other objects
+    otherWay = osmData.Way(1, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
+    
+    self.assertEqual(testWay, otherWay)
+    
+  def test_isWayNotEqual(self):
+    testWay = osmData.Way(self.id, self.refs, self.tags)
+    #Deliberatly not using the self variables to make sure it is filled with
+    #other objects
+    otherWay = osmData.Way(2, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
+    
+    self.assertNotEqual(testWay, otherWay)
   
 
 if __name__ == '__main__':

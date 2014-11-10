@@ -32,6 +32,21 @@ class TestNodeObject(unittest.TestCase):
     self.assertNotEqual(testNode.lat, self.lat)
     self.assertNotEqual(testNode.lon, self.lon)
     self.assertEqual(testNode.tags, self.tags)
+    
+  def test_isNodeEqual(self):
+    testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
+    #Deliberatly not using the self variables to make sure it is filled with
+    #other objects
+    otherNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
+    self.assertEqual(testNode, otherNode)
+    
+  def test_isNodeNotEqual(self):
+    testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
+    #Deliberatly not using the self variables to make sure it is filled with
+    #other objects
+    otherNode = osmData.Node(2, 0.1, 2.1, {"highway":"traffic_signals"})
+    self.assertNotEqual(testNode, otherNode)
+
   
 
 if __name__ == '__main__':
