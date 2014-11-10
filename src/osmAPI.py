@@ -25,9 +25,9 @@ class osmAPI():
   def performRequest(self, boundingBox, filterList=[]):
     """
     This function requests data from openStreetMap
-    @param boundingBox a list of the points of the boundingBox [minLat,minLon,maxLat,maxLon]
-    @param filterList (optional) list of tripel of filter-rules e.g.(["way","node"],"amenity","univerity")
-    @return an request object with the data-xml in the content property
+    @param boundingBox: a list of the points of the boundingBox [minLat,minLon,maxLat,maxLon]
+    @param filterList: (optional) list of tripel of filter-rules e.g.(["way","node"],"amenity","univerity")
+    @return: an request object with the data-xml in the content property
     """
     return self._parseData(requests.get(self.osmurl,params=self._getOsmRequestData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], filterList)),False)
   
