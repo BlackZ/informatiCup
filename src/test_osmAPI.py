@@ -52,15 +52,15 @@ class TestOsmAPI(unittest.TestCase):
     self.assertEqual(testObj2.has_key('data'),True)
     self.assertEqual(testObj2['data'],'[out:xml][timeout:25];(node["amenity"="university"](52.032736,8.486593,52.042113,8.501194);way["amenity"="university"](52.032736,8.486593,52.042113,8.501194);relation["amenity"="university"](52.032736,8.486593,52.042113,8.501194););out body;>;out skel qt;')
    
-  def test_performRequest(self):
-    self.requestData = self.osmAPIobj.performRequest(self.boundingBox)
-    self.assertIsNotNone(self.requestData)
+  #def test_performRequest(self):
+    #self.requestData = self.osmAPIobj.performRequest(self.boundingBox)
+    #self.assertIsNotNone(self.requestData)
   
   def test_parseData(self):
     
     testFile = open(self.osmDataFilename, "r")
     
-    testDataObj = self.osmAPIobj.parseData(testFile, True)
+    testDataObj = self.osmAPIobj._parseData(testFile, True)
     
     testFile.close()
     
