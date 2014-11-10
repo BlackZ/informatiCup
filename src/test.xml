@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<meta>
+  <node id="146891366" lat="52.0364239" lon="8.4867570">
+    <tag k="crossing" v="traffic_signals"/>
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <node id="46426098" lat="52.0375177" lon="8.4995645"/>
+  <node id="46426114" lat="52.0386730" lon="8.4981747"/>
+  <way id="46480681">
+    <nd ref="593900008"/>
+    <nd ref="416938583"/>
+    <tag k="bicycle" v="yes"/>
+    <tag k="highway" v="footway"/>
+  </way>
+  <relation id="152923">
+    <member type="way" ref="35221623" role="outer"/>
+    <tag k="natural" v="scrub"/>
+    <tag k="type" v="multipolygon"/>
+  </relation>
+  <relation id="905522">
+    <member type="way" ref="26582813" role="outer"/>
+    <member type="way" ref="20213971" role="inner"/>
+    <tag k="type" v="multipolygon"/>
+  </relation>
+</meta>

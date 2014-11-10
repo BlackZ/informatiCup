@@ -35,7 +35,6 @@ class OSM():
       print "Error: addRelation only accepts relations."
       sys.exit(-1)
 
-
 class Node():
   
   def __init__(self, identifier, lat, lon, tags):
