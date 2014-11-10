@@ -10,14 +10,26 @@ class osmAPI():
   def __init__(self):
     self.osmurl='http://overpass-api.de/api/interpreter'
       
-  def _getOsmRequestData(self, minLat,minLon,maxLat,maxLon):
-    return {'data': '[out:xml][timeout:25];(node[""=""]({minLat},{minLon},{maxLat},{maxLon});way[""=""]({minLat},{minLon},{maxLat},{maxLon});relation[""=""]({minLat},{minLon},{maxLat},{maxLon}););out body;>;out skel qt;'.format(**locals())}
+  def _getOsmRequestData(self, minLat, minLon, maxLat, maxLon, filterList):
+    if len(filterList) == 0:
+      return {'data': '[out:xml][timeout:25];(node[""=""]({minLat},{minLon},{maxLat},{maxLon});way[""=""]({minLat},{minLon},{maxLat},{maxLon});relation[""=""]({minLat},{minLon},{maxLat},{maxLon}););out body;>;out skel qt;'.format(**locals())}
+    else:
+      compactOverpassQLstring = '[out:xml][timeout:25];('
+      for fil in filterList:
+          for obj in fil[0]:
+              compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);' % (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
+      compactOverpassQLstring += ');out body;>;out skel qt;'
+      return  {'data':compactOverpassQLstring}
 
 
-#Es wird noch eine zweite performRequest für Filterregeln benötigt
-  def performRequest(self, boundingBox):
-    """  """
-    return requests.get(self.osmurl,params=self._getOsmRequestData(boundingBox[0],boundingBox[1],boundingBox[2],boundingBox[3]))
+  def performRequest(self, boundingBox, filterList=[]):
+    """
+    This function requests data from openStreetMap
+    @param boundingBox a list of the points of the boundingBox [minLat,minLon,maxLat,maxLon]
+    @param filterList (optional) list of tripel of filter-rules e.g.(["way","node"],"amenity","univerity")
+    @return an request object with the data-xml in the content property
+    """
+    return requests.get(self.osmurl,params=self._getOsmRequestData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], filterList))
   
   def parseData(self, obj, isFile):
     """ """
@@ -57,7 +69,7 @@ class osmAPI():
         
           wayObj = osmData.Way(way_id, way_refs, way_tags)  
           osmObj.addWay(wayObj)
-    
+      
     for relation in data.getElementsByTagName('relation'):
       rel_id = int(relation.getAttribute('id').encode('utf-8'))
       
@@ -74,7 +86,7 @@ class osmAPI():
 
           relObj = osmData.Relation(rel_id, rel_members, rel_tags)
           osmObj.addRelation(relObj)
-    
+
     return osmObj
 
   def _getTags(self, node):

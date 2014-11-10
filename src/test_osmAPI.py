@@ -33,7 +33,7 @@ class TestOsmAPI(unittest.TestCase):
     self.testOsmObj.addNode(osmData.Node(46426098, 52.0375177, 8.4995645, {}))
     self.testOsmObj.addNode(osmData.Node(46426114, 52.0386730, 8.4981747, {}))
     self.testOsmObj.addWay(osmData.Way(46480681, [593900008, 416938583],
-                                       {"bycicle":"yes","highway":"footway"}))
+                                       {"bicycle":"yes","highway":"footway"}))
     self.testOsmObj.addRelation(osmData.Relation(152923,
                                                  [("way",35221623,"outer")],
                                                  {"natural":"scrub","type":"multipolygon"}))
@@ -42,10 +42,15 @@ class TestOsmAPI(unittest.TestCase):
                                                   "way",20213971,"inner")],{"type":"multipolygon"}))
   
   def test_getOsmRequestData(self):
-    testObj=self.osmAPIobj._getOsmRequestData(self.boundingBox[0],self.boundingBox[1],self.boundingBox[2],self.boundingBox[3])
+    testObj=self.osmAPIobj._getOsmRequestData(self.boundingBox[0],self.boundingBox[1],self.boundingBox[2],self.boundingBox[3],[])
     self.assertIsNotNone(testObj)
     self.assertEqual(testObj.has_key('data'),True)
     self.assertEqual(testObj['data'],'[out:xml][timeout:25];(node[""=""](52.032736,8.486593,52.042113,8.501194);way[""=""](52.032736,8.486593,52.042113,8.501194);relation[""=""](52.032736,8.486593,52.042113,8.501194););out body;>;out skel qt;')
+    
+    testObj2 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],self.boundingBox[1],self.boundingBox[2],self.boundingBox[3], filterList=[(["node","way","relation"],"amenity","university")])
+    self.assertIsNotNone(testObj2)
+    self.assertEqual(testObj2.has_key('data'),True)
+    self.assertEqual(testObj2['data'],'[out:xml][timeout:25];(node["amenity"="university"](52.032736,8.486593,52.042113,8.501194);way["amenity"="university"](52.032736,8.486593,52.042113,8.501194);relation["amenity"="university"](52.032736,8.486593,52.042113,8.501194););out body;>;out skel qt;')
    
   def test_performRequest(self):
     self.requestData = self.osmAPIobj.performRequest(self.boundingBox)
@@ -62,9 +67,10 @@ class TestOsmAPI(unittest.TestCase):
     self.assertIsNotNone(testDataObj)
     self.assertIsNotNone(testDataObj.nodes)
     self.assertIsNotNone(testDataObj.ways)
-    self.assertIsNotNone(testDataObj.relations)
+    self.assertIsNotNone(testDataObj.relations)    
 
-    self.assertEqual(self.testOsmObj, testDataObj)
+    self.assertTrue(self.testOsmObj == testDataObj)
+    #self.assertEqual(self.testOsmObj, testDataObj)
    
   def test_getTags(self):
     tags = {"leisure":"pitch", "type":"multipolygon"}
@@ -126,5 +132,3 @@ class TestOsmAPI(unittest.TestCase):
   #  self.assertEqual(len(testObj.relations[rel_id].tags), rel_tags_len)
   #  self.assertTrue(rel_tag_key in testObj.relations[rel_id].tags)
   #  self.assertEqual(rel_tag_value, testObj.relations[rel_id].tags[rel_tag_key])
-
-  
