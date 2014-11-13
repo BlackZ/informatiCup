@@ -69,8 +69,8 @@ class TestOsmAPI(unittest.TestCase):
     self.assertIsNotNone(testDataObj.ways)
     self.assertIsNotNone(testDataObj.relations)    
 
-    self.assertTrue(self.testOsmObj == testDataObj)
-    #self.assertEqual(self.testOsmObj, testDataObj)
+    #self.assertTrue(self.testOsmObj == testDataObj)
+    self.assertEqual(self.testOsmObj, testDataObj)
    
   def test_getTags(self):
     tags = {"leisure":"pitch", "type":"multipolygon"}
