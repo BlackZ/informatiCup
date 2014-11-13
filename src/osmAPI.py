@@ -29,17 +29,13 @@ class osmAPI():
     @param filterList: (optional) list of tripel of filter-rules e.g.(["way","node"],"amenity","univerity")
     @return: an request object with the data-xml in the content property
     """
-    return self._parseData(requests.get(self.osmurl,params=self._getOsmRequestData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], filterList)),False)
+    return self._parseData(requests.get(self.osmurl,params=self._getOsmRequestData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], filterList)).content)
   
-  def _parseData(self, obj, isFile):
+  def _parseData(self, obj):
     """ """
     osmObj=osmData.OSM()
     
-    if isFile:
-      #needed, when working with xml file
-      data = dom.parse(obj)
-    else:
-      data = dom.parseString(obj.content)
+    data = dom.parseString(obj)
     
     for node in data.getElementsByTagName('node'):      
       node_id = int(node.getAttribute('id').encode('utf-8'))

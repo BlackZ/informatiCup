@@ -58,11 +58,9 @@ class TestOsmAPI(unittest.TestCase):
   
   def test_parseData(self):
     
-    testFile = open(self.osmDataFilename, "r")
+    testFile = open(self.osmDataFilename, "r").read()
     
-    testDataObj = self.osmAPIobj._parseData(testFile, True)
-    
-    testFile.close()
+    testDataObj = self.osmAPIobj._parseData(testFile)
     
     self.assertIsNotNone(testDataObj)
     self.assertIsNotNone(testDataObj.nodes)
