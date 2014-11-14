@@ -49,6 +49,17 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(len(self.testOSM.nodes),2)
     self.assertEqual(self.testOSM.nodes[secondNode.id], secondNode)
     
+  def test_addNodeList(self):
+    testNodeList = [self.testNode, osmData.Node("0002", 0.123, 0.12312, {"building":"university"})]
+    self.testOSM.addNodeList(testNodeList)
+    self.assertEqual(len(self.testOSM.nodes), len(testNodeList))
+    for node in testNodeList:
+      self.assertEqual(self.testOSM.nodes[node.id], node)
+    
+  def test_addNodeListFailNoList(self):
+    with self.assertRaises(TypeError):
+      self.testOSM.addNodeList(self.testNode)
+    
   def test_addWay(self):
     self.testOSM.addWay(self.testWay)
     self.assertEqual(self.testOSM.ways[self.testWay.id], self.testWay)

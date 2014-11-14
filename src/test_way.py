@@ -11,8 +11,8 @@ import osmData
 class TestWayObject(unittest.TestCase):
   
   def setUp(self):
-    self.id = 1
-    self.refs = [1,2,3]
+    self.id = "0001"
+    self.refs = ["0001","0002","0003"]
     self.tags = {"highway":"residential","name":"Clipstone Street"}
     
   
@@ -29,11 +29,24 @@ class TestWayObject(unittest.TestCase):
     self.assertNotEqual(testWay.refs, self.refs)
     self.assertEqual(testWay.tags, self.tags)
     
+  def test_createWayWithIntId(self):
+    testWay = osmData.Way(int(self.id), self.refs, self.tags)
+    self.assertNotEqual(testWay.id, self.id)
+    self.assertEqual(testWay.id, "1")
+    
+  def test_createWayFailNoList(self):
+    with self.assertRaises(TypeError):
+      testWay = osmData.Way(self.id, "asd", self.tags)
+      
+  def test_createWayFailNotADictionary(self):
+    with self.assertRaises(ValueError):
+      testWay = osmData.Way(self.id, self.refs, "a:b")
+    
   def test_isWayEqual(self):
     testWay = osmData.Way(self.id, self.refs, self.tags)
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    otherWay = osmData.Way(1, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
+    otherWay = osmData.Way("0001", ["0001","0002","0003"], {"highway":"residential","name":"Clipstone Street"})
     
     self.assertEqual(testWay, otherWay)
     
@@ -41,7 +54,7 @@ class TestWayObject(unittest.TestCase):
     testWay = osmData.Way(self.id, self.refs, self.tags)
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    otherWay = osmData.Way(2, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
+    otherWay = osmData.Way("0002", ["0001","0002","0003"], {"highway":"residential","name":"Clipstone Street"})
     
     self.assertNotEqual(testWay, otherWay)
   

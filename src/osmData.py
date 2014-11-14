@@ -20,6 +20,11 @@ class OSM():
     else:
       print "Error: addNode only accepts nodes."
       sys.exit(-1)
+      
+      
+  def addNodeList(self, nodeList):
+    for node in nodeList:
+      self.addNode(node)
     
   def addWay(self, way):
     if isinstance(way,Way):
@@ -51,10 +56,21 @@ class OSM():
 class Node():
   
   def __init__(self, identifier, lat, lon, tags):
-    self.id = identifier
-    self.lat = lat
-    self.lon = lon
-    self.tags = tags
+    """
+    Basic class containing an osm Node
+
+    @param identifier: The id of the node as a string.
+    
+    @param lat: Latitude of the node as float
+    
+    @param lon: Longitude of the node as float
+  
+    @param tags: A dictionary containing all the tags for the node
+    """
+    self.id = str(identifier)
+    self.lat = float(lat)
+    self.lon = float(lon)
+    self.tags = dict(tags)
     
   def __eq__(self,other):
     if not isinstance(other,self.__class__):
@@ -72,9 +88,20 @@ class Node():
 class Way():
   
   def __init__(self, identifier, refs, tags):
-    self.id = identifier
-    self.refs = refs #Ordered list of node id's that make up the way
-    self.tags = tags
+    """
+    Basic class containing an osm Way
+    
+    @param identifier: The id of the way as a string
+    
+    @param refs: An ordered list of node id's (strings) that make up the way
+    
+    @param tags: A dictionary containing all the tags for the way
+    """
+    self.id = str(identifier)
+    if not isinstance(refs, list):
+      raise TypeError
+    self.refs = [str(r) for r in refs]
+    self.tags = dict(tags)
     
   def __eq__(self,other):
     if not isinstance(other, self.__class__):
@@ -91,9 +118,20 @@ class Way():
 class Relation():
   
   def __init__(self, identifier, members, tags):
-    self.id = identifier
-    self.members = members #List of tripel (membertype[eg way], id of the member, addition tags [eg outer] )
-    self.tags = tags
+    """
+    Basic class containing an osm Relation
+    
+    @param identifier: The id of the way as a string
+    
+    @param members: A list of tripel (membertype[e.g.  way], id of the member, addition tags [e.g. outer])
+    
+    @param tags: A dictionary containing all the tags for the way
+    """
+    self.id = str(identifier)
+    if not isinstance(members, list):
+      raise TypeError
+    self.members = [tuple(m) for m in members]    
+    self.tags = dict(tags)
    
   def __eq__(self,other):   
     if not isinstance(other, self.__class__):
