@@ -6,16 +6,16 @@ Created on Mon Nov 10 16:52:11 2014
 """
 
 #import Polygon#, Polygon.IO
-from sympy import *
-from sympy.geometry import *
+import sympy
+#import sympy.geometry
 
 #p1, p2, p3, p4, p5 = [(0, 0), (1, 0), (5, 1), (0, 1), (3, 0)]
 p1, p2, p3, p4 = [(0, 0), (0, 1), (1, 1), (1, 0)]
-testPoly=Polygon(p1, p2, p3, p4)
-testPoint=Point(0.5,2.5)
-testPoint2=Point(0.5,0.5)
-testPoint3=Point(0,0.5)
-testPoint4=Point(0,0)
+testPoly=sympy.Polygon(p1, p2, p3, p4)
+testPoint=sympy.Point(0.5,2.5)
+testPoint2=sympy.Point(0.5,0.5)
+testPoint3=sympy.Point(0,0.5)
+testPoint4=sympy.Point(0,0)
 print "============================"
 print "Punkt außerhalb"
 print "----------------------------"
