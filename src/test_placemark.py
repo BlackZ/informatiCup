@@ -41,20 +41,17 @@ class TestPlacemarkObject(unittest.TestCase):
     self.assertEqual(len(placemarkObj.polygon),1)
     self.assertEqual(placemarkObj.polygon[-1], self.nodeList[0])
     
-  def test_addNodeFail(self):
+  def test_addNodeFailStringGiven(self):
     placemarkObj = kml.Placemark(self.testName, self.ruleType)
-    with self.assertRaises(SystemExit) as errorMessage:
+    with self.assertRaises(TypeError):
       placemarkObj.addNode(self.testName)
-    self.assertEqual(errorMessage.exception.code, -1)
     
-  def test_hasPolygonFail(self):
+  def test_hasPolygonFailNoNodes(self):
     placemarkObj = kml.Placemark(self.testName, self.ruleType)
     self.assertFalse(placemarkObj.hasPolygon())
   
-  def test_addNodeList(self):
-    self.fail()
   
-  def test_hasPolygonWith2Nodes(self):
+  def test_hasPolygonFailWith2Nodes(self):
     placemarkObj = kml.Placemark(self.testName, self.ruleType)
     placemarkObj.addNode(self.nodeList[0])
     placemarkObj.addNode(self.nodeList[1])
@@ -70,11 +67,12 @@ class TestPlacemarkObject(unittest.TestCase):
     for node in self.nodeList:
       self.assertTrue(node in placemarkObj.polygon)
   
-  def test_addNodeListFailNoOtherNodes(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType)
+  def test_addNodeListFailNoOtherNodesAffected(self):
+    firstNode = osmData.Node(4,123.2,312.5,{})
+    placemarkObj = kml.Placemark(self.testName, self.ruleType, [firstNode])
     placemarkObj.addNodeList(self.nodeList)
-    self.assertEqual(len(placemarkObj.polygon), len(self.nodeList))
-    self.assertFalse(osmData.Node(4,123.2,312.5,{}))
+    self.assertEqual(len(placemarkObj.polygon), len(self.nodeList) + 1)
+    self.assertTrue(firstNode in placemarkObj.polygon)
       
   
 

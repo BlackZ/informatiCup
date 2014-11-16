@@ -5,8 +5,6 @@ Basic class that holds the osm-data (consisting of basing elements)
 @author: adreyer
 """
 
-import sys
-
 class OSM():
   
   def __init__(self):

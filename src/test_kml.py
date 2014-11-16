@@ -14,7 +14,7 @@ class TestKMLObject(unittest.TestCase):
   def setUp(self):
     self.testPlacemark = kml.Placemark("0002", ("smoking","no"), 
                         [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
-    pass
+    
 
   def test_createKML(self):  
     kmlObj = kml.KML()

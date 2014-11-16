@@ -16,7 +16,7 @@ class TestPlacemarkDistToPolygonObject(unittest.TestCase):
     self.testName = "0002"
     self.ruleType = ("key", "value")
     self.nodeList = [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})]
-    self.placemarkObj = kml.Placemark(self.test, self.ruleType, self.nodeList)
+    self.placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
     self.testNode = osmData.Node() # TODO fill
     self.testDistance = 0 # TODO
 
