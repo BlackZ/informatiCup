@@ -47,8 +47,22 @@ class TestPlacemarkObject(unittest.TestCase):
       placemarkObj.addNode(self.testName)
     self.assertEqual(errorMessage.exception.code, -1)
     
-        
-
+  def test_hasPolygonFail(self):
+    placemarkObj = kml.Placemark(self.testName, self.ruleType)
+    self.assertFalse(placemarkObj.hasPolygon())
+  
+  def test_addNodeList(self):
+    self.fail()
+  
+  def test_hasPolygonWith2Nodes(self):
+    placemarkObj = kml.Placemark(self.testName, self.ruleType)
+    placemarkObj.addNode(self.nodeList[0])
+    placemarkObj.addNode(self.nodeList[1])
+    self.assertFalse(placemarkObj.hasPolygon())    
+    
+  def test_hasPolygon(self):
+    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
+    self.assertTrue(placemarkObj.hasPolygon())    
   
 
 if __name__ == '__main__':
