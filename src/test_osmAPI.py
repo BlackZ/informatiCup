@@ -28,29 +28,45 @@ class TestOsmAPI(unittest.TestCase):
     self.testNode = dom.parseString(self.testXMLString)
     
     self.testOsmObj = osmData.OSM()
-    self.testOsmObj.addNode(osmData.Node(146891366, 52.0364239, 8.4867570,
+    self.testOsmObj.addNode(osmData.Node("146891366", 52.0364239, 8.4867570,
                                          {"crossing":"traffic_signals","highway":"traffic_signals"}))
-    self.testOsmObj.addNode(osmData.Node(46426098, 52.0375177, 8.4995645, {}))
-    self.testOsmObj.addNode(osmData.Node(46426114, 52.0386730, 8.4981747, {}))
-    self.testOsmObj.addWay(osmData.Way(46480681, [593900008, 416938583],
+    self.testOsmObj.addNode(osmData.Node("46426098", 52.0375177, 8.4995645, {}))
+    self.testOsmObj.addNode(osmData.Node("46426114", 52.0386730, 8.4981747, {}))
+    self.testOsmObj.addWay(osmData.Way("46480681", ["593900008", "416938583"],
                                        {"bicycle":"yes","highway":"footway"}))
-    self.testOsmObj.addRelation(osmData.Relation(152923,
-                                                 [("way",35221623,"outer")],
+    self.testOsmObj.addRelation(osmData.Relation("152923",
+                                                 [("way","35221623","outer")],
                                                  {"natural":"scrub","type":"multipolygon"}))
-    self.testOsmObj.addRelation(osmData.Relation(905522,
-                                                 [("way",26582813,"outer"),(
-                                                  "way",20213971,"inner")],{"type":"multipolygon"}))
+    self.testOsmObj.addRelation(osmData.Relation("905522",
+                                                 [("way","26582813","outer"),(
+                                                  "way","20213971","inner")],{"type":"multipolygon"}))
   
   def test_getOsmRequestData(self):
-    testObj=self.osmAPIobj._getOsmRequestData(self.boundingBox[0],self.boundingBox[1],self.boundingBox[2],self.boundingBox[3],[])
+    testObj=self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
+                                              self.boundingBox[1],
+                                              self.boundingBox[2],
+                                              self.boundingBox[3],
+                                              [])
     self.assertIsNotNone(testObj)
     self.assertEqual(testObj.has_key('data'),True)
-    self.assertEqual(testObj['data'],'[out:xml][timeout:25];(node[""=""](52.032736,8.486593,52.042113,8.501194);way[""=""](52.032736,8.486593,52.042113,8.501194);relation[""=""](52.032736,8.486593,52.042113,8.501194););out body;>;out skel qt;')
+    self.assertEqual(testObj['data'],'[out:xml][timeout:25];'\
+                     '(node[""=""](52.032736,8.486593,52.042113,8.501194);'\
+                     'way[""=""](52.032736,8.486593,52.042113,8.501194);'\
+                     'relation[""=""](52.032736,8.486593,52.042113,8.501194););out body;>;out skel qt;')
     
-    testObj2 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],self.boundingBox[1],self.boundingBox[2],self.boundingBox[3], filterList=[(["node","way","relation"],"amenity","university")])
+    testObj2 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
+                                                 self.boundingBox[1],
+                                                 self.boundingBox[2],
+                                                 self.boundingBox[3],
+                                                 filterList=[(["node","way","relation"],
+                                                  "amenity","university")])
     self.assertIsNotNone(testObj2)
     self.assertEqual(testObj2.has_key('data'),True)
-    self.assertEqual(testObj2['data'],'[out:xml][timeout:25];(node["amenity"="university"](52.032736,8.486593,52.042113,8.501194);way["amenity"="university"](52.032736,8.486593,52.042113,8.501194);relation["amenity"="university"](52.032736,8.486593,52.042113,8.501194););out body;>;out skel qt;')
+    self.assertEqual(testObj2['data'],'[out:xml][timeout:25];'\
+                     '(node["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
+                     'way["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
+                     'relation["amenity"="university"](52.032736,8.486593,52.042113,8.501194););'\
+                     'out body;>;out skel qt;')
    
   #def test_performRequest(self):
     #self.requestData = self.osmAPIobj.performRequest(self.boundingBox)
@@ -58,11 +74,9 @@ class TestOsmAPI(unittest.TestCase):
   
   def test_parseData(self):
     
-    testFile = open(self.osmDataFilename, "r")
+    testFile = open(self.osmDataFilename, "r").read()
     
-    testDataObj = self.osmAPIobj._parseData(testFile, True)
-    
-    testFile.close()
+    testDataObj = self.osmAPIobj._parseData(testFile)
     
     self.assertIsNotNone(testDataObj)
     self.assertIsNotNone(testDataObj.nodes)
@@ -81,7 +95,7 @@ class TestOsmAPI(unittest.TestCase):
     self.assertEqual(tags, testTags)
   
   def test_getRefs(self):
-    refs = [43682400,260441217]
+    refs = ["43682400","260441217"]
     
     testRefs = self.osmAPIobj._getRefs(self.testNode)
     
@@ -89,7 +103,7 @@ class TestOsmAPI(unittest.TestCase):
     self.assertEqual(refs, testRefs)
   
   def test_getMembers(self):
-    members = [("way", 17958713,"inner"),("way",17958715, "outer")]
+    members = [("way", "17958713","inner"),("way","17958715", "outer")]
     
     testMembers = self.osmAPIobj._getMembers(self.testNode)
     

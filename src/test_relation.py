@@ -11,7 +11,7 @@ import osmData
 class TestRelationObject(unittest.TestCase):
   
   def setUp(self):
-    self.id = 1
+    self.id = "0001"
     self.members = [("way",8125151,"outer"),("way",249285853,"inner")]
     self.tags = {"name":"Tween Pond", "natural":"water"}
     
@@ -24,16 +24,29 @@ class TestRelationObject(unittest.TestCase):
     self.assertEqual(testRelation.tags, self.tags)
     
   def test_createRelationFail(self):
-    testRelation = osmData.Relation(23, self.members[0], self.tags)
+    testRelation = osmData.Relation(23, [self.members[0]], self.tags)
     self.assertNotEqual(testRelation.id, self.id)
     self.assertNotEqual(testRelation.members, self.members)
     self.assertEqual(testRelation.tags, self.tags)
+    
+  def test_createRelationWithIntId(self):
+    testRelation = osmData.Relation(int(self.id), self.members, self.tags)
+    self.assertNotEqual(testRelation.id, self.id)
+    self.assertEqual(testRelation.id, "1")
+    
+  def test_createRealtionFailMembersNoList(self):
+    with self.assertRaises(TypeError):
+      testRelation = osmData.Relation(self.id, "fail", self.tags)
+      
+  def test_createRelationFailNotADictionary(self):
+    with self.assertRaises(TypeError):
+      testRelation = osmData.Relation(self.id, self.members, "a:b")
   
   def test_isRelationEqual(self):
     testRelation = osmData.Relation(self.id, self.members, self.tags)
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    otherRelation = osmData.Relation(1, 
+    otherRelation = osmData.Relation("0001", 
                   [("way",8125151,"outer"),("way",249285853,"inner")], 
                    {"name":"Tween Pond", "natural":"water"})
     self.assertEqual(testRelation, otherRelation)
@@ -42,7 +55,7 @@ class TestRelationObject(unittest.TestCase):
     testRelation = osmData.Relation(self.id, self.members, self.tags)
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    otherRelation = osmData.Relation(2, 
+    otherRelation = osmData.Relation("0002", 
                   [("way",8125151,"outer"),("way",249285853,"inner")], 
                    {"name":"Tween Pond", "natural":"water"})
     self.assertNotEqual(testRelation, otherRelation)

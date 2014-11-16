@@ -12,12 +12,16 @@ class osmAPI():
       
   def _getOsmRequestData(self, minLat, minLon, maxLat, maxLon, filterList):
     if len(filterList) == 0:
-      return {'data': '[out:xml][timeout:25];(node[""=""]({minLat},{minLon},{maxLat},{maxLon});way[""=""]({minLat},{minLon},{maxLat},{maxLon});relation[""=""]({minLat},{minLon},{maxLat},{maxLon}););out body;>;out skel qt;'.format(**locals())}
+      return {'data': '[out:xml][timeout:25];'\
+              '(node[""=""]({minLat},{minLon},{maxLat},{maxLon});'\
+              'way[""=""]({minLat},{minLon},{maxLat},{maxLon});'\
+              'relation[""=""]({minLat},{minLon},{maxLat},{maxLon}););'\
+              'out body;>;out skel qt;'.format(**locals())}
     else:
       compactOverpassQLstring = '[out:xml][timeout:25];('
       for fil in filterList:
           for obj in fil[0]:
-              compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);' % (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
+              compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);'% (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
       compactOverpassQLstring += ');out body;>;out skel qt;'
       return  {'data':compactOverpassQLstring}
 
@@ -29,20 +33,21 @@ class osmAPI():
     @param filterList: (optional) list of tripel of filter-rules e.g.(["way","node"],"amenity","univerity")
     @return: an request object with the data-xml in the content property
     """
-    return self._parseData(requests.get(self.osmurl,params=self._getOsmRequestData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], filterList)),False)
+    return self._parseData(requests.get(self.osmurl,
+                                        params=self._getOsmRequestData(boundingBox[0],
+                                                                       boundingBox[1],
+                                                                       boundingBox[2],
+                                                                       boundingBox[3],
+                                                                       filterList)).content)
   
-  def _parseData(self, obj, isFile):
+  def _parseData(self, obj):
     """ """
     osmObj=osmData.OSM()
     
-    if isFile:
-      #needed, when working with xml file
-      data = dom.parse(obj)
-    else:
-      data = dom.parseString(obj.content)
+    data = dom.parseString(obj)
     
     for node in data.getElementsByTagName('node'):      
-      node_id = int(node.getAttribute('id').encode('utf-8'))
+      node_id = node.getAttribute('id').encode('utf-8')
       
       if (osmObj.nodes.has_key(node_id)):
         if len(osmObj.nodes[node_id].tags) == 0:
@@ -50,11 +55,14 @@ class osmAPI():
       else:
         node_tags = self._getTags(node)
         
-        nodeObj=osmData.Node(node_id, float(node.getAttribute('lat')), float(node.getAttribute('lon')), node_tags)
+        nodeObj=osmData.Node(node_id,
+                             float(node.getAttribute('lat')),
+                             float(node.getAttribute('lon')),
+                             node_tags)
         osmObj.addNode(nodeObj)
       
     for way in data.getElementsByTagName('way'):
-      way_id = int(way.getAttribute('id').encode('utf-8'))
+      way_id = way.getAttribute('id').encode('utf-8')
       
       if (osmObj.ways.has_key(way_id)):
         if len(osmObj.ways[way_id].refs) == 0:
@@ -71,7 +79,7 @@ class osmAPI():
           osmObj.addWay(wayObj)
       
     for relation in data.getElementsByTagName('relation'):
-      rel_id = int(relation.getAttribute('id').encode('utf-8'))
+      rel_id = relation.getAttribute('id').encode('utf-8')
       
       if (osmObj.relations.has_key(rel_id)):
         if len(osmObj.relations[rel_id].members) == 0:
@@ -99,7 +107,7 @@ class osmAPI():
   def _getRefs(self, node):
     refs = []
     for element in node.getElementsByTagName('nd'):
-      refs.append(int(element.getAttribute('ref').encode( "utf-8" )))
+      refs.append(element.getAttribute('ref').encode( "utf-8" ))
       
     return refs
 
@@ -107,7 +115,7 @@ class osmAPI():
     members = []
     for element in node.getElementsByTagName('member'):
       type = element.getAttribute('type').encode("utf-8")
-      ref = int(element.getAttribute('ref').encode("utf-8"))
+      ref = element.getAttribute('ref').encode("utf-8")
       role = element.getAttribute('role').encode("utf-8")
       members.append((type, ref, role))
       

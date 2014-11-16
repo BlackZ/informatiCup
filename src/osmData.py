@@ -18,22 +18,24 @@ class OSM():
     if isinstance(node,Node):
       self.nodes[node.id] = node
     else:
-      print "Error: addNode only accepts nodes."
-      sys.exit(-1)
+      raise TypeError("addNode only accepts nodes.")
+      
+      
+  def addNodeList(self, nodeList):
+    for node in nodeList:
+      self.addNode(node)
     
   def addWay(self, way):
     if isinstance(way,Way):
       self.ways[way.id] = way
     else:
-      print "Error: addWay only accepts ways."
-      sys.exit(-1)
+      raise TypeError("addWay only accepts ways.")
     
   def addRelation(self,relation):
     if isinstance(relation,Relation):
       self.relations[relation.id] = relation
     else:
-      print "Error: addRelation only accepts relations."
-      sys.exit(-1)
+      raise TypeError("addRelation only accepts relations.")
       
   def __eq__(self, other):
     if not isinstance(other, self.__class__):
@@ -51,9 +53,31 @@ class OSM():
 class Node():
   
   def __init__(self, identifier, lat, lon, tags):
-    self.id = identifier
-    self.lat = lat
-    self.lon = lon
+    """
+    Basic class containing an osm Node
+
+    Parameters
+    ==========
+    
+    @param identifier: The id of the node.
+    
+    @type identifier: Will be parsed to string
+    
+    @param lat: Latitude of the node as float.
+    
+    @type lat: Will be parsed to float.
+    
+    @param lon: Longitude of the node as float.
+    
+    @type lon: Will be parsed to float.
+    
+    @param tags: A dictionary containing all the tags for the node.
+    """
+    self.id = str(identifier)
+    self.lat = float(lat)
+    self.lon = float(lon)
+    if not isinstance(tags, dict):
+      raise TypeError("tags must be a dictionary.")
     self.tags = tags
     
   def __eq__(self,other):
@@ -72,8 +96,21 @@ class Node():
 class Way():
   
   def __init__(self, identifier, refs, tags):
-    self.id = identifier
-    self.refs = refs #Ordered list of node id's that make up the way
+    """
+    Basic class containing an osm Way
+    
+    @param identifier: The id of the way as a string
+    
+    @param refs: An ordered list of node id's (strings) that make up the way
+    
+    @param tags: A dictionary containing all the tags for the way
+    """
+    self.id = str(identifier)
+    if not isinstance(refs, list):
+      raise TypeError("refs must be a list of id's")
+    self.refs = [str(r) for r in refs]
+    if not isinstance(tags, dict):
+      raise TypeError("tags must be a dictionary")
     self.tags = tags
     
   def __eq__(self,other):
@@ -91,8 +128,21 @@ class Way():
 class Relation():
   
   def __init__(self, identifier, members, tags):
-    self.id = identifier
-    self.members = members #List of tripel (membertype[eg way], id of the member, addition tags [eg outer] )
+    """
+    Basic class containing an osm Relation
+    
+    @param identifier: The id of the way as a string
+    
+    @param members: A list of tripel (membertype[e.g.  way], id of the member, addition tags [e.g. outer])
+    
+    @param tags: A dictionary containing all the tags for the way
+    """
+    self.id = str(identifier)
+    if not isinstance(members, list):
+      raise TypeError("members need to be a list of tripel")
+    self.members = [tuple(m) for m in members]   
+    if not isinstance(tags, dict):
+      raise TypeError("tags must be a dictionary")
     self.tags = tags
    
   def __eq__(self,other):   

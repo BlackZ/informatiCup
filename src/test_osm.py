@@ -31,9 +31,8 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(self.testOSM.nodes[self.testNode.id], self.testNode)
     
   def test_addNodeFail(self):
-    with self.assertRaises(SystemExit) as errorMessage:
+    with self.assertRaises(TypeError):
       self.testOSM.addNode("blub")
-    self.assertEqual(errorMessage.exception.code, -1)
   
   def test_addNodeTwice(self):
     self.testOSM.addNode(self.testNode)
@@ -49,23 +48,32 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(len(self.testOSM.nodes),2)
     self.assertEqual(self.testOSM.nodes[secondNode.id], secondNode)
     
+  def test_addNodeList(self):
+    testNodeList = [self.testNode, osmData.Node("0002", 0.123, 0.12312, {"building":"university"})]
+    self.testOSM.addNodeList(testNodeList)
+    self.assertEqual(len(self.testOSM.nodes), len(testNodeList))
+    for node in testNodeList:
+      self.assertEqual(self.testOSM.nodes[node.id], node)
+    
+  def test_addNodeListFailNoList(self):
+    with self.assertRaises(TypeError):
+      self.testOSM.addNodeList(self.testNode)
+    
   def test_addWay(self):
     self.testOSM.addWay(self.testWay)
     self.assertEqual(self.testOSM.ways[self.testWay.id], self.testWay)
     
   def test_addWayFail(self):
-    with self.assertRaises(SystemExit) as errorMessage:
+    with self.assertRaises(TypeError):
       self.testOSM.addWay(self.testNode)
-    self.assertEqual(errorMessage.exception.code, -1)
   
   def test_addRelation(self):
     self.testOSM.addRelation(self.testRelation)
     self.assertEqual(self.testOSM.relations[self.testRelation.id], self.testRelation)
     
   def test_addRelationFail(self):
-    with self.assertRaises(SystemExit) as errorMessage:
+    with self.assertRaises(TypeError):
       self.testOSM.addRelation(42)
-    self.assertEqual(errorMessage.exception.code, -1)   
       
 
 if __name__ == '__main__':
