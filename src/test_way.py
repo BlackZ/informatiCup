@@ -39,7 +39,7 @@ class TestWayObject(unittest.TestCase):
       testWay = osmData.Way(self.id, "asd", self.tags)
       
   def test_createWayFailNotADictionary(self):
-    with self.assertRaises(ValueError):
+    with self.assertRaises(TypeError):
       testWay = osmData.Way(self.id, self.refs, "a:b")
     
   def test_isWayEqual(self):

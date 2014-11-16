@@ -43,9 +43,9 @@ class TestNodeObject(unittest.TestCase):
       testNode = osmData.Node(self.id, "0.1a", self.lon, self.tags)    
       
   def test_createNodeFailNotADictionary(self):
-    with self.assertRaises(ValueError):
+    with self.assertRaises(TypeError):
       testNode = osmData.Node(self.id, self.lat, self.lon, "a:b")
-      
+           
     
   def test_isNodeEqual(self):
     testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)

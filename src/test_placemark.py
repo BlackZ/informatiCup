@@ -47,7 +47,20 @@ class TestPlacemarkObject(unittest.TestCase):
       placemarkObj.addNode(self.testName)
     self.assertEqual(errorMessage.exception.code, -1)
     
-        
+  def test_addNodeList(self):
+    placemarkObj = kml.Placemark(self.testName, self.ruleType)
+    placemarkObj.addNodeList(self.nodeList)
+    for node in self.nodeList:
+      self.assertTrue(node in placemarkObj.polygon)
+  
+  def test_addNodeListFailNoOtherNodes(self):
+    placemarkObj = kml.Placemark(self.testName, self.ruleType)
+    placemarkObj.addNodeList(self.nodeList)
+    self.assertEqual(len(placemarkObj.polygon), len(self.nodeList))
+    self.assertFalse(osmData.Node(4,123.2,312.5,{}))
+      
+  
+    
 
   
 

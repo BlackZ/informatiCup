@@ -39,7 +39,7 @@ class TestRelationObject(unittest.TestCase):
       testRelation = osmData.Relation(self.id, "fail", self.tags)
       
   def test_createRelationFailNotADictionary(self):
-    with self.assertRaises(ValueError):
+    with self.assertRaises(TypeError):
       testRelation = osmData.Relation(self.id, self.members, "a:b")
   
   def test_isRelationEqual(self):

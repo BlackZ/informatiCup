@@ -18,8 +18,7 @@ class OSM():
     if isinstance(node,Node):
       self.nodes[node.id] = node
     else:
-      print "Error: addNode only accepts nodes."
-      sys.exit(-1)
+      raise TypeError("addNode only accepts nodes.")
       
       
   def addNodeList(self, nodeList):
@@ -30,15 +29,13 @@ class OSM():
     if isinstance(way,Way):
       self.ways[way.id] = way
     else:
-      print "Error: addWay only accepts ways."
-      sys.exit(-1)
+      raise TypeError("addWay only accepts ways.")
     
   def addRelation(self,relation):
     if isinstance(relation,Relation):
       self.relations[relation.id] = relation
     else:
-      print "Error: addRelation only accepts relations."
-      sys.exit(-1)
+      raise TypeError("addRelation only accepts relations.")
       
   def __eq__(self, other):
     if not isinstance(other, self.__class__):
@@ -59,18 +56,29 @@ class Node():
     """
     Basic class containing an osm Node
 
-    @param identifier: The id of the node as a string.
+    Parameters
+    ==========
     
-    @param lat: Latitude of the node as float
+    @param identifier: The id of the node.
     
-    @param lon: Longitude of the node as float
-  
-    @param tags: A dictionary containing all the tags for the node
+    @type identifier: Will be parsed to string
+    
+    @param lat: Latitude of the node as float.
+    
+    @type lat: Will be parsed to float.
+    
+    @param lon: Longitude of the node as float.
+    
+    @type lon: Will be parsed to float.
+    
+    @param tags: A dictionary containing all the tags for the node.
     """
     self.id = str(identifier)
     self.lat = float(lat)
     self.lon = float(lon)
-    self.tags = dict(tags)
+    if not isinstance(tags, dict):
+      raise TypeError("tags must be a dictionary.")
+    self.tags = tags
     
   def __eq__(self,other):
     if not isinstance(other,self.__class__):
@@ -99,9 +107,11 @@ class Way():
     """
     self.id = str(identifier)
     if not isinstance(refs, list):
-      raise TypeError
+      raise TypeError("refs must be a list of id's")
     self.refs = [str(r) for r in refs]
-    self.tags = dict(tags)
+    if not isinstance(tags, dict):
+      raise TypeError("tags must be a dictionary")
+    self.tags = tags
     
   def __eq__(self,other):
     if not isinstance(other, self.__class__):
@@ -129,9 +139,11 @@ class Relation():
     """
     self.id = str(identifier)
     if not isinstance(members, list):
-      raise TypeError
-    self.members = [tuple(m) for m in members]    
-    self.tags = dict(tags)
+      raise TypeError("members need to be a list of tripel")
+    self.members = [tuple(m) for m in members]   
+    if not isinstance(tags, dict):
+      raise TypeError("tags must be a dictionary")
+    self.tags = tags
    
   def __eq__(self,other):   
     if not isinstance(other, self.__class__):
