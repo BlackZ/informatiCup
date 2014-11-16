@@ -61,7 +61,10 @@ class TestNodeObject(unittest.TestCase):
     otherNode = osmData.Node("0002", 0.1, 2.1, {"highway":"traffic_signals"})
     self.assertNotEqual(testNode, otherNode)
 
-  
+  def test_getCoordinateString(self):
+    testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
+    testString = str(self.lon) + "," + str(self.lat)
+    self.assertEqual(testNode.getCoordinateString(), testString)
 
 if __name__ == '__main__':
   unittest.main()

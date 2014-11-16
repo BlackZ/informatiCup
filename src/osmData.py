@@ -78,6 +78,9 @@ class Node():
       raise TypeError("tags must be a dictionary.")
     self.tags = tags
     
+  def getCoordinateString(self):
+    return str(self.lon) + "," +str(self.lat)
+    
   def __eq__(self,other):
     if not isinstance(other,self.__class__):
       return False

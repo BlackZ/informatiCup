@@ -31,10 +31,25 @@ class TestKMLObject(unittest.TestCase):
     
     
   def test_addPlacemark(self):
-    kmlObj = kml.KML(self.testPlacemark)
+    kmlObj = kml.KML()
     kmlObj.addPlacemark(self.testPlacemark)
     self.assertEqual(len(kmlObj.placemarks), 1)
     self.assertEqual(kmlObj.placemarks[-1], self.testPlacemark)
+    
+  def test_addPlacemarkList(self):
+    testPlacemark2=kml.Placemark("0003", ("smoking","no"), 
+                        [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
+    testPlacemark3=kml.Placemark("0004", ("smoking","no"), 
+                        [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
+    testPlacemark4=kml.Placemark("0005", ("smoking","no"), 
+                        [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
+    kmlObj=kml.KML()
+    kmlObj.addPlacemarkList([self.testPlacemark, testPlacemark2, testPlacemark3])
+    self.assertEqual(len(kmlObj.placemarks),3)
+    self.assertTrue(self.testPlacemark in kmlObj.placemarks)
+    self.assertTrue(testPlacemark2 in kmlObj.placemarks)
+    self.assertTrue(testPlacemark3 in kmlObj.placemarks)
+    self.assertFalse(testPlacemark4 in kmlObj.placemarks)
     
     
   def test_parseKML(self):
@@ -43,9 +58,9 @@ class TestKMLObject(unittest.TestCase):
   def test_getXML(self):
     self.fail()
       
-
-  def test_getAllStyles(self):
-    self.fail()  
+  #ask me later (mimimi)
+  #def test_getAllRequiredStyles(self):
+  #  self.fail()  
   
 
 if __name__ == '__main__':

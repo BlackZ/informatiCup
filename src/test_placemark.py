@@ -9,6 +9,8 @@ Created on Sun Nov  9 15:17:08 2014
 import unittest
 import kml
 import osmData
+import lxml.etree as ET
+import xml.sax.saxutils as xmlUtils
 
 class TestPlacemarkObject(unittest.TestCase):
   
@@ -16,13 +18,14 @@ class TestPlacemarkObject(unittest.TestCase):
     self.testName = "0002"
     self.ruleType = ("key", "value")
     self.nodeList = [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})]
-
+    self.testStyle = "defaultStyle"
 
   def test_createPlacemark(self):  
     placemarkObj = kml.Placemark(self.testName, self.ruleType)
     self.assertIsNotNone(placemarkObj)
     self.assertEqual(placemarkObj.name, self.testName)
     self.assertEqual(placemarkObj.ruleType, self.ruleType)
+    self.assertEqual(placemarkObj.style, self.testStyle)
     self.assertIsNotNone(placemarkObj.polygon)
     self.assertEqual(len(placemarkObj.polygon),0)
     
@@ -34,6 +37,9 @@ class TestPlacemarkObject(unittest.TestCase):
     self.assertIsNotNone(placemarkObj.polygon)
     self.assertEqual(len(placemarkObj.polygon),len(self.nodeList))
     
+  def test_createPlacemarkFailNoList(self):
+    with self.assertRaises(TypeError):
+      placemarkObj = kml.Placemark(self.testName, self.ruleType, 42)
         
   def test_addNode(self):
     placemarkObj = kml.Placemark(self.testName, self.ruleType)
@@ -73,8 +79,13 @@ class TestPlacemarkObject(unittest.TestCase):
     placemarkObj.addNodeList(self.nodeList)
     self.assertEqual(len(placemarkObj.polygon), len(self.nodeList) + 1)
     self.assertTrue(firstNode in placemarkObj.polygon)
-      
-  
+    
+  def test_getXMLTree(self):
+    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
+    trueString = '' #TODO
+    compareString = xmlUtils.unescape(ET.tostring(placemarkObj.getXMLTree(), encoding='utf-8'))
+    #print compareString
+    self.assertEqual(compareString, trueString)
 
 if __name__ == '__main__':
   unittest.main()
