@@ -7,6 +7,7 @@ Created on Sun Nov  9 15:09:52 2014
 
 import osmData
 import math
+import sys
 #import lxml.etree as ET
 import xml.etree.cElementTree as ET
 
@@ -163,17 +164,17 @@ class Placemark():
     n = len(poly)
     inside =False
 
-    p1x,p1y = poly[0]
-    for i in range(n+1):
-      p2x,p2y = poly[i % n]
-      if y > min(p1y,p2y):
-        if y <= max(p1y,p2y):
-          if x <= max(p1x,p2x):
+    p1x, p1y = poly[0]
+    for i in range(n + 1):
+      p2x, p2y = poly[i % n]
+      if y > min(p1y , p2y):
+        if y <= max(p1y , p2y):
+          if x <= max(p1x , p2x):
             if p1y != p2y:
-              xinters = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
+              xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
             if p1x == p2x or x <= xinters:
               inside = not inside
-        p1x,p1y = p2x,p2y
+        p1x, p1y = p2x, p2y
 
     return inside
     
@@ -189,7 +190,11 @@ class Placemark():
              if mindDist=0 point is on edge
              if the placemark contains no polygon --> #TODO:Errorcode?!? 
     """
-    minDist=99999999999
+    if not isinstance(node, osmData.Node):
+      raise TypeError("distToPolygon only accepts Nodes.")
+    if not self.hasPolygon():
+      sys.exit(-3)
+    minDist=sys.float_info.max
     for s in self.sides:
       dist=self._distPointLine(node.lat,node.lon,s[0][0],s[0][1],s[1][0],s[1][1])
       if dist<minDist:

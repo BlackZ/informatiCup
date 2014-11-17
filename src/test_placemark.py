@@ -96,46 +96,6 @@ class TestPlacemarkObject(unittest.TestCase):
     placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
     trueList=[[(52.12, 4.12),(52.13, 4.12)],[(52.13, 4.12),(52.12, 4.13)],[(52.12, 4.13),(52.12, 4.12)]]
     self.assertEqual(placemarkObj.sides,trueList)
-    
-  def test_isPointInsidePolygon_inside(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    self.assertTrue(placemarkObj._isPointInsidePolygon(52.123,4.12003))
-    
-  def test_isPointInsidePolygon_outside(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    self.assertFalse(placemarkObj._isPointInsidePolygon(52.11,4.11))
-    
-  def test_isPointInsidePolygon_online(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    self.assertFalse(placemarkObj._isPointInsidePolygon(52.12,4.12))
-    
-  def test_distPointLine(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    trueDist=0.0030000000000001137
-    self.assertEqual(placemarkObj._distPointLine(52.123,4.123,52.12,4.12,52.13,4.12),trueDist)
-    
-  def test_distPointLine_online(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    trueDist=0.0
-    self.assertEqual(placemarkObj._distPointLine(52.12,4.12,52.12,4.12,52.13,4.12),trueDist)
-  
-  def test_distToPolygon_inside(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    trueDist=-0.002828427124749019
-    self.assertEqual(placemarkObj.distToPolygon(osmData.Node(7,52.123,4.123,{})),trueDist)
-  
-  def test_distToPolygon_outside(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    trueDist=0.004242640687119446
-    self.assertEqual(placemarkObj.distToPolygon(osmData.Node(7,52.117,4.117,{})),trueDist)
-  
-  def test_distToPolygon_online(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    trueDist=0.0
-    self.assertEqual(placemarkObj.distToPolygon(osmData.Node(7,52.12,4.12,{})),trueDist)
-  
-  def test_distToPolygon_fail(self):
-    pass
 
 if __name__ == '__main__':
   unittest.main()
