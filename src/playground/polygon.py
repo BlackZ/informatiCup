@@ -7,7 +7,7 @@ Created on Mon Nov 10 16:52:11 2014
 
 #import Polygon#, Polygon.IO
 import sympy
-#import sympy.geometry
+import sympy.geometry
 
 #p1, p2, p3, p4, p5 = [(0, 0), (1, 0), (5, 1), (0, 1), (3, 0)]
 p1, p2, p3, p4 = [(0, 0), (0, 1), (1, 1), (1, 0)]
