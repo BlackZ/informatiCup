@@ -9,7 +9,8 @@ Created on Sun Nov  9 15:17:08 2014
 import unittest
 import kml
 import osmData
-import lxml.etree as ET
+#import lxml.etree as ET
+import xml.etree.cElementTree as ET
 import xml.sax.saxutils as xmlUtils
 
 class TestPlacemarkObject(unittest.TestCase):

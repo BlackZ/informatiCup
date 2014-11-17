@@ -6,8 +6,8 @@ Created on Sun Nov  9 15:09:52 2014
 """
 
 import osmData
-import lxml.etree as ET
-
+#import lxml.etree as ET
+import xml.etree.cElementTree as ET
 
 class KML():
   """ Class representing a kml file. Holds a list of contained placemarks.
