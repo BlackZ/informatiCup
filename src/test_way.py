@@ -54,15 +54,15 @@ class TestWayObject(unittest.TestCase):
   
   def test_distToPolygon_inside(self):
     trueDist=-1.0
-    self.assertEqual(self.testWay.distToPolygon(osmData.Node(7,52.123,4.123,{}),self.testVertices),trueDist)
+    self.assertEqual(self.testWay.distToPolygon((52.123,4.123),self.testVertices),trueDist)
   
   def test_distToPolygon_outside(self):
     trueDist=0.004242640687119446
-    self.assertEqual(self.testWay.distToPolygon(osmData.Node(7,52.117,4.117,{}),self.testVertices),trueDist)
+    self.assertEqual(self.testWay.distToPolygon((52.117,4.117),self.testVertices),trueDist)
   
   def test_distToPolygon_border(self):
     trueDist=0.0
-    self.assertEqual(self.testWay.distToPolygon(osmData.Node(7,52.12,4.12,{}),self.testVertices),trueDist)
+    self.assertEqual(self.testWay.distToPolygon((52.12,4.12),self.testVertices),trueDist)
   
   def test_sides(self):
     trueList=[[(52.12, 4.12),(52.13, 4.12)],[(52.13, 4.12),(52.12, 4.13)],[(52.12, 4.13),(52.12, 4.12)]]

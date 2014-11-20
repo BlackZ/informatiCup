@@ -48,12 +48,12 @@ class OSM():
   def __ne__(self,other):
     return not self.__eq__(other)
   
-  def getNearestPoly(self,node):
+  def getNearestPoly(self, coords):
     """
     This function returns the id of the polygon(way) which is closest to the given node
     
-    @param node: node for which the function have to compute closest polygon
-    @type node: osmData.Node
+    @param coords: point for which the function have to compute closest polygon
+    @type coords: Tuple(float,float)
     
     @return Tupel(id,distance)
     """
@@ -67,10 +67,10 @@ class OSM():
     #return nearestPoly
     pass
   
-  def getNearestNode(self,):
+  def getNearestNode(self, coords):
     pass
   
-  def getNearestRelation(self,):
+  def getNearestRelation(self, coords):
     pass
   
     
@@ -140,18 +140,18 @@ class Node():
     """
     return (self.lat,self.lon)
   
-  def distToNode(self,node):
+  def distToNode(self, coords):
     """
     This function computes the distance between two points
     
-    @param node: the node the distance should be computed with
-    @type node: osmData.Node
+    @param cords: the point the distance should be computed with
+    @type node: tuple of latitude and longitude
     
     @return distance between both nodes
     """
-    if not isinstance(node, Node):
-      raise TypeError("distToNode only accepts Nodes from type osmData.Node")
-    return math.hypot(node.lat - self.lat, node.lon - self.lon)
+    #if not isinstance(node, Node):
+    #  raise TypeError("distToNode only accepts Nodes from type osmData.Node")
+    return math.hypot(coords[0] - self.lat, coords[1] - self.lon)
   
   
 class Way():
@@ -251,7 +251,7 @@ class Way():
   
     return math.hypot(dx, dy)
   
-  def _isPointInsidePolygon(self, coords,vertices):
+  def _isPointInsidePolygon(self, coords, vertices):
     """
     This function proves if a points is envolved in a polygone
     
@@ -284,12 +284,12 @@ class Way():
     return inside
   
     
-  def distToPolygon(self, node, vertices):
+  def distToPolygon(self, coords, vertices):
     """
     Function that returns the distance of the given node to the given polygon.
     
-    @param node: The node to which the distance is calculated
-    @type node: osmData.Node
+    @param coords: The point(lat,lon) to which the distance is calculated
+    @type coords: Tuple(float,float)
     @param vertices: list of points, which defines a polygon
     @type vertices: [Tupel(float,float),]
     
@@ -299,30 +299,30 @@ class Way():
              if point is inside: -1 
              if the placemark contains no polygon: -2
     """
-    if not isinstance(node, Node):
-      raise TypeError("distToPolygon only accepts Nodes from type osmData.Node")
+    #if not isinstance(node, Node):
+    #  raise TypeError("distToPolygon only accepts Nodes from type osmData.Node")
     if not self.hasPolygon():
       return -2.0
-    if self._isPointInsidePolygon(node.coords,vertices):
+    if self._isPointInsidePolygon(coords,vertices):
       return -1.0  
-    return self.distToLines(node,vertices)
+    return self.distToLines(coords,vertices)
   
-  def distToLines(self,node,vertices):
+  def distToLines(self,coords,vertices):
     """
     Function that returns the shortest distance of the given node to a list of edges.
     
-    @param node: The node to which the distance is calculated
-    @type node: osmData.Node
+    @param coords: The point(lat,lon) to which the distance is calculated
+    @type coords: Tuple(float,float)
     @param vertices: list of points, which defines a polygon
     @type vertices: [Tupel(float,float),]
     
     @return minDist: The distance to the given node
     """
-    if not isinstance(node, Node):
-      raise TypeError("distToPolygon only accepts Nodes from type osmData.Node")
+    #if not isinstance(node, Node):
+    #  raise TypeError("distToPolygon only accepts Nodes from type osmData.Node")
     minDist=sys.float_info.max
     for s in self._sides(vertices):
-      dist=self._distPointLine(node.lat,node.lon,s[0][0],s[0][1],s[1][0],s[1][1])
+      dist=self._distPointLine(coords[0],coords[1],s[0][0],s[0][1],s[1][0],s[1][1])
       if dist<minDist:
         minDist=dist
     return minDist
