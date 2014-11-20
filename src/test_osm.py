@@ -14,11 +14,24 @@ class TestOSMObject(unittest.TestCase):
   def setUp(self):
     
     self.testNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
-    self.testWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
+    self.testWay = osmData.Way(3, [1,2,3,1], {"highway":"residential","name":"Clipstone Street"})
     self.testRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
                                              {"name":"Tween Pond", "natural":"water"})
     
     self.testOSM = osmData.OSM()
+    
+    self.testOSM2=osmData.OSM()
+    self.testOSM2.addNodeList([osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
+    self.testOSM2.addWay(self.testWay)
+
+
+  def test_getNearestPoly(self):
+    pass
+
+  def test_verticies(self):
+    trueList=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13),(52.12, 4.12)]
+    self.assertEqual(self.testOSM2._vertices(self.testWay.refs),trueList)
+  
   
   def test_createOSM(self):
     self.assertIsNotNone(self.testOSM)

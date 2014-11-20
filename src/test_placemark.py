@@ -86,16 +86,6 @@ class TestPlacemarkObject(unittest.TestCase):
     compareString = xmlUtils.unescape(ET.tostring(placemarkObj.getXMLTree(), encoding='utf-8'))
     #print compareString
     self.assertEqual(compareString, trueString)
-    
-  def test_verticies(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    trueList=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13)]
-    self.assertEqual(placemarkObj.vertices,trueList)
-  
-  def test_sides(self):
-    placemarkObj = kml.Placemark(self.testName, self.ruleType, self.nodeList)
-    trueList=[[(52.12, 4.12),(52.13, 4.12)],[(52.13, 4.12),(52.12, 4.13)],[(52.12, 4.13),(52.12, 4.12)]]
-    self.assertEqual(placemarkObj.sides,trueList)
 
 if __name__ == '__main__':
   unittest.main()

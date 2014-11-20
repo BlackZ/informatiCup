@@ -17,6 +17,15 @@ class TestNodeObject(unittest.TestCase):
     self.lon = 2.1
     self.tags = {"highway":"traffic_signals"}
     
+  def test_distToNode(self):
+    testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
+    trueValue=1.2727922061357855
+    self.assertEqual(testNode.distToNode(osmData.Node("0002",1.0,3.0,self.tags)),trueValue)
+    
+  def test_coords(self):
+    testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
+    trueValue=(0.1,2.1)
+    self.assertEqual(testNode.coords,trueValue)
   
   def test_createNode(self):
     testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
