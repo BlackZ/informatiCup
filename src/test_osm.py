@@ -42,6 +42,7 @@ class TestOSMObject(unittest.TestCase):
                                osmData.Node(7, 2, 10, {})])
     self.testOSM3.addWay(osmData.Way(1,[1,2,3,4,1],{"testTag":"testValue"}))
     self.testOSM3.addWay(osmData.Way(2,[5,6,7],{}))
+    self.testOSM3.addWay(osmData.Way(2,[5,6,7,5],{}))
     
     #Nearest Poly (fail)/Node Function Variables
     self.testOSM4 = osmData.OSM()
@@ -85,7 +86,7 @@ class TestOSMObject(unittest.TestCase):
       self.testOSM3.getNearestWay(self.testPoint,True,"asd")
 
   def test_getNearestWayOnlyPoly(self):
-    nearestPoly = ("1", 4.47213595499958) #3*sqrt(2)
+    nearestPoly = ("2", 2.0) 
     self.assertEqual(nearestPoly, self.testOSM3.getNearestWay(self.testPoint,True))
     
   def test_getNearestWayAll(self):
@@ -93,7 +94,7 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestPoly, self.testOSM3.getNearestWay(self.testPoint,False))
     
   def test_getNearestWayWithTagFilter(self):
-    nearestPoly = ("1", 4.47213595499958)
+    nearestPoly = ("1", 4.47213595499958)#3*sqrt(2)
     self.assertEqual(nearestPoly, self.testOSM3.getNearestWay(self.testPoint,False, {"testTag":"testValue"}))
 
   def test_getNearestWayNothinFound(self):
