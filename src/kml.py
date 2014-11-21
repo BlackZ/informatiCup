@@ -28,6 +28,17 @@ class KML():
       raise TypeError("addPlacemarkList only accepts a list of placemarks.")
     for placemark in placemarkList:
       self.addPlacemark(placemark)
+      
+  @classmethod
+  def parseKML(cls, f):
+    tree=ET.parse(f)
+    print tree
+    root=tree.getroot()
+    print root
+    print root[0][1]
+    for pm in root.iter("Placemark"):
+      print "anything\n"
+    print "bla"
   
 class Placemark():
   
