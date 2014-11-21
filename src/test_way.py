@@ -28,12 +28,12 @@ class TestWayObject(unittest.TestCase):
   def test_hasPolygon_notClosed(self):
     self.assertFalse(self.testWay3.hasPolygon())
   
-  def test_distToPolygonFailNoNode(self):
+  def test_distToPolygonFailNoTypel(self):
     with self.assertRaises(TypeError):
       self.testWay.distToPolygon("asd")
     
   def test_distToPolygonFailNoPolygon(self):
-    self.assertEqual(self.testWay2.distToPolygon(osmData.Node(7,52.123,4.123,{}),self.testVertices), -2)
+    self.assertEqual(self.testWay2.distToPolygon((52.123,4.123),self.testVertices), -2)
 
   def test_isPointInsidePolygon_inside(self):
     self.assertTrue(self.testWay._isPointInsidePolygon((52.123,4.12003),self.testVertices))

@@ -6,6 +6,7 @@ Basic class that holds the osm-data (consisting of basing elements)
 """
 import sys
 import math
+import types
 
 class OSM():
   
@@ -48,27 +49,83 @@ class OSM():
   def __ne__(self,other):
     return not self.__eq__(other)
   
-  def getNearestPoly(self, coords):
+  def getNearestWay(self, coords, onlyPolygons ,tags={}):
     """
     This function returns the id of the polygon(way) which is closest to the given node
     
     @param coords: point for which the function have to compute closest polygon
     @type coords: Tuple(float,float)
+    @param onlyPolygons: prove only distance to way with complete polygons?
+    @type onlyPolygons: boolean
+    @param tags: list of tags which will be used to filter the ways
+    @type tags: dict(str:str)
     
     @return Tupel(id,distance)
     """
-    #nearestPoly=(None,-4)
-    #for way in self.ways:
-    #  if way.hasPolygon(): 
-    #    vertices=self._vertices(way.refs)
-    #    dist=Way.distToPolygon(node,poly)
-    #    if nearestPoly[1]>dist:
-    #      nearestPoly=(way.id,dist)
-    #return nearestPoly
-    pass
+    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+      raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+      raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(tags, dict) :
+      raise TypeError("getNearestNode only accepts a dict to filter nodes")
+    
+    nearestWay=(None,sys.float_info.max)
+    
+    for n in self.ways:
+      way=self.ways[n]
+      wayOk=True
+      if onlyPolygons and not way.hasPolygon():
+        continue
+      for tag in tags:
+        if not way.tags.has_key(tag) or not way.tags[tag]==tags[tag]:
+          wayOk=False
+      if not wayOk:
+        continue
+      try:
+        if way.hasPolygon():
+          dist=way.distToPolygon(coords,self._vertices(way.refs))
+        else:
+          dist=way.distToLines(coords,self._vertices(way.refs))
+        if dist<nearestWay[1]:
+          nearestWay=(way.id,dist)
+      except TypeError:
+        pass
+    return nearestWay
   
-  def getNearestNode(self, coords):
-    pass
+  def getNearestNode(self, coords, tags={}):
+    """
+    This function returns the nearest node given a point and an optional list of tags
+    
+    @param coords: a point for which the nearest node should be found
+    @type coords: Tupel(float,float)
+    
+    @param tags: a list of tags for filtering the nodes e.g. {"":""}
+    @type tags: dict(str:str)
+    """
+    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+      raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+      raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(tags, dict) :
+      raise TypeError("getNearestNode only accepts a dict to filter nodes")
+    
+    nearestNode=(None,sys.float_info.max)
+    
+    for n in self.nodes:
+      node=self.nodes[n]
+      nodeOk=True
+      for tag in tags:
+        if not node.tags.has_key(tag) or not node.tags[tag]==tags[tag]:
+          nodeOk=False
+      if not nodeOk:
+        continue
+      try:
+        dist=node.distToNode(coords)
+        if dist<nearestNode[1]:
+          nearestNode=(node.id,dist)
+      except TypeError:
+        pass
+    return nearestNode
   
   def getNearestRelation(self, coords):
     pass
@@ -145,12 +202,14 @@ class Node():
     This function computes the distance between two points
     
     @param cords: the point the distance should be computed with
-    @type node: tuple of latitude and longitude
+    @type node: tuple of latitude and longitude (float,float)
     
     @return distance between both nodes
     """
-    #if not isinstance(node, Node):
-    #  raise TypeError("distToNode only accepts Nodes from type osmData.Node")
+    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+      raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+      raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     return math.hypot(coords[0] - self.lat, coords[1] - self.lon)
   
   
@@ -198,6 +257,9 @@ class Way():
   def _sides(self,vertices):
     """
     This function returns a list of lists of tuples, which describes all edges of the polygone
+    
+    @param vertices: all points of the polygon
+    @type vertices: [(float,float),...]
     
     @return edgeList: a list of lists of tuples (e.g. [[(0,0),(0,1)],[(0,1),(1,1)]]) a sublist represents an edge 
     """
@@ -299,8 +361,10 @@ class Way():
              if point is inside: -1 
              if the placemark contains no polygon: -2
     """
-    #if not isinstance(node, Node):
-    #  raise TypeError("distToPolygon only accepts Nodes from type osmData.Node")
+    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+      raise TypeError("distToPolygon only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+      raise TypeError("distToPolygon only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not self.hasPolygon():
       return -2.0
     if self._isPointInsidePolygon(coords,vertices):
@@ -318,8 +382,10 @@ class Way():
     
     @return minDist: The distance to the given node
     """
-    #if not isinstance(node, Node):
-    #  raise TypeError("distToPolygon only accepts Nodes from type osmData.Node")
+    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+      raise TypeError("distToPolygon only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+      raise TypeError("distToPolygon only accepts Tupels from type types.TupelType with 2 Entries from type float")
     minDist=sys.float_info.max
     for s in self._sides(vertices):
       dist=self._distPointLine(coords[0],coords[1],s[0][0],s[0][1],s[1][0],s[1][1])

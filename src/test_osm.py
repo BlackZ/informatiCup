@@ -8,6 +8,7 @@ Created on Thu Nov  6 11:46:54 2014
 
 import unittest
 import osmData
+import sys
 
 class TestOSMObject(unittest.TestCase):
   
@@ -28,7 +29,7 @@ class TestOSMObject(unittest.TestCase):
     self.testOSM2.addWay(self.testWay)
 
     #Test Point for Nearest Functions
-    self.testPoint = (2,1)
+    self.testPoint = (2.0,1.0)
     
     #Nearest Poly Function Variables
     self.testOSM3 = osmData.OSM()
@@ -36,36 +37,68 @@ class TestOSMObject(unittest.TestCase):
                                osmData.Node(2, 8, 1, {}),
                                osmData.Node(3, 10, 3, {}),
                                osmData.Node(4, 10, 7, {}),
-                               osmData.Node(5, 3, 7, {}),
+                               osmData.Node(5, 2, 3, {}),
                                osmData.Node(6, 5, 8, {}),
                                osmData.Node(7, 2, 10, {})])
-    self.testOSM3.addWay(osmData.Way(1,[1,2,3,4,1]))
-    self.testOSM3.addWay(osmData.Way(2,[5,6,7,5]))
+    self.testOSM3.addWay(osmData.Way(1,[1,2,3,4,1],{"testTag":"testValue"}))
+    self.testOSM3.addWay(osmData.Way(2,[5,6,7],{}))
     
     #Nearest Poly (fail)/Node Function Variables
     self.testOSM4 = osmData.OSM()
-    self.testOSM4.addNodeList([osmData.Node(1, 6, 3, {}),
-                               osmData.Node(2, 8, 1, {}),
-                               osmData.Node(3, 10, 3, {}),
-                               osmData.Node(4, 10, 7, {})])
-    self.testOSM4.addWay(osmData.Way(1, [1,2]))
-    self.testOSM4.addWay(osmData.Way(2, [3,4]))
+    self.testOSM4.addNodeList([osmData.Node(1, 6.0, 3.0, {}),
+                               osmData.Node(2, 8.0, 1.0, {"testTag":"testValue"}),
+                               osmData.Node(3, 10.0, 3.0, {"testTag":"testValue"}),
+                               osmData.Node(4, 10.0, 7.0, {})])
+    self.testOSM4.addWay(osmData.Way(1, [1,2],{}))
+    self.testOSM4.addWay(osmData.Way(2, [3,4],{}))
     
 
   def test_getNearestNode(self):
-    nearestPoint = (1, 5.385164807) #sqrt(29)
+    nearestPoint = ("1", 4.47213595499958) #sqrt(29) wieso 29? xD sqrt((2.0-6.0)^2+(1.0-3.0)^2)=sqrt(20)
     self.assertEqual(nearestPoint, self.testOSM4.getNearestNode(self.testPoint))
+  
+  def test_getNearestNodeWithTagFilter(self):
+    nearestPoint = ("2", 6.0)
+    self.assertEqual(nearestPoint, self.testOSM4.getNearestNode(self.testPoint, {"testTag":"testValue"}))
+    
+  def test_getNearestNodeFailWithTagFilter(self):
+    with self.assertRaises(TypeError):
+      self.testOSM4.getNearestNode(self.testPoint, "asd")
+  
+  def test_getNearestNodeFail(self):
+    with self.assertRaises(TypeError):
+      self.testOSM4.getNearestNode((1,0))
+  
+  def test_getNearestNodeNothnigFound(self):
+    nearestPoint = (None, sys.float_info.max)
+    self.assertEqual(nearestPoint, self.testOSM4.getNearestNode(self.testPoint, {"asd":"asd"}))
 
   def test_getNearestRelation(self):
     pass
 
-  def test_getNearestPoly(self):
-    nearestPoly = (1, 4.242640687) #3*sqrt(2)
-    self.assertEqual(nearestPoly, self.testOSM3.getNearestPoly(self.testPoint))
+  def test_getNearestNodeFailPoint(self):
+    with self.assertRaises(TypeError):
+      self.testOSM3.getNearestWay((1,0),True)
 
-  def test_getNearestPolyFail(self):
-    nearestPoly = (-1,-2)
-    self.assertEqual(nearestPoly, self.testOSM4.getNearestPoly(self.testPoint))
+  def test_getNearestNodeFailFilter(self):
+    with self.assertRaises(TypeError):
+      self.testOSM3.getNearestWay(self.testPoint,True,"asd")
+
+  def test_getNearestWayOnlyPoly(self):
+    nearestPoly = ("1", 4.47213595499958) #3*sqrt(2)
+    self.assertEqual(nearestPoly, self.testOSM3.getNearestWay(self.testPoint,True))
+    
+  def test_getNearestWayAll(self):
+    nearestPoly = ("2", 2.0)
+    self.assertEqual(nearestPoly, self.testOSM3.getNearestWay(self.testPoint,False))
+    
+  def test_getNearestWayWithTagFilter(self):
+    nearestPoly = ("1", 4.47213595499958)
+    self.assertEqual(nearestPoly, self.testOSM3.getNearestWay(self.testPoint,False, {"testTag":"testValue"}))
+
+  def test_getNearestWayNothinFound(self):
+    nearestPoly = (None, sys.float_info.max)
+    self.assertEqual(nearestPoly, self.testOSM4.getNearestWay(self.testPoint,True, {"asd":"asd"}))
 
   def test_verticies(self):
     trueList=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13),(52.12, 4.12)]

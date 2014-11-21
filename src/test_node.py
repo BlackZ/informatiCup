@@ -22,6 +22,11 @@ class TestNodeObject(unittest.TestCase):
     trueValue=1.2727922061357855
     self.assertEqual(testNode.distToNode((1.0,3.0)),trueValue)
     
+  def test_distToNodeFail(self):
+    testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
+    with self.assertRaises(TypeError):
+      testNode.distToNode("asd")
+    
   def test_coords(self):
     testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
     trueValue=(0.1,2.1)
