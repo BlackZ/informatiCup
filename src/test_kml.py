@@ -6,24 +6,24 @@ Created on Sun Nov  9 14:10:52 2014
 """
 
 import unittest
-import kml
+import kmlData
 import osmData
 
 class TestKMLObject(unittest.TestCase):
   
   def setUp(self):
-    self.testPlacemark = kml.Placemark("0002", ("smoking","no"), 
+    self.testPlacemark = kmlData.Placemark("0002", ("smoking","no"), 
                         [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
     
 
   def test_createKML(self):  
-    kmlObj = kml.KML()
+    kmlObj = kmlData.KMLObject()
     self.assertIsNotNone(kmlObj)
     self.assertIsNotNone(kmlObj.placemarks)
     
     
   def test_createKMLWithPlacemark(self):
-    kmlObj = kml.KML(self.testPlacemark)
+    kmlObj = kmlData.KMLObject(self.testPlacemark)
     self.assertIsNotNone(kmlObj)
     self.assertIsNotNone(kmlObj.placemarks)
     self.assertEqual(len(kmlObj.placemarks), 1)
@@ -31,19 +31,19 @@ class TestKMLObject(unittest.TestCase):
     
     
   def test_addPlacemark(self):
-    kmlObj = kml.KML()
+    kmlObj = kmlData.KMLObject()
     kmlObj.addPlacemark(self.testPlacemark)
     self.assertEqual(len(kmlObj.placemarks), 1)
     self.assertEqual(kmlObj.placemarks[-1], self.testPlacemark)
     
   def test_addPlacemarkList(self):
-    testPlacemark2=kml.Placemark("0003", ("smoking","no"), 
+    testPlacemark2=kmlData.Placemark("0003", ("smoking","no"), 
                         [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
-    testPlacemark3=kml.Placemark("0004", ("smoking","no"), 
+    testPlacemark3=kmlData.Placemark("0004", ("smoking","no"), 
                         [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
-    testPlacemark4=kml.Placemark("0005", ("smoking","no"), 
+    testPlacemark4=kmlData.Placemark("0005", ("smoking","no"), 
                         [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
-    kmlObj=kml.KML()
+    kmlObj=kmlData.KMLObject()
     kmlObj.addPlacemarkList([self.testPlacemark, testPlacemark2, testPlacemark3])
     self.assertEqual(len(kmlObj.placemarks),3)
     self.assertTrue(self.testPlacemark in kmlObj.placemarks)
@@ -64,7 +64,7 @@ class TestKMLObject(unittest.TestCase):
     node22=node13
     node23=osmData.Node(4,5.33897360,50.93040040,{})
     
-    testKML = kml.KML.parseKML(filename);
+    testKML = kmlData.KMLObject.parseKML(filename);
     self.assertEqual(len(testKML.placemarks),2)
     self.assertEqual(testKML.placemarks[0].name,name1)
     self.assertEqual(testKML.placemarks[0].style,style)

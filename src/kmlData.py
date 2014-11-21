@@ -9,7 +9,7 @@ import osmData
 #import lxml.etree as ET
 import xml.etree.cElementTree as ET
 
-class KML():
+class KMLObject():
   """ Class representing a kml file. Holds a list of contained placemarks.
   """
   
