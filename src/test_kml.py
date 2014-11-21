@@ -62,7 +62,7 @@ class TestKMLObject(unittest.TestCase):
     node13=osmData.Node(3,5.33892360,50.93035480,{})
     node21=node12
     node22=node13
-    node23=osmData.Node(4,5.33890610,50.93033890,{})
+    node23=osmData.Node(4,5.33897360,50.93040040,{})
     
     testKML = kml.KML.parseKML(filename);
     self.assertEqual(len(testKML.placemarks),2)
