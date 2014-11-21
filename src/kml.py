@@ -32,13 +32,35 @@ class KML():
   @classmethod
   def parseKML(cls, f):
     tree=ET.parse(f)
-    print tree
     root=tree.getroot()
-    print root
-    print root[0][1]
-    for pm in root.iter("Placemark"):
-      print "anything\n"
-    print "bla"
+    nid=1
+    res=cls()
+    for pm in root.iter("{http://earth.google.com/kml/2.1}Placemark"):
+      newPlacemark=Placemark(pm[0].text,None,None,pm[2].text)
+      startlat=None
+      startlon=None
+      for coord in pm.iter("{http://earth.google.com/kml/2.1}coordinates"):
+        coordstring = coord.text
+        nodes = coordstring.split('\n')
+        for node in nodes:
+          if node.lstrip()!='':#leaves out the first and last entry because
+                               #they don't hold coordinates
+            pos = node.split(',')
+            lat=pos[0]
+            lon=pos[1]
+            if startlat==None:
+              startlat=lat
+              startlon=lon
+              newPlacemark.addNode(osmData.Node(nid,lat,lon,{}))
+              nid+=1
+            elif startlat!=lat or startlon!=lon:
+              newPlacemark.addNode(osmData.Node(nid,lat,lon,{}))
+              nid+=1
+            else:
+              startlat=None
+              startlon=None
+      res.addPlacemark(newPlacemark)
+    return res
   
 class Placemark():
   

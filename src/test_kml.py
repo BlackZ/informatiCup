@@ -53,7 +53,7 @@ class TestKMLObject(unittest.TestCase):
     
     
   def test_parseKML(self):
-    filename="../testData/Test.kml"
+    filename="../testData/TestOfKml.kml"
     name1="0001"
     name2="0002"
     style="#Poly1"
