@@ -42,7 +42,10 @@ class KMLObject():
       for coord in pm.iter("{http://earth.google.com/kml/2.1}coordinates"):
         coordstring = coord.text
         nodes = coordstring.split('\n')
+        numberOfNodes=len(nodes)
+        nodeNr=0
         for node in nodes:
+          nodeNr+=1
           if node.lstrip()!='':#leaves out the first and last entry because
                                #they don't hold coordinates
             pos = node.split(',')
@@ -56,6 +59,8 @@ class KMLObject():
             elif startlat!=lat or startlon!=lon:
               newPlacemark.addNode(osmData.Node(nid,lat,lon,{}))
               nid+=1
+              if nodeNr+1==numberOfNodes:
+                raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
             else:
               startlat=None
               startlon=None

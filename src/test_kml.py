@@ -86,9 +86,14 @@ class TestKMLObject(unittest.TestCase):
     self.assertEqual(testKML.placemarks[1].polygon[2].lat,node23.lat)
     self.assertEqual(testKML.placemarks[1].polygon[2].lon,node23.lon)
     
+  def test_parseKMLWithInvalidDataFile(self):
+    filename="../testData/dataOnlyForTests/TestOfInvalidKml.kml"
+    with self.assertRaises(IOError):
+      testKML = kmlData.KMLObject.parseKML(filename);
+    
     
   def test_getXML(self):
-    self.fail()
+    self.fail("TODO implement")
       
   #ask me later (mimimi)
   #def test_getAllRequiredStyles(self):
