@@ -10,7 +10,7 @@
     <color>7f00ff00</color>
    </PolyStyle>
   </Style>
-<Placemark>
+  <Placemark>
    <name>0001</name>
    <description><img src='0001.jpg' width = '400' /></description>
    <styleUrl>#Poly1</styleUrl>
@@ -21,32 +21,13 @@
     <outerBoundaryIs>
      <LinearRing>
       <coordinates>
+       1.5,0
+       1.5,1.5
+       0,1.5
        0,1
        1,1
-       1,2
-       0,2
-       0,1
-      </coordinates>
-     </LinearRing>
-    </outerBoundaryIs>
-   </Polygon>
-  </Placemark>
-  <Placemark>
-   <name>0002</name>
-   <description><img src='0002.jpg' width = '400' /></description>
-   <styleUrl>#Poly1</styleUrl>
-   <Polygon>
-    <altitudeMode>clampToGround</altitudeMode>
-    <extrude>1</extrude>
-    <tessellate>1</tessellate>
-    <outerBoundaryIs>
-     <LinearRing>
-      <coordinates>
-       1.5,2
-       2.5,2
-       2.5,3
-       1.5,3
-       1.5,2
+       1,0
+       1.5,0
       </coordinates>
      </LinearRing>
     </outerBoundaryIs>
