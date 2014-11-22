@@ -23,36 +23,36 @@ class TestKMLComperator(unittest.TestCase):
   
   def test_compareWithTwoIdenticKMLs(self):
     res = self.Comp.compare(self.testKML1,self.testKML1)
-    self.assertEqual(res.numberOfPlacemarks,2)
-    self.assertEqual(res.percentaceOfOverlab,1)
+    self.assertEqual(res.numberOfPlacemarks,1)
+    self.assertEqual(res.percentaceOfOverlap,1)
     
   def test_compareWithTwoDifferentKMLs(self):
     filename="../testData/dataOnlyForTests/TestOfKmlComperator2.kml"
     testKML2=kmlData.KMLObject.parseKML(filename)
     res=self.Comp.compare(self.testKML1,testKML2)
-    self.assertEqual(res.numberOfPlacemarks,2)
-    self.assertEqual(res.percentaceOfOverlab,0.225)
+    self.assertEqual(res.numberOfPlacemarks,1)
+    self.assertEqual(res.percentaceOfOverlap,0.225)
     
   def test_compareWithTwoKMLsWithDiffernetNumbersOfPlacemarks(self):
     filename="../testData/dataOnlyForTests/TestOfKmlComperator3.kml"
     testKML2=kmlData.KMLObject.parseKML(filename)
     res=self.Comp.compare(self.testKML1,testKML2)
     self.assertEqual(res.numberOfPlacemarks,"different")
-    self.assertEqual(res.percentaceOfOverlab,0.1625)
+    self.assertEqual(res.percentaceOfOverlap,0.1625)
   
   def test_compareWithTwoKMLsWithMultipleOverlaps(self):
     filename="../testData/dataOnlyForTests/TestOfKmlComperator4.kml"
     testKML2=kmlData.KMLObject.parseKML(filename)
     res=self.Comp.compare(self.testKML1,testKML2)
     self.assertEqual(res.numberOfPlacemarks,1)
-    self.assertEqual(res.percentaceOfOverlab,0.4)
+    self.assertEqual(res.percentaceOfOverlap,0.4)
     
   def test_compareWithTwoKMLsWithoutOverlap(self):
     filename="../testData/dataOnlyForTests/TestOfKmlComperator5.kml"
     testKML2=kmlData.KMLObject.parseKML(filename)
     res=self.Comp.compare(self.testKML1,testKML2)
     self.assertEqual(res.numberOfPlacemarks,1)
-    self.assertEqual(res.percentaceOfOverlab,0)
+    self.assertEqual(res.percentaceOfOverlap,0)
     
 class TestKMLComperatorHelpFunction(unittest.TestCase):
   

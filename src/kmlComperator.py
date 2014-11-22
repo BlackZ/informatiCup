@@ -15,7 +15,22 @@ class KMLComperator():
   
   def compare(self, kml1, kml2):
     if isinstance(kml1,kmlData.KMLObject) and isinstance(kml2,kmlData.KMLObject):
-      pass
+      poly1=self._buildPolygon(kml1)
+      poly2=self._buildPolygon(kml2)
+      numberOfPlacemarks1=len(kml1.placemarks)
+      numberOfPlacemarks2=len(kml2.placemarks)
+      
+      overlap=poly1&poly2
+      percentage1=overlap.area()/poly1.area()
+      percentage2=overlap.area()/poly2.area()
+      percentage=(percentage1+percentage2)/2
+      
+      if numberOfPlacemarks1==numberOfPlacemarks2:
+        result=compareResult(numberOfPlacemarks1, percentage)
+      else:
+        result=compareResult("different", percentage)
+        
+      return result
     else:
       raise TypeError("compare can only compare two kmlObjects")
   
@@ -28,4 +43,10 @@ class KMLComperator():
       tmppoly=Polygon.Polygon(coord)
       poly=poly|tmppoly
     return poly
+    
+class compareResult():
+  
+  def __init__(self, numberOfPlacemarks, percentaceOfOverlap):
+    self.numberOfPlacemarks=numberOfPlacemarks
+    self.percentaceOfOverlap=percentaceOfOverlap
   
