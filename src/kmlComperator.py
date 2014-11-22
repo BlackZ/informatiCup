@@ -7,6 +7,7 @@ Created on Sat Nov 22 16:48:55 2014
 
 import Polygon
 import kmlData
+import argparse
 
 class KMLComperator():
   
@@ -50,3 +51,13 @@ class compareResult():
     self.numberOfPlacemarks=numberOfPlacemarks
     self.percentaceOfOverlap=percentaceOfOverlap
   
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(description='compares the Placemarks of two given .kml-files')
+  parser.add_argument('file', nargs=2, type=argparse.FileType('r'), help="valid .kml file")
+  args = parser.parse_args()
+  Comp = KMLComperator()
+  testKML1=kmlData.KMLObject.parseKML(args.file[0])
+  testKML2=kmlData.KMLObject.parseKML(args.file[1])
+  res = Comp.compare(testKML1,testKML2)
+  print "Number of Placemarks in the files: " + str(res.numberOfPlacemarks)
+  print "Percentage of Overlap: " + str(res.percentaceOfOverlap*100) + "%"
