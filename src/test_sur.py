@@ -36,7 +36,7 @@ class TestSURObject(unittest.TestCase):
     
   def test_parseSURFromFile(self):
     # set up
-    testFile = open('../testData/TestData.txt','r')
+    testFile = open('../testData/dataOnlyForTests/TestData.txt','r')
     ruleName1_2 = {"smoking": "no", "access:dog": "no"}
     id2 = "0002"
     lat2 = 50.9325
