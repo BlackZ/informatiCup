@@ -4,7 +4,7 @@ Created on Thu Nov  6 11:52:04 2014
 
 @author: adreyer
 """
-
+import os
 import unittest
 import kmlData
 import kmlComperator
@@ -84,4 +84,6 @@ class TestKMLComperatorHelpFunction(unittest.TestCase):
     self.assertEqual(poly.area(),(poly|truePoly).area())
   
 if __name__ == '__main__':
+  os.chdir("..")
   unittest.main()
+  
