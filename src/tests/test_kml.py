@@ -8,6 +8,7 @@ Created on Sun Nov  9 14:10:52 2014
 import unittest
 import kmlData
 import osmData
+import os
 
 class TestKMLObject(unittest.TestCase):
   
@@ -101,4 +102,5 @@ class TestKMLObject(unittest.TestCase):
   
 
 if __name__ == '__main__':
+  os.chdir("..")
   unittest.main()

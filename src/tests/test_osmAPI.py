@@ -146,3 +146,8 @@ class TestOsmAPI(unittest.TestCase):
   #  self.assertEqual(len(testObj.relations[rel_id].tags), rel_tags_len)
   #  self.assertTrue(rel_tag_key in testObj.relations[rel_id].tags)
   #  self.assertEqual(rel_tag_value, testObj.relations[rel_id].tags[rel_tag_key])
+
+
+if __name__ == '__main__':
+  os.chdir("..")
+  unittest.main()
