@@ -49,9 +49,9 @@ class OSM():
   def __ne__(self,other):
     return not self.__eq__(other)
   
-  def getNearestWay(self, coords, onlyPolygons ,tags={}):
+  def getNearestWay(self, coords, onlyPolygons ,tags={}, otherWays=[]):
     """
-    This function returns the id of the polygon(way) which is closest to the given node
+    This function returns the id of the polygon(way) and its distance which is closest to the given node
     
     @param coords: point for which the function have to compute closest polygon
     @type coords: Tuple(float,float)
@@ -59,19 +59,26 @@ class OSM():
     @type onlyPolygons: boolean
     @param tags: list of tags which will be used to filter the ways
     @type tags: dict(str:str)
+    @param otherWays: use this ways to find nearest way
+    @type otherWays: [str,]
     
     @return Tupel(id,distance)
     """
     if not isinstance(coords, types.TupleType) or not len(coords)==2:
-      raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
+      raise TypeError("getNearestWay only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
-      raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
+      raise TypeError("getNearestWay only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(tags, dict) :
-      raise TypeError("getNearestNode only accepts a dict to filter nodes")
+      raise TypeError("getNearestWay only accepts a dict to filter nodes")
     
     nearestWay=(None,sys.float_info.max)
     
-    for n in self.ways:
+    if len(otherWays)>0:
+      ways=otherWays
+    else:
+      ways=self.ways
+    
+    for n in ways:
       way=self.ways[n]
       wayOk=True
       if onlyPolygons and not way.hasPolygon():
@@ -94,7 +101,7 @@ class OSM():
   
   def getNearestNode(self, coords, tags={}):
     """
-    This function returns the nearest node given a point and an optional list of tags
+    This function returns the nearest node and its distance given a point and an optional list of tags
     
     @param coords: a point for which the nearest node should be found
     @type coords: Tupel(float,float)
@@ -127,8 +134,51 @@ class OSM():
         pass
     return nearestNode
   
-  def getNearestRelation(self, coords):
-    pass
+  def getNearestRelation(self, coords, onlyPolygons ,tags={}):
+    """
+    This function returns the ids of the relation,its way and its distance which is closest to the given node 
+    
+    @param coords: point for which the function have to compute closest polygon
+    @type coords: Tuple(float,float)
+    @param onlyPolygons: prove only distance to way with complete polygons?
+    @type onlyPolygons: boolean
+    @param tags: list of tags which will be used to filter the ways
+    @type tags: dict(str:str)
+    
+    @return Tupel(Tupel(rel_id,way_id),distance)
+    """
+    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+      raise TypeError("getNearestRelation only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+      raise TypeError("getNearestRelation only accepts Tupels from type types.TupelType with 2 Entries from type float")
+    if not isinstance(tags, dict) :
+      raise TypeError("getNearestRelation only accepts a dict to filter nodes")
+    
+    nearestRel=(None,sys.float_info.max)
+    
+    for r in self.relations:
+      rel=self.relations[r]
+      
+      #prove the given tag-list
+      relOk=True
+      for tag in tags:
+        if not rel.tags.has_key(tag) or not rel.tags[tag]==tags[tag]:
+          relOk=False
+      if not relOk:
+        continue
+      
+      if rel.tags["type"]=="multipolygon":
+        ways=[]
+        for m in rel.members:
+          #Type=way?
+          if m[0]=="way":
+            ways.append(m[1])
+        nearestWay=self.getNearestWay(coords, onlyPolygons ,{}, ways)
+      elif rel.tags["type"]=="route":
+        pass
+      if nearestRel[1]>nearestWay[1]:
+        nearestRel=((rel.id,nearestWay[0]),nearestWay[1])
+    return nearestRel
   
     
   def _vertices(self,nodeList):
