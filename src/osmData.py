@@ -58,6 +58,9 @@ class OSM():
     
     @param tags: a list of tags for filtering the nodes e.g. {"":""}
     @type tags: dict(str:str)
+    
+    @param otherNodes: use this nodes to find nearest node
+    @type otherNodes: [str,]
     """
     if not isinstance(coords, types.TupleType) or not len(coords)==2:
       raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
@@ -74,8 +77,11 @@ class OSM():
     else:
       nodes=self.nodes
     
+    #for all nodes
     for n in nodes:
       node=self.nodes[n]
+      
+      #proove if current node fullfill all filter-rules 
       nodeOk=True
       for tag in tags:
         if not node.tags.has_key(tag) or not node.tags[tag]==tags[tag]:
@@ -83,7 +89,9 @@ class OSM():
       if not nodeOk:
         continue
       try:
+        #calculate distance
         dist=node.distToNode(coords)
+        #proove if the current node is the current nearest node
         if dist<nearestNode.distance:
           nearestNode.distance=dist
           nearestNode.nearestObj=(node.id,"node")
@@ -97,10 +105,13 @@ class OSM():
     
     @param coords: point for which the function have to compute closest polygon
     @type coords: Tuple(float,float)
+    
     @param onlyPolygons: prove only distance to way with complete polygons?
     @type onlyPolygons: boolean
+    
     @param tags: list of tags which will be used to filter the ways
     @type tags: dict(str:str)
+    
     @param otherWays: use this ways to find nearest way
     @type otherWays: [str,]
     
@@ -121,8 +132,11 @@ class OSM():
     else:
       ways=self.ways
     
+    #for all ways
     for n in ways:
       way=self.ways[n]
+      
+      #proove if current way fullfill all filter-rules
       wayOk=True
       if onlyPolygons and not way.hasPolygon():
         continue
@@ -131,8 +145,11 @@ class OSM():
           wayOk=False
       if not wayOk:
         continue
+      
       try:
+        #calculate distance
         dist=way.getDistance(coords,self._vertices(way.refs))
+        #proove if current way is the current nearest way
         if dist<nearestWay.distance:
           nearestWay.distance=dist
           nearestWay.nearestObj=(way.id,"way")
@@ -142,6 +159,8 @@ class OSM():
   
   #======================================
   #TODO: Beachte auch zusammengesetze Polygone!
+  #TODO: ggf. sonderbedingungen für verschiedene Typen
+  #TODO: bzgl. inner outer sonderregeln definieren --> E-Mail
   #======================================
   def getNearestRelation(self, coords, tags={}):
     """
@@ -149,8 +168,7 @@ class OSM():
     
     @param coords: point for which the function have to compute closest polygon
     @type coords: Tuple(float,float)
-    @param onlyPolygons: prove only distance to way with complete polygons?
-    @type onlyPolygons: boolean
+
     @param tags: list of tags which will be used to filter the ways
     @type tags: dict(str:str)
     
@@ -168,6 +186,7 @@ class OSM():
     for r in self.relations:
       rel=self.relations[r]
 
+      #does this relation fullfill all filter-rules?
       relOk=True
       for tag in tags:
         if not rel.tags.has_key(tag) or not rel.tags[tag]==tags[tag]:
@@ -175,13 +194,16 @@ class OSM():
       if not relOk:
         continue
       
+      #sort all members by type
       memb={"way":[],"node":[],"relation":[]}
       for m in rel.members:
         memb[m[0]].append(m[1])
-        
+      
+      #init resultObjects for member-distances  
       nearestNode=distanceResult(sys.float_info.max,("-1",None))
       nearestWay=distanceResult(sys.float_info.max,("-1",None))
       nearestSubRel=distanceResult(sys.float_info.max,("-1",None))
+      #get all memberDistances
       if len(memb["node"])>0:
         nearestNode=self.getNearestNode(coords, {}, memb["node"])
       if len(memb["way"])>0:
@@ -189,12 +211,14 @@ class OSM():
       if len(memb["relation"])>0:
         nearestSubRel=self.getNearestRelation(coords,tags)
       
+      #find the neareast subobject to determine the distance of the relation to the given point
       for obj in [nearestNode,nearestWay,nearestSubRel]:
         if obj.distance<nearestRel.distance:
           nearestRel.distance=obj.distance
           nearestRel.nearestSubObj=obj.nearestObj
           nearestRel.nearestObj=(rel.id,"relation")
           nearestRel.insidePolygon=obj.insidePolygon
+    
     return nearestRel
   
   def _searchForPolygons(self,rel):
@@ -524,6 +548,23 @@ class Relation():
   
 class distanceResult(object):
   def __init__(self, distance, nearestObj, nearestSubObj=("-1",None)):
+    """
+    Basic class containing the result of a distance calculation
+
+    Parameters
+    ==========
+    
+    @param distance: The distance to the nearestObj
+    @type distance: float
+    
+    @param nearestObj: the id and type of the nearest object e.g. ("1","relation")
+    @type nearestObj: Tuple(str,str)
+    
+    @param nearestSubObj: (optional) the nearest subobject of the current
+                          nearest object (a way which is a subobject of a relation)
+                          e.g. ("2","way")
+    @type nearestSubObj: Tuple(str,str)
+    """
     if distance<0:
       self.distance=-distance
       self.insidePolygon=True
