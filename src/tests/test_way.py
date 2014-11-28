@@ -19,6 +19,9 @@ class TestWayObject(unittest.TestCase):
     self.testWay3 = osmData.Way(3, [1,2,3,4], {"highway":"residential","name":"Clipstone Street"})
     self.testVertices=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13),(52.12, 4.12)]
   
+  #============================================================
+  #hasPolygon()-Tests
+  #============================================================
   def test_hasPolygon(self):
     self.assertTrue(self.testWay.hasPolygon())
   
@@ -27,14 +30,12 @@ class TestWayObject(unittest.TestCase):
   
   def test_hasPolygon_notClosed(self):
     self.assertFalse(self.testWay3.hasPolygon())
+  #============================================================
   
-  def test_distToPolygonFailNoTypel(self):
-    with self.assertRaises(TypeError):
-      self.testWay.distToPolygon("asd")
-    
-  def test_distToPolygonFailNoPolygon(self):
-    self.assertEqual(self.testWay2.distToPolygon((52.123,4.123),self.testVertices), -2)
-
+  
+  #============================================================
+  #isPointInsidePolygon()-Tests
+  #============================================================  
   def test_isPointInsidePolygon_inside(self):
     self.assertTrue(self.testWay._isPointInsidePolygon((52.123,4.12003),self.testVertices))
     
@@ -43,7 +44,37 @@ class TestWayObject(unittest.TestCase):
     
   def test_isPointInsidePolygon_border(self):
     self.assertFalse(self.testWay._isPointInsidePolygon((52.12,4.12),self.testVertices))
+  #============================================================
+  
+  
+  #============================================================
+  #getDistance()-Tests
+  #============================================================  
+  def test_getDistanceFailNoTupel(self):
+    with self.assertRaises(TypeError):
+      self.testWay.getDistance("asd",self.testVertices)
+      
+  def test_getDistance_inside(self):
+    trueDist=-0.002828427124749019
+    self.assertEqual(self.testWay.getDistance((52.123,4.123),self.testVertices),trueDist)
+  
+  def test_getDistance_outside(self):
+    trueDist=0.004242640687119446
+    self.assertEqual(self.testWay.getDistance((52.117,4.117),self.testVertices),trueDist)
+  
+  def test_getDistance_border(self):
+    trueDist=0.0
+    self.assertEqual(self.testWay.getDistance((52.12,4.12),self.testVertices),trueDist)
     
+  #def test_distToPolygonFailNoPolygon(self):
+  #  errorCode=-2
+  #  self.assertEqual(self.testWay2.distToPolygon((52.123,4.123),self.testVertices), errorCode)
+  #============================================================
+
+
+  #============================================================
+  #_distPointLine()-Tests
+  #============================================================ 
   def test_distPointLine(self):
     trueDist=0.0030000000000001137
     self.assertEqual(self.testWay._distPointLine(52.123,4.123,52.12,4.12,52.13,4.12),trueDist)
@@ -51,18 +82,8 @@ class TestWayObject(unittest.TestCase):
   def test_distPointLine_border(self):
     trueDist=0.0
     self.assertEqual(self.testWay._distPointLine(52.12,4.12,52.12,4.12,52.13,4.12),trueDist)
-  
-  def test_distToPolygon_inside(self):
-    trueDist=-1.0
-    self.assertEqual(self.testWay.distToPolygon((52.123,4.123),self.testVertices),trueDist)
-  
-  def test_distToPolygon_outside(self):
-    trueDist=0.004242640687119446
-    self.assertEqual(self.testWay.distToPolygon((52.117,4.117),self.testVertices),trueDist)
-  
-  def test_distToPolygon_border(self):
-    trueDist=0.0
-    self.assertEqual(self.testWay.distToPolygon((52.12,4.12),self.testVertices),trueDist)
+  #============================================================
+
   
   def test_sides(self):
     trueList=[[(52.12, 4.12),(52.13, 4.12)],[(52.13, 4.12),(52.12, 4.13)],[(52.12, 4.13),(52.12, 4.12)]]

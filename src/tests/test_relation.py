@@ -59,6 +59,23 @@ class TestRelationObject(unittest.TestCase):
                   [("way",8125151,"outer"),("way",249285853,"inner")], 
                    {"name":"Tween Pond", "natural":"water"})
     self.assertNotEqual(testRelation, otherRelation)
+    
+  def test_addPolygon(self):
+    testRelation = osmData.Relation(self.id, self.members, self.tags)
+    polyList = [[1,2,3,4,5]]
+    emptyList = []
+    self.assertEqual(testRelation.polygons, emptyList)
+    testRelation.addPolygon([1,2,3,4,5])
+    self.assertEqual(testRelation.polygons, polyList)
+    
+  def test_addPolygonList(self):
+    testRelation = osmData.Relation(self.id, self.members, self.tags)
+    emptyList = []
+    polyList = [[1,2,3,4], [5,6,7]]
+    self.assertEqual(testRelation.polygons, emptyList)
+    testRelation.addPolygonList([[1,2,3,4], [5,6,7]])
+    self.assertEqual(testRelation.polygons, polyList)
+  
 
 if __name__ == '__main__':
   unittest.main()
