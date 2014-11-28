@@ -203,26 +203,36 @@ class OSM():
     """
     if not isinstance(rel, Relation) :
       raise TypeError("_searchForPolygons only accepts an object with type osmData.Relation")
+    #only outer ways and inner ways together
     for pos in ["outer","inner"]:
       ways=[]
+      #collecting all ways
       for m in rel.members:
         if m[0]=="way" and m[2]==pos:
           ways.append(str(m[1]))
+      #for all ways proove if it could be completed to a polygon
       for w1_key in ways:
+        #get polygon by id
         w1=self.ways[w1_key]
         tmpResult=[w1_key]
+        #make a deep copy of the remaining way-objects
         tmpWays=copy.deepcopy(ways)
+        #and delete the current way
         tmpWays.remove(w1_key)
         tmpLen=len(tmpWays)-1
+        #for each item of the remaining way-objects
         for i in range(0, tmpLen):
           for w2_key in tmpWays:
             w2=self.ways[w2_key]
+            #is the last node-id of the last added way = first node-id of the next way
             if self.ways[tmpResult[-1]].refs[-1]==w2.refs[0]:
               tmpResult.append(w2_key)
               tmpWays.remove(w2_key)
               break
+        #complete polygon?
         if self.ways[tmpResult[0]].refs[0]==self.ways[tmpResult[-1]].refs[-1]:
           rel.addPolygon(tmpResult)
+          #delete all for this polygon used ways
           for res in tmpResult:
             ways.remove(res)
           
