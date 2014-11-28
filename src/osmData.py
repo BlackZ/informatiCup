@@ -208,6 +208,10 @@ class OSM():
         nearestNode=self.getNearestNode(coords, {}, memb["node"])
       if len(memb["way"])>0:
         nearestWay=self.getNearestWay(coords, False ,{}, memb["way"])
+        #if the nearestWay was a inner-polygon --> the point couldn't be inside that polygon
+        for m in rel.members:
+          if nearestWay.nearestObj[1]==m[0] and m[2]=="inner":
+            nearestWay.insidePolygon=False
       if len(memb["relation"])>0:
         nearestSubRel=self.getNearestRelation(coords,tags)
       
