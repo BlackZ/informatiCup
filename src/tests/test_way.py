@@ -43,7 +43,7 @@ class TestWayObject(unittest.TestCase):
     self.assertFalse(self.testWay._isPointInsidePolygon((52.11,4.11),self.testVertices))
     
   def test_isPointInsidePolygon_border(self):
-    self.assertFalse(self.testWay._isPointInsidePolygon((52.12,4.12),self.testVertices))
+    self.assertTrue(self.testWay._isPointInsidePolygon((52.12,4.12),self.testVertices))
   #============================================================
   
   
