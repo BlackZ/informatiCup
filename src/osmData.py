@@ -140,6 +140,9 @@ class OSM():
         pass
     return nearestWay
   
+  #======================================
+  #TODO: Beachte auch zusammengesetze Polygone!
+  #======================================
   def getNearestRelation(self, coords, tags={}):
     """
     This function returns the ids of the relation,its way and its distance which is closest to the given node 
@@ -217,10 +220,12 @@ class OSM():
             if self.ways[tmpResult[-1]].refs[-1]==w2.refs[0]:
               tmpResult.append(w2_key)
               tmpWays.remove(w2_key)
-              ways.remove(w2_key)
               break
         if self.ways[tmpResult[0]].refs[0]==self.ways[tmpResult[-1]].refs[-1]:
           rel.addPolygon(tmpResult)
+          for res in tmpResult:
+            ways.remove(res)
+          
   
   def _vertices(self,nodeList):
     """
