@@ -77,11 +77,10 @@ class OSM():
     else:
       nodes=self.nodes
     
-    #for all nodes
-    for n in nodes:
+    for n in nodes:             # for all nodes
       node=self.nodes[n]
       
-      #proove if current node fullfill all filter-rules 
+      # proove if current node fullfill all filter-rules 
       nodeOk=True
       for tag in tags:
         if not node.tags.has_key(tag) or not node.tags[tag]==tags[tag]:
@@ -89,9 +88,9 @@ class OSM():
       if not nodeOk:
         continue
       try:
-        #calculate distance
-        dist=node.distToNode(coords)
-        #proove if the current node is the current nearest node
+        dist=node.distToNode(coords)    # calculate distance
+        
+        # proove if the current node is the current nearest node
         if dist<nearestNode.distance:
           nearestNode.distance=dist
           nearestNode.nearestObj=(node.id,"node")
@@ -131,11 +130,10 @@ class OSM():
       ways=otherWays
     else:
       ways=self.ways
-    #for all ways
-    for n in ways:
+    for n in ways:              # for all ways
       way=self.ways[n]
       
-      #proove if current way fullfill all filter-rules
+      # proove if current way fullfill all filter-rules
       wayOk=True
       if onlyPolygons and not way.hasPolygon():
         continue
@@ -145,9 +143,9 @@ class OSM():
       if not wayOk:
         continue
       try:
-        #calculate distance
-        dist=way.getDistance(coords,self._vertices(way.refs))
-        #proove if current way is the current nearest way
+        dist=way.getDistance(coords,self._vertices(way.refs))       # calculate distance
+        
+        # proove if current way is the current nearest way
         if dist<currentDist or (dist<0 and currentDist<0 and dist>currentDist):
           currentDist=dist
           nearestWay.distance=dist
@@ -157,7 +155,6 @@ class OSM():
     return nearestWay
   
   #======================================
-  #TODO: Beachte auch zusammengesetze Polygone!
   #TODO: ggf. sonderbedingungen für verschiedene Typen
   #======================================
   def getNearestRelation(self, coords, tags={}):
@@ -185,7 +182,7 @@ class OSM():
       rel=self.relations[r]
       self._searchForPolygons(rel)
 
-      #does this relation fullfill all filter-rules?
+      # does this relation fullfill all filter-rules?
       relOk=True
       for tag in tags:
         if not rel.tags.has_key(tag) or not rel.tags[tag]==tags[tag]:
@@ -193,22 +190,22 @@ class OSM():
       if not relOk:
         continue
       
-      #sort all members by type
+      # sort all members by type
       memb={"way":[],"node":[],"relation":[]}
       for m in rel.members:
         memb[m[0]].append(m[1])
       
-      #init resultObjects for member-distances  
+      # init resultObjects for member-distances  
       nearestNode=distanceResult(sys.float_info.max,("-1",None))
       nearestWay=distanceResult(sys.float_info.max,("-1",None))
       nearestSubRel=distanceResult(sys.float_info.max,("-1",None))
-      #get all memberDistances
+      # get all memberDistances
       if len(memb["node"])>0:
         nearestNode=self.getNearestNode(coords, {}, memb["node"])
       if len(memb["way"])>0:
         nearestWay=self.getNearestWay(coords, False ,{}, memb["way"])
       
-        #if the found way belongs to a polygon combined of several ways proove if point is inside and set flag
+        # if the found way belongs to a polygon combined of several ways proove if point is inside and set flag
         for p in rel.polygons:
           if nearestWay.nearestObj[0] in p:
             ver=[]
@@ -222,14 +219,14 @@ class OSM():
             if self.ways[nearestWay.nearestObj[0]]._isPointInsidePolygon(coords,ver):
               nearestWay.insidePolygon=True
               
-        #if the nearestWay was a inner-polygon --> the point couldn't be inside that polygon
+        # if the nearestWay was a inner-polygon --> the point couldn't be inside that polygon
         for m in rel.members:
           if nearestWay.nearestObj[0]==m[1] and m[2]=="inner":
             nearestWay.insidePolygon=False
       if len(memb["relation"])>0:
         nearestSubRel=self.getNearestRelation(coords,tags)
       
-      #find the neareast subobject to determine the distance of the relation to the given point
+      # find the neareast subobject to determine the distance of the relation to the given point
       for obj in [nearestNode,nearestWay,nearestSubRel]:
         if obj.distance<nearestRel.distance:
           nearestRel.distance=obj.distance
@@ -245,37 +242,28 @@ class OSM():
     """
     if not isinstance(rel, Relation) :
       raise TypeError("_searchForPolygons only accepts an object with type osmData.Relation")
-    #only outer ways and inner ways together
-    for pos in ["outer","inner"]:
+    for pos in ["outer","inner"]:     # only outer ways and inner ways together
       ways=[]
-      #collecting all ways
-      for m in rel.members:
+      for m in rel.members:           # collecting all ways
         if m[0]=="way" and m[2]==pos:
           ways.append(str(m[1]))
-      #for all ways proove if it could be completed to a polygon
-      for w1_key in ways:
-        #get polygon by id
-        w1=self.ways[w1_key]
+      for w1_key in ways:             # for all ways proove if it could be completed to a polygon
+        w1=self.ways[w1_key]          # get polygon by id
         tmpResult=[w1_key]
-        #make a deep copy of the remaining way-objects
-        tmpWays=copy.deepcopy(ways)
-        #and delete the current way
-        tmpWays.remove(w1_key)
+        tmpWays=copy.deepcopy(ways)   # make a deep copy of the remaining way-objects
+        tmpWays.remove(w1_key)        # and delete the current way
         tmpLen=len(tmpWays)-1
-        #for each item of the remaining way-objects
-        for i in range(0, tmpLen):
+        for i in range(0, tmpLen):    # for each item of the remaining way-objects
           for w2_key in tmpWays:
             w2=self.ways[w2_key]
-            #is the last node-id of the last added way = first node-id of the next way
+            # is the last node-id of the last added way = first node-id of the next way
             if self.ways[tmpResult[-1]].refs[-1]==w2.refs[0]:
               tmpResult.append(w2_key)
               tmpWays.remove(w2_key)
               break
-        #complete polygon?
-        if self.ways[tmpResult[0]].refs[0]==self.ways[tmpResult[-1]].refs[-1]:
+        if self.ways[tmpResult[0]].refs[0]==self.ways[tmpResult[-1]].refs[-1]:    # complete polygon?
           rel.addPolygon(tmpResult)
-          #delete all for this polygon used ways
-          for res in tmpResult:
+          for res in tmpResult:       # delete all for this polygon used ways
             ways.remove(res)
           
   
@@ -460,55 +448,57 @@ class Way():
   
     return math.hypot(dx, dy)
   
-  def _isPointInsidePolygon(self, P, V):
+  def _isPointInsidePolygonOld(self,coords,vertices):
+    poly=vertices
+    x=coords[0]
+    y=coords[1]
+    n = len(poly)
+    inside =False
+    
+    p1x, p1y = poly[0]
+    for i in range(n + 1):
+      p2x, p2y = poly[i % n]
+      if y > min(p1y , p2y):
+        if y <= max(p1y , p2y):
+          if x <= max(p1x , p2x):
+            if p1y != p2y:
+              print "test",p1x,p1y,p2x,p2y
+              xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+              print xinters
+            if p1x == p2x or x <= xinters:
+              print "test"
+              inside = not inside
+        p1x, p1y = p2x, p2y
+    print coords,vertices,inside
+    return inside
+  
+  def _isPointInsidePolygon(self, coords, vertices):
     """
     This function proves if a points is envolved in a polygone
     
-    @param P: x&y-coord of the point
-    @type P: Tupel(float,float)
+    @param coords: x&y-coord of the point
+    @type coords: Tupel(float,float)
     
-    @param V: list of points, which defines a polygon
-    @type V: [Tupel(float,float),]
+    @param vertices: list of points, which defines a polygon
+    @type vertices: [Tupel(float,float),]
 
     @return: true if point is inside
              false if point is outside or on edge
     """
-    #poly=vertices
-    #x=coords[0]
-    #y=coords[1]
-    #n = len(poly)
-    #inside =False
-    #
-    #p1x, p1y = poly[0]
-    #for i in range(n + 1):
-    #  p2x, p2y = poly[i % n]
-    #  if y > min(p1y , p2y):
-    #    if y <= max(p1y , p2y):
-    #      if x <= max(p1x , p2x):
-    #        if p1y != p2y:
-    #          print "test",p1x,p1y,p2x,p2y
-    #          xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
-    #          print xinters
-    #        if p1x == p2x or x <= xinters:
-    #          print "test"
-    #          inside = not inside
-    #    p1x, p1y = p2x, p2y
-    #print coords,vertices,inside
-    #return inside
     cn = 0    # the crossing number counter
 
-    # repeat the first vertex at end
-    if not V[0]==V[-1]:
-      V = tuple(V[:])+(V[0],)
+    # repeat the first vertex at end if not already done
+    if not vertices[0]==vertices[-1]:
+      vertices = tuple(vertices[:])+(vertices[0],)
 
     # loop through all edges of the polygon
-    for i in range(len(V)-1):   # edge from V[i] to V[i+1]
-        if ((V[i][1] <= P[1] and V[i+1][1] > P[1])   # an upward crossing
-            or (V[i][1] > P[1] and V[i+1][1] <= P[1])):  # a downward crossing
+    for i in range(len(vertices)-1):   # edge from vertices[i] to vertices[i+1]
+        if ((vertices[i][1] <= coords[1] and vertices[i+1][1] > coords[1])   # an upward crossing
+            or (vertices[i][1] > coords[1] and vertices[i+1][1] <= coords[1])):  # a downward crossing
             # compute the actual edge-ray intersect x-coordinate
-            vt = (P[1] - V[i][1]) / float(V[i+1][1] - V[i][1])
-            if P[0] < V[i][0] + vt * (V[i+1][0] - V[i][0]): # P[0] < intersect
-                cn += 1  # a valid crossing of y=P[1] right of P[0]
+            vt = (coords[1] - vertices[i][1]) / float(vertices[i+1][1] - vertices[i][1])
+            if coords[0] < vertices[i][0] + vt * (vertices[i+1][0] - vertices[i][0]): # coords[0] < intersect
+                cn += 1  # a valid crossing of y=coords[1] right of coords[0]
 
     return cn % 2 == 1   # 0 if even (out), and 1 if odd (in)
 
