@@ -164,13 +164,13 @@ class TestOSMObject(unittest.TestCase):
     
     for way in self.testOSM6.ways:
       self.testOSM8.addWay(self.testOSM6.ways[way])
-    self.testOSM8.addWay(osmData.Way(5, [11, 12, 13, 11], {}))
+    self.testOSM8.addWay(osmData.Way(8, [11, 12, 13, 11], {}))
     
     self.testOSM8.addRelation(osmData.Relation(1,
-                                               [("way", 1, "outer"),("way", 2, "outer"),("way", 3, "inner"), ("way", 4, "inner")],
+                                               [("way", "1", "outer"),("way", "2", "outer"),("way", "3", "inner"), ("way", "4", "inner"), ("way", "5", "outer")],
                                                {"type":"multipolygon"}))
     self.testOSM8.addRelation(osmData.Relation(2,
-                                               [("way", 5, "outer"),("relation", 1, "parking")],
+                                               [("way", "8", "outer"),("relation", "1", "parking")],
                                                {"type":"site"}))
     
     self.testOSM9=osmData.OSM()
@@ -305,6 +305,14 @@ class TestOSMObject(unittest.TestCase):
   def test_getNearestRelationFailFilterByTags(self):
     with self.assertRaises(TypeError):
       self.testOSM5.getNearestRelation(self.testPoint, "asd")
+  
+  def test_getNearestRelationTypeSite(self):
+    nearestRelation= osmData.distanceResult(-0.17149858514250862,("2","relation"),("1","relation"))
+    result=self.testOSM8.getNearestRelation((2.0,7.0))
+    self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
+    self.assertEqual(nearestRelation.distance, result.distance)
+    self.assertEqual(nearestRelation.nearestSubObj, result.nearestSubObj)
+    self.assertEqual(nearestRelation.insidePolygon, result.insidePolygon)
   #========================================================
 
 

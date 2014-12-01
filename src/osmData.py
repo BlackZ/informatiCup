@@ -157,7 +157,7 @@ class OSM():
   #======================================
   #TODO: ggf. sonderbedingungen für verschiedene Typen
   #======================================
-  def getNearestRelation(self, coords, tags={}):
+  def getNearestRelation(self, coords, tags={}, otherRelations=[]):
     """
     This function returns the ids of the relation,its way and its distance which is closest to the given node 
     
@@ -166,6 +166,9 @@ class OSM():
 
     @param tags: list of tags which will be used to filter the ways
     @type tags: dict(str:str)
+    
+    @param otherRelations: use this relations to find nearest relation
+    @type otherRelations: [str,]
     
     @return Tupel(Tupel(rel_id,way_id),distance)
     """
@@ -178,9 +181,16 @@ class OSM():
     
     nearestRel=distanceResult(sys.float_info.max,("-1",None))
     
-    for r in self.relations:
+    relations=[]
+    if len(otherRelations)>0:
+      relations=otherRelations
+    else:
+      relations=self.relations
+    
+    for r in relations:
       rel=self.relations[r]
-      self._searchForPolygons(rel)
+      if len(rel.polygons)==0:
+        self._searchForPolygons(rel)
 
       # does this relation fullfill all filter-rules?
       relOk=True
@@ -204,7 +214,6 @@ class OSM():
         nearestNode=self.getNearestNode(coords, {}, memb["node"])
       if len(memb["way"])>0:
         nearestWay=self.getNearestWay(coords, False ,{}, memb["way"])
-      
         # if the found way belongs to a polygon combined of several ways proove if point is inside and set flag
         for p in rel.polygons:
           if nearestWay.nearestObj[0] in p:
@@ -216,6 +225,7 @@ class OSM():
                 if n_coords not in ver:
                   ver.append(n_coords)
             ver.append(ver[0])
+            #print coords,ver
             if self.ways[nearestWay.nearestObj[0]]._isPointInsidePolygon(coords,ver):
               nearestWay.insidePolygon=True
               
@@ -223,12 +233,14 @@ class OSM():
         for m in rel.members:
           if nearestWay.nearestObj[0]==m[1] and m[2]=="inner":
             nearestWay.insidePolygon=False
+            
       if len(memb["relation"])>0:
-        nearestSubRel=self.getNearestRelation(coords,tags)
+        nearestSubRel=self.getNearestRelation(coords,tags,memb["relation"])
+      #print coords,nearestSubRel.distance, nearestSubRel.insidePolygon
       
       # find the neareast subobject to determine the distance of the relation to the given point
       for obj in [nearestNode,nearestWay,nearestSubRel]:
-        if obj.distance<nearestRel.distance:
+        if obj.distance<=nearestRel.distance:
           nearestRel.distance=obj.distance
           nearestRel.nearestSubObj=obj.nearestObj
           nearestRel.nearestObj=(rel.id,"relation")
@@ -252,8 +264,7 @@ class OSM():
         tmpResult=[w1_key]
         tmpWays=copy.deepcopy(ways)   # make a deep copy of the remaining way-objects
         tmpWays.remove(w1_key)        # and delete the current way
-        tmpLen=len(tmpWays)-1
-        for i in range(0, tmpLen):    # for each item of the remaining way-objects
+        for i in range(0, len(tmpWays)):    # for each item of the remaining way-objects
           for w2_key in tmpWays:
             w2=self.ways[w2_key]
             # is the last node-id of the last added way = first node-id of the next way
