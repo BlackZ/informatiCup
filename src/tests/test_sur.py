@@ -14,13 +14,13 @@ class TestSURObject(unittest.TestCase):
   def setUp(self):
     self.testString =("0001, 50.9304, 5.33901, access:dog=\"no\"")
     self.id = "0001"
-    self.long = 50.9304
-    self.lat = 5.33901
+    self.lat = 50.9304
+    self.long = 5.33901
     self.ruleNameString = "access:dog=\"no\""
     self.ruleName = {"access:dog": "no"}
   
   def test_createSUR(self):
-    testSUR = sur.SUR(self.id, self.ruleNameString, self.long, self.lat)
+    testSUR = sur.SUR(self.id, self.ruleNameString, self.lat, self.long)
     self.assertIsNotNone(testSUR)
     self.assertEqual(testSUR.id, self.id)
     self.assertEqual(testSUR.latitude, self.lat)
@@ -40,8 +40,8 @@ class TestSURObject(unittest.TestCase):
     testFile = open('../testData/dataOnlyForTests/TestData.txt','r')
     ruleName1_2 = {"smoking": "no", "access:dog": "no"}
     id2 = "0002"
-    long2 = 50.9325
-    lat2 = 5.34174
+    lat2 = 50.9325
+    long2 = 5.34174
     ruleName2 = {"cellphone": "no"}
     
     # do it!

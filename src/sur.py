@@ -7,7 +7,7 @@ Basic class to load and store space usage rules.
 
 class SUR():
   
-  def __init__(self, surID, name, lon, lat):
+  def __init__(self, surID, name, lat, lon):
     self.id = surID
     self.longitude = lon
     self.latitude = lat
