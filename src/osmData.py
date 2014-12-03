@@ -367,14 +367,14 @@ class Way():
     
     @param identifier: The id of the way as a string
     
-    @param refs: An ordered list of node id's (strings) that make up the way
+    @param refs: An ordered list of node id's that make up the way
     
     @param tags: A dictionary containing all the tags for the way
     """
-    self.id = str(identifier)
+    self.id = identifier
     if not isinstance(refs, list):
       raise TypeError("refs must be a list of id's")
-    self.refs = [str(r) for r in refs]
+    self.refs = refs
     if not isinstance(tags, dict):
       raise TypeError("tags must be a dictionary")
     self.tags = tags
