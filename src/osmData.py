@@ -263,7 +263,6 @@ class OSM():
           vertices=[self._vertices[self.ways[i].refs] for i in rel.polygons]
         if len(vertices)>0 and way._isPointInsidePolygon(point,vertices):
           dist=way.getDistance(point,vertices)
-          #print point,memb["way"],vertices,dist
           if result[0]>dist:
             result=(dist,([x for y in rel.polygons for x in y if way.id in y],"way"))
     for r in memb["relation"]:
