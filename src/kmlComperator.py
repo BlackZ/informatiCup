@@ -40,7 +40,7 @@ class KMLComperator():
     for placemark in kml.placemarks:
       coord=[]
       for node in placemark.polygon:
-        coord.append((node.lon,node.lat))
+        coord.append((node.lat,node.lon))
       tmppoly=Polygon.Polygon(coord)
       poly=poly|tmppoly
     return poly

@@ -7,10 +7,10 @@ Basic class to load and store space usage rules.
 
 class SUR():
   
-  def __init__(self, surID, name, lat, lon):
+  def __init__(self, surID, name, lon, lat):
     self.id = surID
-    self.latitude = lat
     self.longitude = lon
+    self.latitude = lat
     name = name.replace("\"", "").split('=')
     self.ruleName = {name[0]: name[1]}
     

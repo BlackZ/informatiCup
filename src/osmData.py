@@ -315,7 +315,7 @@ class OSM():
 
 class Node():
   
-  def __init__(self, identifier, lon, lat, tags):
+  def __init__(self, identifier, lat, lon, tags):
     """
     Basic class containing an osm Node
 
@@ -345,7 +345,7 @@ class Node():
     self.distance=None
     
   def getCoordinateString(self):
-    return str(self.lon) + "," +str(self.lat)
+    return str(self.lat) + "," +str(self.lon)
     
   def __eq__(self,other):
     if not isinstance(other,self.__class__):
@@ -366,7 +366,7 @@ class Node():
     
     @return (lon,lat) as tupel
     """
-    return (self.lon,self.lat)
+    return (self.lat,self.lon)
   
   def distToNode(self, coords):
     """
@@ -381,7 +381,7 @@ class Node():
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
-    return math.hypot(coords[0] - self.lon, coords[1] - self.lat)
+    return math.hypot(coords[0] - self.lat, coords[1] - self.lon)
   
 class Way():
   
