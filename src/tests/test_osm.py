@@ -248,16 +248,31 @@ class TestOSMObject(unittest.TestCase):
   #========================================================
 
   #========================================================
-  #Tests for getNearestRelation
+  #Tests for isInside
   #========================================================
   def test_isInsideCombinedPoly(self):
     trueResult = (True,([1,2,5],"way"))
     result=self.testOSM6.isInside((2.0,7.0),1)
     self.assertEqual(result,trueResult)
   
+  def test_isInsideOutside(self):
+    trueResult = (False,("-1",None))
+    result=self.testOSM6.isInside((2.0,9.0),1)
+    self.assertEqual(result,trueResult)
+  
   def test_isInsideWithMoreRelations(self):
     trueResult = (True,([1],"relation"))
     result=self.testOSM8.isInside((2.0,7.0),2)
+    self.assertEqual(result,trueResult)
+    
+  def test_isInsideComplex(self):
+    trueResult = (True,([7],"way"))
+    result=self.testOSM5.isInside((2.5,2.5),1)
+    self.assertEqual(result,trueResult)
+    
+  def test_isInsideComplex2(self):
+    trueResult = (True,([2],"way"))
+    result=self.testOSM5.isInside((2.18,2.18),1)
     self.assertEqual(result,trueResult)
   #========================================================
 
