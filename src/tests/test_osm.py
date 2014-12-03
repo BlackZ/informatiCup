@@ -23,7 +23,7 @@ class TestOSMObject(unittest.TestCase):
     
     self.testOSM2=osmData.OSM()
     self.testOSM2.addNodeList([osmData.Node(1, 52.12, 4.12, {}),
-                               osmData.Node(2, 52.13, 4.12, {}),
+                               osmData.Node(2, 52.13, 4.12,{}),
                                osmData.Node(3, 52.12, 4.13, {})])
     self.testOSM2.addWay(self.testWay)
     self.testOSM2.addRelation(osmData.Relation(1, [("way", 3, "outer")], {"boundary":"postal_code","type":"boundary", "postal_code":"33615"}))
@@ -247,34 +247,46 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestPoint.nearestSubObj, result.nearestSubObj)
   #========================================================
 
+  #========================================================
+  #Tests for getNearestRelation
+  #========================================================
+  def test_isInsideCombinedPoly(self):
+    trueResult = (True,([1,2,5],"way"))
+    result=self.testOSM6.isInside((2.0,7.0),1)
+    self.assertEqual(result,trueResult)
+  
+  def test_isInsideWithMoreRelations(self):
+    trueResult = (True,([1],"relation"))
+    result=self.testOSM8.isInside((2.0,7.0),2)
+    self.assertEqual(result,trueResult)
+  #========================================================
 
   #========================================================
   #Tests for getNearestRelation
   #========================================================
   def test_getNearestRelation(self):
     nearestRelation = osmData.distanceResult(7.0710678118654755,(2,"relation"),(4,"way"))
+    
     result=self.testOSM5.getNearestRelation(self.testPoint2)
     self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
     self.assertEqual(nearestRelation.distance, result.distance)
     self.assertEqual(nearestRelation.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestRelation.insidePolygon, result.insidePolygon)
     
   def test_getNearestRelationInsideCombinedPoly(self):
-    nearestRelation = osmData.distanceResult(-0.17149858514250862,(1,"relation"),(5,"way"))
+    nearestRelation = osmData.distanceResult(0.17149858514250862,(1,"relation"),(5,"way"))
+    
     result=self.testOSM6.getNearestRelation((2.0,7.0))
     self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
     self.assertEqual(nearestRelation.distance, result.distance)
     self.assertEqual(nearestRelation.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestRelation.insidePolygon, result.insidePolygon)
     
   def test_getNearestRelationInside(self):
-    nearestRelation =osmData.distanceResult(-1,(1,"relation"),(1,"way"))
+    nearestRelation =osmData.distanceResult(0.8999999999999999,(1,"relation"),(2,"way"))
     
-    result=self.testOSM5.getNearestRelation(self.testPoint)
+    result=self.testOSM5.getNearestRelation((3.0,1.1))
     self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
     self.assertEqual(nearestRelation.distance, result.distance)
     self.assertEqual(nearestRelation.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestRelation.insidePolygon, result.insidePolygon)
   
   def test_getNearestRelationInsideInnerPoly(self):
     nearestRelation =osmData.distanceResult(0.10000000000000009,(1,"relation"),(2,"way"))
@@ -283,36 +295,33 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
     self.assertEqual(nearestRelation.distance, result.distance)
     self.assertEqual(nearestRelation.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestRelation.insidePolygon, result.insidePolygon)
     
   def test_getNearestRelationInsideInnerInsideOuterPoly(self):
-    nearestRelation =osmData.distanceResult(-0.2999999999999998,(1,"relation"),(7,"way"))
+    nearestRelation =osmData.distanceResult(0.2999999999999998,(1,"relation"),(7,"way"))
     
     result=self.testOSM5.getNearestRelation((2.5,2.5))
     self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
     self.assertEqual(nearestRelation.distance, result.distance)
     self.assertEqual(nearestRelation.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestRelation.insidePolygon, result.insidePolygon)
   
   def test_getNearestRelationFilterByTags(self):
     nearestRelation= osmData.distanceResult(15.556349186104045,(1,"relation"),(1,"way"))
+    
     result=self.testOSM5.getNearestRelation(self.testPoint2,{"name":"Tween"})
     self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
     self.assertEqual(nearestRelation.distance, result.distance)
     self.assertEqual(nearestRelation.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestRelation.insidePolygon, result.insidePolygon)
   
   def test_getNearestRelationFailFilterByTags(self):
     with self.assertRaises(TypeError):
       self.testOSM5.getNearestRelation(self.testPoint, "asd")
   
   def test_getNearestRelationTypeSite(self):
-    nearestRelation= osmData.distanceResult(-0.17149858514250862,(2,"relation"),(1,"relation"))
+    nearestRelation= osmData.distanceResult(0.17149858514250862,(2,"relation"),(1,"relation"))
     result=self.testOSM8.getNearestRelation((2.0,7.0))
     self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
     self.assertEqual(nearestRelation.distance, result.distance)
     self.assertEqual(nearestRelation.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestRelation.insidePolygon, result.insidePolygon)
   #========================================================
 
 
@@ -325,7 +334,6 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestWay.nearestObj, result.nearestObj)
     self.assertEqual(nearestWay.distance, result.distance)
     self.assertEqual(nearestWay.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestWay.insidePolygon, result.insidePolygon)
     
   def test_getNearestWayOtherWayList(self):
     nearestWay=osmData.distanceResult(2.0,(3,"way"))
@@ -333,7 +341,6 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestWay.nearestObj, result.nearestObj)
     self.assertEqual(nearestWay.distance, result.distance)
     self.assertEqual(nearestWay.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestWay.insidePolygon, result.insidePolygon)
   
   def test_getNearestWayAll(self):
     nearestWay=osmData.distanceResult(2.1213203435596424,(2,"way"))
@@ -341,7 +348,6 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestWay.nearestObj, result.nearestObj)
     self.assertEqual(nearestWay.distance, result.distance)
     self.assertEqual(nearestWay.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestWay.insidePolygon, result.insidePolygon)
     
   def test_getNearestWayWithTagFilter(self):
     nearestWay =osmData.distanceResult(4.47213595499958,(1,"way"))
@@ -349,7 +355,6 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestWay.nearestObj, result.nearestObj)
     self.assertEqual(nearestWay.distance, result.distance)
     self.assertEqual(nearestWay.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestWay.insidePolygon, result.insidePolygon)
 
   def test_getNearestWayNothinFound(self):
     nearestWay = osmData.distanceResult(sys.float_info.max,("-1",None))
@@ -357,7 +362,6 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestWay.nearestObj, result.nearestObj)
     self.assertEqual(nearestWay.distance, result.distance)
     self.assertEqual(nearestWay.nearestSubObj, result.nearestSubObj)
-    self.assertEqual(nearestWay.insidePolygon, result.insidePolygon)
   #========================================================
 
 

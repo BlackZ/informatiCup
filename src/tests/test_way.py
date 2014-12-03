@@ -55,7 +55,7 @@ class TestWayObject(unittest.TestCase):
       self.testWay.getDistance("asd",self.testVertices)
       
   def test_getDistance_inside(self):
-    trueDist=-0.002828427124749019
+    trueDist=0.002828427124749019
     self.assertEqual(self.testWay.getDistance((52.123,4.123),self.testVertices),trueDist)
   
   def test_getDistance_outside(self):
@@ -76,8 +76,8 @@ class TestWayObject(unittest.TestCase):
   #_distPointLine()-Tests
   #============================================================ 
   def test_distPointLine(self):
-    trueDist=0.0030000000000001137
-    self.assertEqual(self.testWay._distPointLine(52.123,4.123,52.12,4.12,52.13,4.12),trueDist)
+    trueDist=2.23606797749979
+    self.assertEqual(self.testWay._distPointLine(3.0,3.0,1.0,1.0,2.0,1.0),trueDist)
     
   def test_distPointLine_border(self):
     trueDist=0.0

@@ -124,7 +124,6 @@ class OSM():
       raise TypeError("getNearestWay only accepts a dict to filter nodes")
     
     nearestWay=distanceResult(sys.float_info.max,("-1",None))
-    currentDist=sys.float_info.max
     ways=[]
     if len(otherWays)>0:
       ways=otherWays
@@ -146,17 +145,13 @@ class OSM():
         dist=way.getDistance(coords,self._vertices(way.refs))       # calculate distance
         
         # proove if current way is the current nearest way
-        if dist<currentDist or (dist<0 and currentDist<0 and dist>currentDist):
-          currentDist=dist
+        if dist<nearestWay.distance:
           nearestWay.distance=dist
           nearestWay.nearestObj=(way.id,"way")
       except TypeError:
         pass
     return nearestWay
   
-  #======================================
-  #TODO: ggf. sonderbedingungen für verschiedene Typen
-  #======================================
   def getNearestRelation(self, coords, tags={}, otherRelations=[]):
     """
     This function returns the ids of the relation,its way and its distance which is closest to the given node 
@@ -189,8 +184,10 @@ class OSM():
     
     for r in relations:
       rel=self.relations[r]
-      if len(rel.polygons)==0:
-        self._searchForPolygons(rel)
+      if not rel.distance==None:
+        continue
+      #if len(rel.polygons)==0:
+      #  self._searchForPolygons(rel)
 
       # does this relation fullfill all filter-rules?
       relOk=True
@@ -209,45 +206,73 @@ class OSM():
       nearestNode=distanceResult(sys.float_info.max,("-1",None))
       nearestWay=distanceResult(sys.float_info.max,("-1",None))
       nearestSubRel=distanceResult(sys.float_info.max,("-1",None))
-      # get all memberDistances
-      if len(memb["node"])>0:
-        nearestNode=self.getNearestNode(coords, {}, memb["node"])
-      if len(memb["way"])>0:
-        nearestWay=self.getNearestWay(coords, False ,{}, memb["way"])
+
+
         # if the found way belongs to a polygon combined of several ways proove if point is inside and set flag
-        for p in rel.polygons:
-          if nearestWay.nearestObj[0] in p:
-            ver=[]
-            for w_k in p:
-              w=self.ways[w_k]
-              for n_k in w.refs:
-                n_coords=self.nodes[n_k].coords
-                if n_coords not in ver:
-                  ver.append(n_coords)
-            ver.append(ver[0])
-            #print coords,ver
-            if self.ways[nearestWay.nearestObj[0]]._isPointInsidePolygon(coords,ver):
-              nearestWay.insidePolygon=True
+        #for p in rel.polygons:
+        #  if nearestWay.nearestObj[0] in p:
+        #    ver=[]
+        #    for w_k in p:
+        #      w=self.ways[w_k]
+        #      for n_k in w.refs:
+        #        n_coords=self.nodes[n_k].coords
+        #        if n_coords not in ver:
+        #          ver.append(n_coords)
+        #    ver.append(ver[0])
+        #    if self.ways[nearestWay.nearestObj[0]]._isPointInsidePolygon(coords,ver):
+        #      nearestWay.insidePolygon=True
               
         # if the nearestWay was a inner-polygon --> the point couldn't be inside that polygon
-        for m in rel.members:
-          if nearestWay.nearestObj[0]==m[1] and m[2]=="inner":
-            nearestWay.insidePolygon=False
-            
+        #for m in rel.members:
+        #  if nearestWay.nearestObj[0]==m[1] and m[2]=="inner":
+        #    nearestWay.insidePolygon=False
+      # get all memberDistances      
       if len(memb["relation"])>0:
         nearestSubRel=self.getNearestRelation(coords,tags,memb["relation"])
-      #print coords,nearestSubRel.distance, nearestSubRel.insidePolygon
-      
+      if len(memb["way"])>0:
+        nearestWay=self.getNearestWay(coords, False ,{}, memb["way"])
+      if len(memb["node"])>0:
+        nearestNode=self.getNearestNode(coords, {}, memb["node"])
+        
       # find the neareast subobject to determine the distance of the relation to the given point
       for obj in [nearestNode,nearestWay,nearestSubRel]:
         if obj.distance<=nearestRel.distance:
           nearestRel.distance=obj.distance
           nearestRel.nearestSubObj=obj.nearestObj
           nearestRel.nearestObj=(rel.id,"relation")
-          nearestRel.insidePolygon=obj.insidePolygon
-    
+    rel.distance=nearestRel.distance
     return nearestRel
   
+  def isInside(self, point, rel_id):
+    rel=self.relations[rel_id]
+    if len(rel.polygons)==0:
+      self._searchForPolygons(rel)
+      
+    memb={"way":[],"node":[],"relation":[]}
+    for m in rel.members:
+      memb[m[0]].append(m[1])
+      
+    result=(sys.float_info.max,("-1",None))
+    for w in memb["way"]:
+      way=self.ways[w]
+      if any([w in x for x in rel.polygons]):
+        vertices=[]
+        if way.isPolygon:
+          vertices=self._vertices(way.refs)
+        else:
+          vertices=[self._vertices[self.ways[i].refs] for i in rel.polygons]
+        if len(vertices)>0 and way._isPointInsidePolygon(point,vertices):
+          dist=way.getDistance(point,vertices)
+          if result[0]>dist:
+            result=(dist,([x for y in rel.polygons for x in y if way.id in y],"way"))
+    for r in memb["relation"]:
+      subRes=self.isInside(point,r)
+      if result[0]>subRes[0]:
+        result=(subRes[0],([r],"relation"))
+    if not result[1]==("-1",None):
+      result=(True,result[1])
+    return result    
+
   def _searchForPolygons(self,rel):
     """
     This function searches hidden polygons, which are defined by more then one way
@@ -276,7 +301,6 @@ class OSM():
           rel.addPolygon(tmpResult)
           for res in tmpResult:       # delete all for this polygon used ways
             ways.remove(res)
-          
   
   def _vertices(self,nodeList):
     """
@@ -291,7 +315,7 @@ class OSM():
 
 class Node():
   
-  def __init__(self, identifier, lat, lon, tags):
+  def __init__(self, identifier, lon, lat, tags):
     """
     Basic class containing an osm Node
 
@@ -318,6 +342,7 @@ class Node():
     if not isinstance(tags, dict):
       raise TypeError("tags must be a dictionary.")
     self.tags = tags
+    self.distance=None
     
   def getCoordinateString(self):
     return str(self.lon) + "," +str(self.lat)
@@ -339,9 +364,9 @@ class Node():
     """
     This function-property returns latitude and longitude as tupel
     
-    @return (lat,lon) as tupel
+    @return (lon,lat) as tupel
     """
-    return (self.lat,self.lon)
+    return (self.lon,self.lat)
   
   def distToNode(self, coords):
     """
@@ -356,8 +381,7 @@ class Node():
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
-    return math.hypot(coords[0] - self.lat, coords[1] - self.lon)
-  
+    return math.hypot(coords[0] - self.lon, coords[1] - self.lat)
   
 class Way():
   
@@ -378,6 +402,7 @@ class Way():
     if not isinstance(tags, dict):
       raise TypeError("tags must be a dictionary")
     self.tags = tags
+    self.distance=None
   
   def isPolygon(self):
     """
@@ -499,8 +524,8 @@ class Way():
     cn = 0    # the crossing number counter
 
     # repeat the first vertex at end if not already done
-    if not vertices[0]==vertices[-1]:
-      vertices = tuple(vertices[:])+(vertices[0],)
+    #if not vertices[0]==vertices[-1]:
+    #  vertices = tuple(vertices[:])+(vertices[0],)
 
     # loop through all edges of the polygon
     for i in range(len(vertices)-1):   # edge from vertices[i] to vertices[i+1]
@@ -539,9 +564,9 @@ class Way():
       if dist<minDist:
         minDist=dist
         
-    if self.isPolygon():
-      if self._isPointInsidePolygon(coords,vertices):
-        minDist=-minDist
+    #if self.isPolygon():
+    #  if self._isPointInsidePolygon(coords,vertices):
+    #    minDist=-minDist
     return minDist
   
 class Relation():
@@ -563,14 +588,13 @@ class Relation():
     if not isinstance(tags, dict):
       raise TypeError("tags must be a dictionary")
     self.tags = tags
-    
+    self.distance=None
     self.polygons = []    
   
   def addPolygon(self, nodeList):
     self.polygons.append(nodeList)
     
   def addPolygonList(self, polyList):
-    #self.polygons = [tuple(poly) for poly in polyList]
     self.polygons=polyList
    
   def __eq__(self,other):   
@@ -603,24 +627,6 @@ class distanceResult(object):
                           e.g. ("2","way")
     @type nearestSubObj: Tuple(str,str)
     """
-    if distance<0:
-      self.distance=-distance
-      self.insidePolygon=True
-    else:
-      self.distance=distance
-      self.insidePolygon=False
+    self.distance=distance
     self.nearestObj=nearestObj
     self.nearestSubObj=nearestSubObj
-  
-  @property
-  def distance(self):
-    return self.__distance
-
-  @distance.setter
-  def distance(self,distance):
-    if distance<0:
-      self.__distance=-distance
-      self.insidePolygon=True
-    else:
-      self.__distance=distance
-      self.insidePolygon=False
