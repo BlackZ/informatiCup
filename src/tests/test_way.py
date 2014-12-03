@@ -22,14 +22,14 @@ class TestWayObject(unittest.TestCase):
   #============================================================
   #hasPolygon()-Tests
   #============================================================
-  def test_hasPolygon(self):
-    self.assertTrue(self.testWay.hasPolygon())
+  def test_isPolygon(self):
+    self.assertTrue(self.testWay.isPolygon())
   
-  def test_hasPolygon_notEnoughPoints(self):
-    self.assertFalse(self.testWay2.hasPolygon())
+  def test_isPolygon_notEnoughPoints(self):
+    self.assertFalse(self.testWay2.isPolygon())
   
-  def test_hasPolygon_notClosed(self):
-    self.assertFalse(self.testWay3.hasPolygon())
+  def test_isPolygon_notClosed(self):
+    self.assertFalse(self.testWay3.isPolygon())
   #============================================================
   
   

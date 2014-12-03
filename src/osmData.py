@@ -135,7 +135,7 @@ class OSM():
       
       # proove if current way fullfill all filter-rules
       wayOk=True
-      if onlyPolygons and not way.hasPolygon():
+      if onlyPolygons and not way.isPolygon():
         continue
       for tag in tags:
         if not way.tags.has_key(tag) or not way.tags[tag]==tags[tag]:
@@ -258,7 +258,7 @@ class OSM():
       ways=[]
       for m in rel.members:           # collecting all ways
         if m[0]=="way" and m[2]==pos:
-          ways.append(str(m[1]))
+          ways.append(m[1])
       for w1_key in ways:             # for all ways proove if it could be completed to a polygon
         w1=self.ways[w1_key]          # get polygon by id
         tmpResult=[w1_key]
@@ -312,7 +312,7 @@ class Node():
     
     @param tags: A dictionary containing all the tags for the node.
     """
-    self.id = str(identifier)
+    self.id = identifier
     self.lat = float(lat)
     self.lon = float(lon)
     if not isinstance(tags, dict):
@@ -379,7 +379,7 @@ class Way():
       raise TypeError("tags must be a dictionary")
     self.tags = tags
   
-  def hasPolygon(self):
+  def isPolygon(self):
     """
     This functions prooves if the Way has a polygon
     
@@ -539,7 +539,7 @@ class Way():
       if dist<minDist:
         minDist=dist
         
-    if self.hasPolygon():
+    if self.isPolygon():
       if self._isPointInsidePolygon(coords,vertices):
         minDist=-minDist
     return minDist
@@ -556,7 +556,7 @@ class Relation():
     
     @param tags: A dictionary containing all the tags for the way
     """
-    self.id = str(identifier)
+    self.id = identifier
     if not isinstance(members, list):
       raise TypeError("members need to be a list of tripel")
     self.members = [tuple(m) for m in members]   
