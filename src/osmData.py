@@ -244,6 +244,17 @@ class OSM():
     return nearestRel
   
   def isInside(self, point, rel_id):
+    """
+    This function prooves, if a point is inside a relation.
+    
+    @param point: the point to proove
+    @type point; Tuple(float,float)
+    
+    @param rel_id: the ID of the relation for which the function prooves
+    @type rel_id: str
+    
+    @return the result e.g. (True,([1],"way")) or (True,([1,2,5],"way")) for polygon combinded of more then one way
+    """
     rel=self.relations[rel_id]
     if len(rel.polygons)==0:
       self._searchForPolygons(rel)
@@ -253,6 +264,7 @@ class OSM():
       memb[m[0]].append(m[1])
       
     result=(sys.float_info.max,("-1",None))
+    # proove all ways
     for w in memb["way"]:
       way=self.ways[w]
       if any([w in x for x in rel.polygons]):
@@ -265,6 +277,7 @@ class OSM():
           dist=way.getDistance(point,vertices)
           if result[0]>dist:
             result=(dist,([x for y in rel.polygons for x in y if way.id in y],"way"))
+    # proove all relations
     for r in memb["relation"]:
       subRes=self.isInside(point,r)
       if result[0]>subRes[0]:
@@ -275,6 +288,7 @@ class OSM():
   def _searchForPolygons(self,rel):
     """
     This function searches hidden polygons, which are defined by more then one way
+    and saves them in the list "polygons" of the given relation
     """
     if not isinstance(rel, Relation) :
       raise TypeError("_searchForPolygons only accepts an object with type osmData.Relation")
@@ -404,7 +418,7 @@ class Way():
   
   def isPolygon(self):
     """
-    This functions prooves if the Way has a polygon
+    This functions prooves if the Way is a polygon
     
     @return true if polygon exists
     """
@@ -547,10 +561,8 @@ class Way():
     @type vertices: [Tupel(float,float),]
     
     @return minDist: The distance to the given node
-             if minDist>0 point is outside
+             if minDist>0 distance to the way-obj
              if mindDist=0 point is on edge
-             if point is inside: -1 
-             if the placemark contains no polygon: -2
     """
     if not isinstance(coords, types.TupleType) or not len(coords)==2:
       raise TypeError("getDistance only accepts Tupels from type types.TupelType with 2 Entries from type float")
