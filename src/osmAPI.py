@@ -33,13 +33,14 @@ class osmAPI():
     @param filterList: (optional) list of tripel of filter-rules e.g.(["way","node"],"amenity","univerity")
     @return: an request object with the data-xml in the content property
     """
-    return self._parseData(requests.get(self.osmurl,
-                                        params=self._getOsmRequestData(boundingBox[0],
-                                                                       boundingBox[1],
-                                                                       boundingBox[2],
-                                                                       boundingBox[3],
-                                                                       filterList)).content)
-  
+    return self._parseData(
+      requests.get(self.osmurl,
+                    params=self._getOsmRequestData(boundingBox[0],
+                                                   boundingBox[1],
+                                                   boundingBox[2],
+                                                   boundingBox[3],
+                                                   filterList)).content)
+
   def _parseData(self, obj):
     """ """
     osmObj=osmData.OSM()
