@@ -263,14 +263,14 @@ class OSM():
           vertices=[self._vertices[self.ways[i].refs] for i in rel.polygons]
         if len(vertices)>0 and way._isPointInsidePolygon(point,vertices):
           dist=way.getDistance(point,vertices)
+          #print point,memb["way"],vertices,dist
           if result[0]>dist:
             result=(dist,([x for y in rel.polygons for x in y if way.id in y],"way"))
     for r in memb["relation"]:
       subRes=self.isInside(point,r)
       if result[0]>subRes[0]:
         result=(subRes[0],([r],"relation"))
-    if not result[1]==("-1",None):
-      result=(True,result[1])
+    result=(not result[1]==("-1",None),result[1])
     return result    
 
   def _searchForPolygons(self,rel):
@@ -285,22 +285,21 @@ class OSM():
         if m[0]=="way" and m[2]==pos:
           ways.append(m[1])
       for w1_key in ways:             # for all ways proove if it could be completed to a polygon
-        w1=self.ways[w1_key]          # get polygon by id
-        tmpResult=[w1_key]
-        tmpWays=copy.deepcopy(ways)   # make a deep copy of the remaining way-objects
-        tmpWays.remove(w1_key)        # and delete the current way
-        for i in range(0, len(tmpWays)):    # for each item of the remaining way-objects
-          for w2_key in tmpWays:
-            w2=self.ways[w2_key]
-            # is the last node-id of the last added way = first node-id of the next way
-            if self.ways[tmpResult[-1]].refs[-1]==w2.refs[0]:
-              tmpResult.append(w2_key)
-              tmpWays.remove(w2_key)
-              break
-        if self.ways[tmpResult[0]].refs[0]==self.ways[tmpResult[-1]].refs[-1]:    # complete polygon?
-          rel.addPolygon(tmpResult)
-          for res in tmpResult:       # delete all for this polygon used ways
-            ways.remove(res)
+        if not any([w1_key in x for x in rel.polygons]):
+          w1=self.ways[w1_key]          # get polygon by id
+          tmpResult=[w1_key]
+          tmpWays=copy.deepcopy(ways)   # make a deep copy of the remaining way-objects
+          tmpWays.remove(w1_key)        # and delete the current way
+          for i in range(0, len(tmpWays)):    # for each item of the remaining way-objects
+            for w2_key in tmpWays:
+              w2=self.ways[w2_key]
+              # is the last node-id of the last added way = first node-id of the next way
+              if self.ways[tmpResult[-1]].refs[-1]==w2.refs[0]:
+                tmpResult.append(w2_key)
+                tmpWays.remove(w2_key)
+                break
+          if self.ways[tmpResult[0]].refs[0]==self.ways[tmpResult[-1]].refs[-1]:    # complete polygon?
+            rel.addPolygon(tmpResult)
   
   def _vertices(self,nodeList):
     """
