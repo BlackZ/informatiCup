@@ -108,12 +108,15 @@ class TestRelationObject(unittest.TestCase):
                                                [("way", 8, "outer"),("relation", 1, "parking")],
                                                {"type":"site"}))
     
+    self.wayType=self.testOSM8.ways[8].__class__
+    self.relType=self.testOSM8.relations[1].__class__
+    
   
   #========================================================
   #Tests for isInside
   #========================================================
   def test_isInsideCombinedPoly(self):
-    trueResult = (True,([1,2,5],"way"))
+    trueResult = (True,([1,2,5],self.wayType))
     result=self.testOSM6.relations[1].isInside((2.0,7.0),self.testOSM6)
     self.assertEqual(result,trueResult)
   
@@ -123,17 +126,17 @@ class TestRelationObject(unittest.TestCase):
     self.assertEqual(result,trueResult)
   
   def test_isInsideWithMoreRelations(self):
-    trueResult = (True,([1],"relation"))
+    trueResult = (True,([1],self.relType))
     result=self.testOSM8.relations[2].isInside((2.0,7.0),self.testOSM8)
     self.assertEqual(result,trueResult)
     
   def test_isInsideComplex(self):
-    trueResult = (True,([7],"way"))
+    trueResult = (True,([7],self.wayType))
     result=self.testOSM5.relations[1].isInside((2.5,2.5),self.testOSM5)
     self.assertEqual(result,trueResult)
     
   def test_isInsideComplex2(self):
-    trueResult = (True,([2],"way"))
+    trueResult = (True,([2],self.wayType))
     result=self.testOSM5.relations[1].isInside((2.18,2.18),self.testOSM5)
     self.assertEqual(result,trueResult)
   #========================================================

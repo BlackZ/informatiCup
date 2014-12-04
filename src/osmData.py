@@ -622,12 +622,12 @@ class Relation(object):
         if len(vertices)>0 and way._isPointInsidePolygon(point,vertices):
           dist=way.getDistance(point,vertices)
           if result[0]>dist:
-            result=(dist,([x for y in rel.polygons for x in y if way.id in y],"way"))
+            result=(dist,([x for y in rel.polygons for x in y if way.id in y],way.__class__))
     # proove all relations
     for r in memb["relation"]:
       subRes=osmObj.relations[r].isInside(point,osmObj)
       if result[0]>subRes[0]:
-        result=(subRes[0],([r],"relation"))
+        result=(subRes[0],([r],osmObj.relations[r].__class__))
     result=(not result[1]==("-1",None),result[1])
     return result    
   
