@@ -16,6 +16,8 @@ class OSM():
     self.ways = {}
     self.relations = {}
     
+    self.visitedRelations={}
+    
   def addNode(self, node):
     if isinstance(node,Node):
       self.nodes[node.id] = node
@@ -69,7 +71,7 @@ class OSM():
     if not isinstance(tags, dict) :
       raise TypeError("getNearestNode only accepts a dict to filter nodes")
     
-    nearestNode=distanceResult(sys.float_info.max,("-1",None))
+    nearestNode=distanceResult(sys.float_info.max,[("-1",None)])
     
     nodes=[]
     if len(otherNodes)>0:
@@ -90,11 +92,14 @@ class OSM():
       try:
         if node.distance==None:
           node.distance=node.distToNode(coords)    # calculate distance
-        dist=node.distance
+          
         # proove if the current node is the current nearest node
-        if dist<nearestNode.distance:
-          nearestNode.distance=dist
-          nearestNode.nearestObj=(node.id,"node")
+        if node.distance<nearestNode.distance:
+          nearestNode.distance=node.distance
+          nearestNode.nearestObj=[(node.id,node.__class__)]
+        elif node.distance==nearestNode.distance:
+          nearestNode.nearestObj.append(node.id,node.__class__)
+          
       except TypeError:
         pass
     return nearestNode 
@@ -124,7 +129,7 @@ class OSM():
     if not isinstance(tags, dict) :
       raise TypeError("getNearestWay only accepts a dict to filter nodes")
     
-    nearestWay=distanceResult(sys.float_info.max,("-1",None))
+    nearestWay=distanceResult(sys.float_info.max,[("-1",None)])
     ways=[]
     if len(otherWays)>0:
       ways=otherWays
@@ -145,12 +150,14 @@ class OSM():
       try:
         if way.distance==None:
           way.distance=way.getDistance(coords,self._vertices(way.refs))       # calculate distance
-        dist=way.distance
         
         # proove if current way is the current nearest way
-        if dist<nearestWay.distance:
-          nearestWay.distance=dist
-          nearestWay.nearestObj=(way.id,"way")
+        # TODO: ggf nearestEdge einfügen als subobject
+        if way.distance<nearestWay.distance:
+          nearestWay.distance=way.distance
+          nearestWay.nearestObj=[(way.id,way.__class__)]
+        elif way.distance==nearestWay.distance:
+          nearestWay.nearestObj.append((way.id,way.__class__))
       except TypeError:
         pass
     return nearestWay
@@ -177,7 +184,7 @@ class OSM():
     if not isinstance(tags, dict) :
       raise TypeError("getNearestRelation only accepts a dict to filter nodes")
     
-    nearestRel=distanceResult(sys.float_info.max,("-1",None))
+    nearestRel=distanceResult(sys.float_info.max,[("-1",None)])
     
     relations=[]
     if len(otherRelations)>0:
@@ -187,9 +194,7 @@ class OSM():
     
     for r in relations:
       rel=self.relations[r]
-      if not rel.distance==None and level==0:
-        continue
-        
+      
       #if len(rel.polygons)==0:
       #  self._searchForPolygons(rel)
 
@@ -207,9 +212,9 @@ class OSM():
         memb[m[0]].append(m[1])
       
       # init resultObjects for member-distances  
-      nearestNode=distanceResult(sys.float_info.max,("-1",None))
-      nearestWay=distanceResult(sys.float_info.max,("-1",None))
-      nearestSubRel=distanceResult(sys.float_info.max,("-1",None))
+      nearestNode=distanceResult(sys.float_info.max,[("-1",None)])
+      nearestWay=distanceResult(sys.float_info.max,[("-1",None)])
+      nearestSubRel=distanceResult(sys.float_info.max,[("-1",None)])
 
 
         # if the found way belongs to a polygon combined of several ways proove if point is inside and set flag
@@ -240,13 +245,33 @@ class OSM():
         
       # find the neareast subobject to determine the distance of the relation to the given point
       for obj in [nearestNode,nearestWay,nearestSubRel]:
-        if obj.distance<=nearestRel.distance:
+        if obj.distance<nearestRel.distance:
           nearestRel.distance=obj.distance
           nearestRel.nearestSubObj=obj.nearestObj
-          nearestRel.nearestObj=(rel.id,"relation")
-    rel.distance=nearestRel.distance
+          nearestRel.nearestObj=[(rel.id,rel.__class__)]
+        elif obj.distance==nearestRel.distance and not obj.nearestObj[0][0]=="-1":
+          # if subobj already found, don't add
+          if (rel.id in self.visitedRelations.keys()):
+            if self.visitedRelations[rel.id]>level:
+              continue
+          nearestRel.nearestSubObj=nearestRel.nearestSubObj+obj.nearestObj
+          nearestRel.nearestObj.append((rel.id,rel.__class__))
+      rel.distance=min(nearestNode.distance,nearestWay.distance,nearestSubRel.distance)
+      
+      # only update if this is the a deeper appeareance of the item
+      if (rel.id in self.visitedRelations.keys() and level>self.visitedRelations[rel.id]) or not rel.id in self.visitedRelations.keys():
+        self.visitedRelations.update({rel.id:level})
+        
+    # del all items which are listed but are subitems
+    if level==0:
+      newNearestRel=copy.deepcopy(nearestRel) 
+      for i in range(0,len(nearestRel.nearestObj)):
+        if nearestRel.nearestObj[i][0] in self.visitedRelations.keys() and self.visitedRelations[nearestRel.nearestObj[i][0]]>0:
+          idx=newNearestRel.nearestObj.index(nearestRel.nearestObj[i])
+          del newNearestRel.nearestObj[idx]
+          del newNearestRel.nearestSubObj[idx]
+      return newNearestRel
     return nearestRel
-  
 
   def _searchForPolygons(self,rel):
     """
@@ -288,7 +313,7 @@ class OSM():
       listOfPoints.append(self.nodes[n].coords)
     return listOfPoints
 
-class Node():
+class Node(object):
   
   def __init__(self, identifier, lat, lon, tags):
     """
@@ -358,7 +383,7 @@ class Node():
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     return math.hypot(coords[0] - self.lat, coords[1] - self.lon)
   
-class Way():
+class Way(object):
   
   def __init__(self, identifier, refs, tags):
     """
@@ -542,7 +567,7 @@ class Way():
     #    minDist=-minDist
     return minDist
   
-class Relation():
+class Relation(object):
   
   def __init__(self, identifier, members, tags):
     """
@@ -624,7 +649,7 @@ class Relation():
     return not self.__eq__(other)
   
 class distanceResult(object):
-  def __init__(self, distance, nearestObj, nearestSubObj=("-1",None)):
+  def __init__(self, distance, nearestObj, nearestSubObj=[("-1",None)]):
     """
     Basic class containing the result of a distance calculation
 
