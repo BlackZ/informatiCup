@@ -88,8 +88,9 @@ class OSM():
       if not nodeOk:
         continue
       try:
-        dist=node.distToNode(coords)    # calculate distance
-        
+        if node.distance==None:
+          node.distance=node.distToNode(coords)    # calculate distance
+        dist=node.distance
         # proove if the current node is the current nearest node
         if dist<nearestNode.distance:
           nearestNode.distance=dist
@@ -142,7 +143,9 @@ class OSM():
       if not wayOk:
         continue
       try:
-        dist=way.getDistance(coords,self._vertices(way.refs))       # calculate distance
+        if way.distance==None:
+          way.distance=way.getDistance(coords,self._vertices(way.refs))       # calculate distance
+        dist=way.distance
         
         # proove if current way is the current nearest way
         if dist<nearestWay.distance:
@@ -152,7 +155,7 @@ class OSM():
         pass
     return nearestWay
   
-  def getNearestRelation(self, coords, tags={}, otherRelations=[]):
+  def getNearestRelation(self, coords, tags={}, otherRelations=[], level=0):
     """
     This function returns the ids of the relation,its way and its distance which is closest to the given node 
     
@@ -184,8 +187,9 @@ class OSM():
     
     for r in relations:
       rel=self.relations[r]
-      #if not rel.distance==None:
-      #  continue
+      if not rel.distance==None and level==0:
+        continue
+        
       #if len(rel.polygons)==0:
       #  self._searchForPolygons(rel)
 
@@ -228,7 +232,7 @@ class OSM():
         #    nearestWay.insidePolygon=False
       # get all memberDistances      
       if len(memb["relation"])>0:
-        nearestSubRel=self.getNearestRelation(coords,tags,memb["relation"])
+        nearestSubRel=self.getNearestRelation(coords,tags,memb["relation"],level=level+1)
       if len(memb["way"])>0:
         nearestWay=self.getNearestWay(coords, False ,{}, memb["way"])
       if len(memb["node"])>0:
@@ -243,47 +247,6 @@ class OSM():
     rel.distance=nearestRel.distance
     return nearestRel
   
-  def isInside(self, point, rel_id):
-    """
-    This function prooves, if a point is inside a relation.
-    
-    @param point: the point to proove
-    @type point; Tuple(float,float)
-    
-    @param rel_id: the ID of the relation for which the function prooves
-    @type rel_id: str
-    
-    @return the result e.g. (True,([1],"way")) or (True,([1,2,5],"way")) for polygon combinded of more then one way
-    """
-    rel=self.relations[rel_id]
-    if len(rel.polygons)==0:
-      self._searchForPolygons(rel)
-      
-    memb={"way":[],"node":[],"relation":[]}
-    for m in rel.members:
-      memb[m[0]].append(m[1])
-      
-    result=(sys.float_info.max,("-1",None))
-    # proove all ways
-    for w in memb["way"]:
-      way=self.ways[w]
-      if any([w in x for x in rel.polygons]):
-        vertices=[]
-        if way.isPolygon:
-          vertices=self._vertices(way.refs)
-        else:
-          vertices=[self._vertices[self.ways[i].refs] for i in rel.polygons]
-        if len(vertices)>0 and way._isPointInsidePolygon(point,vertices):
-          dist=way.getDistance(point,vertices)
-          if result[0]>dist:
-            result=(dist,([x for y in rel.polygons for x in y if way.id in y],"way"))
-    # proove all relations
-    for r in memb["relation"]:
-      subRes=self.isInside(point,r)
-      if result[0]>subRes[0]:
-        result=(subRes[0],([r],"relation"))
-    result=(not result[1]==("-1",None),result[1])
-    return result    
 
   def _searchForPolygons(self,rel):
     """
@@ -600,6 +563,48 @@ class Relation():
     self.tags = tags
     self.distance=None
     self.polygons = []    
+  
+  def isInside(self, point, osmObj):
+    """
+    This function prooves, if a point is inside a relation.
+    
+    @param point: the point to proove
+    @type point; Tuple(float,float)
+    
+    @param osmObj: current osm-Object with all data about nodes,ways and relations
+    @type osmObj: osmData.osm
+    
+    @return the result e.g. (True,([1],"way")) or (True,([1,2,5],"way")) for polygon combinded of more then one way
+    """
+    rel=osmObj.relations[self.id]
+    if len(rel.polygons)==0:
+      osmObj._searchForPolygons(rel)
+      
+    memb={"way":[],"node":[],"relation":[]}
+    for m in rel.members:
+      memb[m[0]].append(m[1])
+      
+    result=(sys.float_info.max,("-1",None))
+    # proove all ways
+    for w in memb["way"]:
+      way=osmObj.ways[w]
+      if any([w in x for x in rel.polygons]):
+        vertices=[]
+        if way.isPolygon:
+          vertices=osmObj._vertices(way.refs)
+        else:
+          vertices=[osmObj._vertices[osmObj.ways[i].refs] for i in rel.polygons]
+        if len(vertices)>0 and way._isPointInsidePolygon(point,vertices):
+          dist=way.getDistance(point,vertices)
+          if result[0]>dist:
+            result=(dist,([x for y in rel.polygons for x in y if way.id in y],"way"))
+    # proove all relations
+    for r in memb["relation"]:
+      subRes=osmObj.relations[r].isInside(point,osmObj)
+      if result[0]>subRes[0]:
+        result=(subRes[0],([r],"relation"))
+    result=(not result[1]==("-1",None),result[1])
+    return result    
   
   def addPolygon(self, nodeList):
     self.polygons.append(nodeList)

@@ -166,11 +166,11 @@ class TestOSMObject(unittest.TestCase):
       self.testOSM8.addWay(self.testOSM6.ways[way])
     self.testOSM8.addWay(osmData.Way(8, [11, 12, 13, 11], {}))
     
-    self.testOSM8.addRelation(osmData.Relation(1,
+    self.testOSM8.addRelation(osmData.Relation(2,
                                                [("way", 1, "outer"),("way", 2, "outer"),("way", 3, "inner"), ("way", 4, "inner"), ("way", 5, "outer")],
                                                {"type":"multipolygon"}))
-    self.testOSM8.addRelation(osmData.Relation(2,
-                                               [("way", 8, "outer"),("relation", 1, "parking")],
+    self.testOSM8.addRelation(osmData.Relation(1,
+                                               [("way", 8, "outer"),("relation", 2, "parking")],
                                                {"type":"site"}))
     
     self.testOSM9=osmData.OSM()
@@ -247,34 +247,6 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestPoint.nearestSubObj, result.nearestSubObj)
   #========================================================
 
-  #========================================================
-  #Tests for isInside
-  #========================================================
-  def test_isInsideCombinedPoly(self):
-    trueResult = (True,([1,2,5],"way"))
-    result=self.testOSM6.isInside((2.0,7.0),1)
-    self.assertEqual(result,trueResult)
-  
-  def test_isInsideOutside(self):
-    trueResult = (False,("-1",None))
-    result=self.testOSM6.isInside((2.0,9.0),1)
-    self.assertEqual(result,trueResult)
-  
-  def test_isInsideWithMoreRelations(self):
-    trueResult = (True,([1],"relation"))
-    result=self.testOSM8.isInside((2.0,7.0),2)
-    self.assertEqual(result,trueResult)
-    
-  def test_isInsideComplex(self):
-    trueResult = (True,([7],"way"))
-    result=self.testOSM5.isInside((2.5,2.5),1)
-    self.assertEqual(result,trueResult)
-    
-  def test_isInsideComplex2(self):
-    trueResult = (True,([2],"way"))
-    result=self.testOSM5.isInside((2.18,2.18),1)
-    self.assertEqual(result,trueResult)
-  #========================================================
 
   #========================================================
   #Tests for getNearestRelation
@@ -332,7 +304,7 @@ class TestOSMObject(unittest.TestCase):
       self.testOSM5.getNearestRelation(self.testPoint, "asd")
   
   def test_getNearestRelationTypeSite(self):
-    nearestRelation= osmData.distanceResult(0.17149858514250862,(2,"relation"),(1,"relation"))
+    nearestRelation= osmData.distanceResult(0.17149858514250862,(1,"relation"),(2,"relation"))
     result=self.testOSM8.getNearestRelation((2.0,7.0))
     self.assertEqual(nearestRelation.nearestObj, result.nearestObj)
     self.assertEqual(nearestRelation.distance, result.distance)
