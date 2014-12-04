@@ -184,8 +184,8 @@ class OSM():
     
     for r in relations:
       rel=self.relations[r]
-      if not rel.distance==None:
-        continue
+      #if not rel.distance==None:
+      #  continue
       #if len(rel.polygons)==0:
       #  self._searchForPolygons(rel)
 
