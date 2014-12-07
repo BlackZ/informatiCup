@@ -156,8 +156,8 @@ class TestRelationObject(unittest.TestCase):
     
   def test_createRelationWithIntId(self):
     testRelation = osmData.Relation(int(self.id), self.members, self.tags)
-    self.assertNotEqual(testRelation.id, self.id)
-    self.assertEqual(testRelation.id, "1")
+    self.assertEqual(testRelation.id, int(self.id))
+    self.assertNotEqual(testRelation.id, "1")
     
   def test_createRealtionFailMembersNoList(self):
     with self.assertRaises(TypeError):

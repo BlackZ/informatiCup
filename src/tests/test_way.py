@@ -104,8 +104,9 @@ class TestWayObject(unittest.TestCase):
     
   def test_createWayWithIntId(self):
     testWay = osmData.Way(int(self.id), self.refs, self.tags)
-    self.assertNotEqual(testWay.id, self.id)
-    self.assertEqual(testWay.id, "1")
+    self.assertEqual(testWay.id, int(self.id))
+    self.assertNotEqual(testWay.id, "1")
+    
     
   def test_createWayFailNoList(self):
     with self.assertRaises(TypeError):
