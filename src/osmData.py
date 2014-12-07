@@ -51,12 +51,12 @@ class OSM():
   def __ne__(self,other):
     return not self.__eq__(other)
   
-  def getNearestNode(self, coords, tags={}, otherNodes=[]):
+  def getNearestNode(self, point, tags={}, otherNodes=[]):
     """
     This function returns the nearest node and its distance given a point and an optional list of tags
     
-    @param coords: a point for which the nearest node should be found
-    @type coords: Tupel(float,float)
+    @param point: a point for which the nearest node should be found
+    @type point: Tupel(float,float)
     
     @param tags: a list of tags for filtering the nodes e.g. {"":""}
     @type tags: dict(str:str)
@@ -64,9 +64,9 @@ class OSM():
     @param otherNodes: use this nodes to find nearest node
     @type otherNodes: [str,]
     """
-    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+    if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
-    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+    if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(tags, dict) :
       raise TypeError("getNearestNode only accepts a dict to filter nodes")
@@ -87,11 +87,12 @@ class OSM():
       for tag in tags:
         if not node.tags.has_key(tag) or not node.tags[tag]==tags[tag]:
           nodeOk=False
+          break
       if not nodeOk:
         continue
       try:
         if node.distance==None:
-          node.distance=node.distToNode(coords)    # calculate distance
+          node.distance=node.distToNode(point)    # calculate distance
           
         # proove if the current node is the current nearest node
         if node.distance<nearestNode.distance:
@@ -104,12 +105,12 @@ class OSM():
         pass
     return nearestNode 
   
-  def getNearestWay(self, coords, onlyPolygons,tags={}, otherWays=[]):
+  def getNearestWay(self, point, onlyPolygons,tags={}, otherWays=[]):
     """
     This function returns the id of the polygon(way) and its distance which is closest to the given node
     
-    @param coords: point for which the function have to compute closest polygon
-    @type coords: Tuple(float,float)
+    @param point: point for which the function have to compute closest polygon
+    @type point: Tuple(float,float)
     
     @param onlyPolygons: prove only distance to way with complete polygons?
     @type onlyPolygons: boolean
@@ -122,9 +123,9 @@ class OSM():
     
     @return Tupel(id,distance)
     """
-    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+    if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestWay only accepts Tupels from type types.TupelType with 2 Entries from type float")
-    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+    if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("getNearestWay only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(tags, dict) :
       raise TypeError("getNearestWay only accepts a dict to filter nodes")
@@ -145,11 +146,12 @@ class OSM():
       for tag in tags:
         if not way.tags.has_key(tag) or not way.tags[tag]==tags[tag]:
           wayOk=False
+          break
       if not wayOk:
         continue
       try:
         if way.distance==None:
-          way.distance=way.getDistance(coords,self._vertices(way.refs))       # calculate distance
+          way.distance=way.getDistance(point,self._vertices(way.refs))       # calculate distance
         
         # proove if current way is the current nearest way
         # TODO: ggf nearestEdge einfügen als subobject
@@ -251,12 +253,12 @@ class OSM():
           nearestRel.nearestObj=[(rel.id,rel.__class__)]      
     return nearestRel
   
-  def getNearestRelation(self, coords, tags={}, otherRelations=[], level=0):
+  def getNearestRelation(self, point, tags={}, otherRelations=[], level=0):
     """
     This function returns the ids of the relation,its way and its distance which is closest to the given node 
     
-    @param coords: point for which the function have to compute closest polygon
-    @type coords: Tuple(float,float)
+    @param point: point for which the function have to compute closest polygon
+    @type point: Tuple(float,float)
 
     @param tags: list of tags which will be used to filter the ways
     @type tags: dict(str:str)
@@ -266,9 +268,9 @@ class OSM():
     
     @return Tupel(Tupel(rel_id,way_id),distance)
     """
-    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+    if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestRelation only accepts Tupels from type types.TupelType with 2 Entries from type float")
-    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+    if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("getNearestRelation only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(tags, dict) :
       raise TypeError("getNearestRelation only accepts a dict to filter nodes")
@@ -289,6 +291,7 @@ class OSM():
       for tag in tags:
         if not rel.tags.has_key(tag) or not rel.tags[tag]==tags[tag]:
           relOk=False
+          break
       if not relOk:
         continue
       
@@ -304,11 +307,11 @@ class OSM():
 
       # get all memberDistances      
       if len(memb["relation"])>0:
-        nearestSubRel=self.getNearestRelation(coords,tags,memb["relation"],level=level+1)
+        nearestSubRel=self.getNearestRelation(point,tags,memb["relation"],level=level+1)
       if len(memb["way"])>0:
-        nearestWay=self.getNearestWay(coords, False ,{}, memb["way"])
+        nearestWay=self.getNearestWay(point, False ,{}, memb["way"])
       if len(memb["node"])>0:
-        nearestNode=self.getNearestNode(coords, {}, memb["node"])
+        nearestNode=self.getNearestNode(point, {}, memb["node"])
         
       # find the neareast subobject to determine the distance of the relation to the given point
       for obj in [nearestNode,nearestWay,nearestSubRel]:
@@ -619,9 +622,9 @@ class Way(object):
              if minDist>0 distance to the way-obj
              if mindDist=0 point is on edge
     """
-    if not isinstance(coords, types.TupleType) or not len(coords)==2:
+    if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getDistance only accepts Tupels from type types.TupelType with 2 Entries from type float")
-    if not isinstance(coords[0], float) or not isinstance(coords[1], float) :
+    if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("getDistance only accepts Tupels from type types.TupelType with 2 Entries from type float")    
     minDist=sys.float_info.max
     for s in self._sides(vertices):
