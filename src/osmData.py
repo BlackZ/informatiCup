@@ -12,6 +12,13 @@ import copy
 class OSM():
   
   def __init__(self):
+    """
+      Constructor for the osm data object. 
+      
+      Initialises the dictionaries for the nodes, ways and relations that will be 
+      contained in this osmObject.
+      
+    """
     self.nodes = {}
     self.ways = {}
     self.relations = {}
@@ -19,28 +26,64 @@ class OSM():
     self.visitedRelations={}
     
   def addNode(self, node):
+    """
+      Function to add a node to this osm object.
+      
+      @param relation: The node object that is to be added.
+      
+      @raise TypeError: TypeError is raised when something other than a node is passed.
+    """
     if isinstance(node,Node):
       self.nodes[node.id] = node
     else:
       raise TypeError("addNode only accepts nodes.")
       
   def addNodeList(self, nodeList):
+    """
+      Function to add a list of nodes to this osm object.
+      
+      @param nodeList: The list of node objects that are to be added.
+    """
     for node in nodeList:
       self.addNode(node)
     
   def addWay(self, way):
+    """
+      Function to add a way to this osm object.
+      
+      @param relation: The way object that is to be added.
+      
+      @raise TypeError: TypeError is raised when something other than a way is passed.
+    """
     if isinstance(way,Way):
       self.ways[way.id] = way
     else:
       raise TypeError("addWay only accepts ways.")
     
   def addRelation(self,relation):
+    """
+      Function to add a relation to this osm object.
+      
+      @param relation: The relation object that is to be added.
+      
+      @raise TypeError: TypeError is raised when something other than a relation is passed.
+    """
     if isinstance(relation,Relation):
       self.relations[relation.id] = relation
     else:
       raise TypeError("addRelation only accepts relations.")
       
   def __eq__(self, other):
+    """
+      Override of the equal method for OSM.
+      
+      Equality is based on the equality of the three dictionaries nodes, ways and relations
+      
+      @param other: The other osm object that this object is to be compared with.
+      
+      @return: True if the other object is equal to this object, else False.
+      @rtype: Boolean
+    """
     if not isinstance(other, self.__class__):
       return False
     
@@ -49,6 +92,14 @@ class OSM():
       and self.relations == other.relations)
 
   def __ne__(self,other):
+    """
+      Override of the not equal method for OSM.
+      
+      @param other: The osm object that this object is to be compared with.
+      
+      @return: True if other is not equal to this object, else False.
+      @rtype: Boolean
+    """
     return not self.__eq__(other)
   
   def getNearestNode(self, point, tags={}, otherNodes=[]):
@@ -418,6 +469,17 @@ class Node(object):
     return str(self.lat) + "," +str(self.lon)
     
   def __eq__(self,other):
+    """
+      Override of the equality method for node. 
+      
+      Equality is based on the equality of the id, longitude, latitude and the tags.
+      
+      @param other: The node this node is to be compared with.
+      
+      @return: True if the other node is equal to this node with respect to 
+              the above mentioned fields, else False.
+      @rtype: Boolean
+    """
     if not isinstance(other,self.__class__):
       return False
     
@@ -427,6 +489,14 @@ class Node(object):
       and self.tags == other.tags)
       
   def __ne__(self,other):
+    """
+      Override of the not equal method for node.
+      
+      @param other: The node that this node is to be compared with.
+      
+      @return: True if other is not equal to this node, else False.
+      @rtype: Boolean
+    """
     return not self.__eq__(other)
   
   @property
@@ -485,6 +555,16 @@ class Way(object):
     return False
   
   def __eq__(self,other):
+    """
+      Override of the equality method for way. 
+      
+      Equality is based on the equality of the id, the references and the tags.
+      
+      @param other: The relation this relation is to be compared with.
+      
+      @return: True if the other way is equal to this way in id, references and tags, else False.
+      @rtype: Boolean
+    """
     if not isinstance(other, self.__class__):
       return False
     
@@ -493,6 +573,14 @@ class Way(object):
       and self.tags == other.tags)
       
   def __ne__(self,other):
+    """
+      Override of the not equal method for way.
+      
+      @param other: The way that this way is to be compared with.
+      
+      @return: True if other is not equal to this way, else False.
+      @rtype: Boolean
+    """
     return not self.__eq__(other)
   
   def _sides(self,vertices):
@@ -643,11 +731,13 @@ class Relation(object):
     """
     Basic class containing an osm Relation
     
-    @param identifier: The id of the way as a string
+    @param identifier: The id of the relation.
     
-    @param members: A list of tripel (membertype[e.g.  way], id of the member, addition tags [e.g. outer])
+    @param members: The members of this relation.
+    @type members: A list of tripel [membertype(e.g.  way), id of the member, addition tags (e.g. outer)]
     
-    @param tags: A dictionary containing all the tags for the way
+    @param tags: A dictionary containing all the tags for the relation
+    @type tags: {key: value,}
     """
     self.id = identifier
     if not isinstance(members, list):
@@ -701,13 +791,37 @@ class Relation(object):
     result=(not result[1]==("-1",None),result[1])
     return result    
   
-  def addPolygon(self, nodeList):
-    self.polygons.append(nodeList)
+  def addPolygon(self, wayList):
+    """
+    Function to add a polygon to the relation.
+    
+    @param wayList: List of way ids that make up the polygon 
+    @type wayList: A list of ids. The id's can be of any type but must match
+                  the type of the actual objects.
+    """
+    self.polygons.append(wayList)
     
   def addPolygonList(self, polyList):
+    """
+      Function to add a list of polygons to the relation.
+      
+      @param polyList: List of polygons. A polygon is given by a list of way Ids 
+                      that make up the polygon.
+      @type polyList: A list of lists that contain way Ids.
+    """
     self.polygons=polyList
    
   def __eq__(self,other):   
+    """
+      Override of the equality method for relations. 
+      
+      Equality is based on the equality of the id, the members and the tags.
+      
+      @param other: The relation this relation is to be compared with.
+      
+      @return: True if the other relation is equal to this relation in id, members and tags, else False.
+      @rtype: Boolean
+    """
     if not isinstance(other, self.__class__):
       return False
     
@@ -716,6 +830,14 @@ class Relation(object):
       and self.tags == other.tags)
    
   def __ne__(self,other):
+    """
+      Override of the not equal method for relations.
+      
+      @param other: The relation that this relation is to be compared with.
+      
+      @return: True if other is not equal to this relation, else False.
+      @rtype: Boolean
+    """
     return not self.__eq__(other)
   
 class distanceResult(object):
