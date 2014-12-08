@@ -308,17 +308,43 @@ class OSM():
     """
     This function returns the ids of the relation,its way and its distance which is closest to the given node 
     
-    @param point: point for which the function have to compute closest polygon
+    @param point: The point - (lat, lon) - for which the function has
+                  to compute the closest polygon.
     @type point: Tuple(float,float)
 
-    @param tags: list of tags which will be used to filter the ways
+    @param tags: A dictionary of tags, given as a key value pair, which
+                will be used to filter the ways.
+                
+                e.g. dict("type":"multipolyon")                
     @type tags: dict(str:str)
     
-    @param otherRelations: use this relations to find nearest relation
+    @param otherRelations: Use only this relations, given by a list of
+                           its IDs, to find the nearest relation.                       
     @type otherRelations: [str,]
     
-    @return Tupel(Tupel(rel_id,way_id),distance)
+    @return The function returns a distanceResult-Object which holds the
+            following informations:
+            
+            - distance (float): If an object is found, it contains the
+                                distance to the nearest object, otherwise
+                                it contains the float_max value.
+  
+            - nearestObj (str, type): If an object is found, it contains the ID and
+                                      the type of the nearest object, otherwise the
+                                      ID equals -1 and the type is None.
+                                      
+                                      For example:
+                                        found object: ("1", osmData.Relation)
+                                        nothing found: ("-1", None)
+                                      
+            - nearestSubObj (str, type):  If an object is found, it contains the ID
+                                          and the tyoe if the neares subobject in
+                                          the relation. Otherwise the ID equals -1
+                                          and the type is None.
+                                        
+                                          For examples look at nearestObj.
     """
+    
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestRelation only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(point[0], float) or not isinstance(point[1], float) :
@@ -504,7 +530,7 @@ class Node(object):
     """
     This function-property returns latitude and longitude as tupel
     
-    @return (lon,lat) as tupel
+    @return (lat, lon) as tupel
     """
     return (self.lat,self.lon)
   
@@ -851,14 +877,14 @@ class distanceResult(object):
     @param distance: The distance to the nearestObj
     @type distance: float
     
-    @param nearestObj: the id and type of the nearest object e.g. ("1","relation")
+    @param nearestObj: the id and type of the nearest object e.g. ("1",osmData.Relation)
     @type nearestObj: Tuple(str,str)
     
     @param nearestSubObj: (optional) the nearest subobject of the current
                           nearest object (a way which is a subobject of a relation)
-                          e.g. ("2","way")
+                          e.g. ("2",osmData.Way)
     @type nearestSubObj: Tuple(str,str)
     """
-    self.distance=distance
-    self.nearestObj=nearestObj
-    self.nearestSubObj=nearestSubObj
+    self.distance = distance
+    self.nearestObj = nearestObj
+    self.nearestSubObj = nearestSubObj
