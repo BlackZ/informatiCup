@@ -96,7 +96,7 @@ class KMLObject():
   
 class Placemark():
   
-  def __init__(self, name, ruleType, nodeList=None, style="defaultStyle"):
+  def __init__(self, name, ruleType=None, nodeList=None, style="defaultStyle"):
     """
       Constructor for the Placemark class.
       
