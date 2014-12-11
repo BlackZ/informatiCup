@@ -14,10 +14,26 @@ class TestWayObject(unittest.TestCase):
     self.id = "0001"
     self.refs = ["0001","0002","0003"]
     self.tags = {"highway":"residential","name":"Clipstone Street"}
-    self.testWay = osmData.Way(3, [1,2,3,1], {"highway":"residential","name":"Clipstone Street"})
-    self.testWay2 = osmData.Way(3, [1,2], {"highway":"residential","name":"Clipstone Street"})
-    self.testWay3 = osmData.Way(3, [1,2,3,4], {"highway":"residential","name":"Clipstone Street"})
-    self.testVertices=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13),(52.12, 4.12)]
+    self.testOSM=osmData.OSM()
+    self.testOSM.addNodeList([osmData.Node(1, 52.12, 4.12, {}),
+                               osmData.Node(2, 52.13, 4.12,{}),
+                               osmData.Node(3, 52.12, 4.13, {})])
+
+    self.testWay = osmData.Way(1, [1,2,3,1], {"highway":"residential","name":"Clipstone Street"},self.testOSM)
+    self.testWay2 = osmData.Way(2, [1,2], {"highway":"residential","name":"Clipstone Street"},self.testOSM)
+    self.testWay3 = osmData.Way(3, [1,2,3,4], {"highway":"residential","name":"Clipstone Street"},self.testOSM)
+    self.testOSM.addWay(self.testWay)
+    self.testOSM.addWay(self.testWay2)
+    self.testOSM.addWay(self.testWay3)
+    
+    self.wayType=self.testOSM.ways[1].__class__
+    self.nodeType=self.testOSM.nodes[1].__class__
+    
+    #self.testVertices=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13),(52.12, 4.12)]
+  
+  def test_verticies(self):
+    trueList=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13),(52.12, 4.12)]
+    self.assertEqual(self.testWay._vertices(),trueList)
   
   #============================================================
   #hasPolygon()-Tests
@@ -37,13 +53,13 @@ class TestWayObject(unittest.TestCase):
   #isPointInsidePolygon()-Tests
   #============================================================  
   def test_isPointInsidePolygon_inside(self):
-    self.assertTrue(self.testWay._isPointInsidePolygon((52.123,4.12003),self.testVertices))
+    self.assertTrue(self.testWay._isPointInsidePolygon((52.123,4.12003)))
     
   def test_isPointInsidePolygon_outside(self):
-    self.assertFalse(self.testWay._isPointInsidePolygon((52.11,4.11),self.testVertices))
+    self.assertFalse(self.testWay._isPointInsidePolygon((52.11,4.11)))
     
   def test_isPointInsidePolygon_border(self):
-    self.assertTrue(self.testWay._isPointInsidePolygon((52.12,4.12),self.testVertices))
+    self.assertTrue(self.testWay._isPointInsidePolygon((52.12,4.12)))
   #============================================================
   
   
@@ -52,23 +68,28 @@ class TestWayObject(unittest.TestCase):
   #============================================================  
   def test_getDistanceFailNoTupel(self):
     with self.assertRaises(TypeError):
-      self.testWay.getDistance("asd",self.testVertices)
+      self.testWay.getDistance("asd")
       
   def test_getDistance_inside(self):
-    trueDist=0.002828427124749019
-    self.assertEqual(self.testWay.getDistance((52.123,4.123),self.testVertices),trueDist)
+    trueObj=osmData.distanceResult(0.002828427124749019,[(self.testWay.id,self.testWay.__class__)],[([(52.13, 4.12), (52.12, 4.13)],self.nodeType)])
+    result=self.testWay.getDistance((52.123,4.123))
+    self.assertEqual(result.distance,trueObj.distance)
+    self.assertEqual(result.nearestObj,trueObj.nearestObj)
+    self.assertEqual(result.nearestSubObj,trueObj.nearestSubObj)
   
   def test_getDistance_outside(self):
-    trueDist=0.004242640687119446
-    self.assertEqual(self.testWay.getDistance((52.117,4.117),self.testVertices),trueDist)
+    trueObj=osmData.distanceResult(0.004242640687119446,[(self.testWay.id,self.testWay.__class__)],[([(52.12, 4.12), (52.13, 4.12)],self.nodeType)])
+    result=self.testWay.getDistance((52.117,4.117))
+    self.assertEqual(result.distance,trueObj.distance)
+    self.assertEqual(result.nearestObj,trueObj.nearestObj)
+    self.assertEqual(result.nearestSubObj,trueObj.nearestSubObj)
   
   def test_getDistance_border(self):
-    trueDist=0.0
-    self.assertEqual(self.testWay.getDistance((52.12,4.12),self.testVertices),trueDist)
-    
-  #def test_distToPolygonFailNoPolygon(self):
-  #  errorCode=-2
-  #  self.assertEqual(self.testWay2.distToPolygon((52.123,4.123),self.testVertices), errorCode)
+    trueObj=osmData.distanceResult(0.0,[(self.testWay.id,self.testWay.__class__)],[([(52.12, 4.12), (52.13, 4.12)],self.nodeType)])
+    result=self.testWay.getDistance((52.12,4.12))
+    self.assertEqual(result.distance,trueObj.distance)
+    self.assertEqual(result.nearestObj,trueObj.nearestObj)
+    self.assertEqual(result.nearestSubObj,trueObj.nearestSubObj)
   #============================================================
 
 
@@ -87,45 +108,47 @@ class TestWayObject(unittest.TestCase):
   
   def test_sides(self):
     trueList=[[(52.12, 4.12),(52.13, 4.12)],[(52.13, 4.12),(52.12, 4.13)],[(52.12, 4.13),(52.12, 4.12)]]
-    self.assertEqual(self.testWay._sides(self.testVertices),trueList)
+    self.assertEqual(self.testWay._sides(),trueList)
   
   def test_createWay(self):
-    testWay = osmData.Way(self.id, self.refs, self.tags)
+    testWay = osmData.Way(self.id, self.refs, self.tags,self.testOSM)
     self.assertIsNotNone(testWay)
     self.assertEqual(testWay.id, self.id)
     self.assertEqual(testWay.refs, self.refs)
     self.assertEqual(testWay.tags, self.tags)
+    self.assertEqual(testWay.osmObj, self.testOSM)
     
   def test_createWayFail(self):
-    testWay = osmData.Way(2, self.refs[0:2], self.tags)
+    testWay = osmData.Way(2, self.refs[0:2], self.tags,self.testOSM)
     self.assertNotEqual(testWay.id, self.id)
     self.assertNotEqual(testWay.refs, self.refs)
     self.assertEqual(testWay.tags, self.tags)
+    self.assertEqual(testWay.osmObj, self.testOSM)
     
   def test_createWayWithIntId(self):
-    testWay = osmData.Way(int(self.id), self.refs, self.tags)
+    testWay = osmData.Way(int(self.id), self.refs, self.tags,self.testOSM)
     self.assertEqual(testWay.id, int(self.id))
     self.assertNotEqual(testWay.id, "1")
     
     
   def test_createWayFailNoList(self):
     with self.assertRaises(TypeError):
-      testWay = osmData.Way(self.id, "asd", self.tags)
+      testWay = osmData.Way(self.id, "asd", self.tags,self.testOSM)
       
   def test_createWayFailNotADictionary(self):
     with self.assertRaises(TypeError):
-      testWay = osmData.Way(self.id, self.refs, "a:b")
+      testWay = osmData.Way(self.id, self.refs, "a:b",self.testOSM)
     
   def test_isWayEqual(self):
-    testWay = osmData.Way(self.id, self.refs, self.tags)
+    testWay = osmData.Way(self.id, self.refs, self.tags,self.testOSM)
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    otherWay = osmData.Way("0001", ["0001","0002","0003"], {"highway":"residential","name":"Clipstone Street"})
+    otherWay = osmData.Way("0001", ["0001","0002","0003"], {"highway":"residential","name":"Clipstone Street"},self.testOSM)
     
     self.assertEqual(testWay, otherWay)
     
   def test_isWayNotEqual(self):
-    testWay = osmData.Way(self.id, self.refs, self.tags)
+    testWay = osmData.Way(self.id, self.refs, self.tags,self.testOSM)
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
     otherWay = osmData.Way("0002", ["0001","0002","0003"], {"highway":"residential","name":"Clipstone Street"})

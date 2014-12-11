@@ -17,15 +17,17 @@ class TestNodeObject(unittest.TestCase):
     self.lon = 2.1
     self.tags = {"highway":"traffic_signals"}
     
-  def test_distToNode(self):
+  def test_getDistance(self):
     testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
-    trueValue=1.2727922061357855
-    self.assertEqual(testNode.distToNode((1.0,3.0)),trueValue)
+    trueObj=osmData.distanceResult(1.2727922061357855,[(testNode.id,testNode.__class__)])
+    result=testNode.getDistance((1.0,3.0))
+    self.assertEqual(result.nearestObj,trueObj.nearestObj)
+    self.assertEqual(result.distance,trueObj.distance)
     
-  def test_distToNodeFail(self):
+  def test_getDistanceFail(self):
     testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
     with self.assertRaises(TypeError):
-      testNode.distToNode("asd")
+      testNode.getDistance("asd")
     
   def test_coords(self):
     testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
