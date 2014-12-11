@@ -435,7 +435,7 @@ class OSM():
       raise TypeError("getNearestWay only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(tags, dict) :
       raise TypeError("getNearestWay only accepts a dict to filter nodes")
-    if not isinstance(otherNodes,types.ListType):
+    if not isinstance(otherWays,types.ListType):
       raise TypeError("getNearestWay only accepts a list of other ways")
     
     nearestWay=distanceResult(sys.float_info.max,[("-1",None)])
@@ -518,7 +518,7 @@ class OSM():
       raise TypeError("getNearestRelation only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(tags, dict) :
       raise TypeError("getNearestRelation only accepts a dict to filter nodes")
-    if not isinstance(otherNodes,types.ListType):
+    if not isinstance(otherRelations,types.ListType):
       raise TypeError("getNearestRelation only accepts a list of other relations")
     
     nearestRel=distanceResult(sys.float_info.max,[("-1",None)])
@@ -546,7 +546,7 @@ class OSM():
         nearestRel=distResult
       elif distResult.distance==nearestRel.distance:
         nearestRel.nearestObj+=distResult.nearestObj
-        nearestRel.nearestSubObj+=+distResult.nearestSubObj
+        nearestRel.nearestSubObj+=distResult.nearestSubObj
     
     # take only top-lvl relations
     newNearestRel=copy.deepcopy(nearestRel)
