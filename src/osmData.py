@@ -925,10 +925,9 @@ class Relation(object):
         nearestElem.distance=distResult.distance
         nearestElem.nearestObj=[(self.id,self.__class__)]
         nearestElem.nearestSubObj=distResult.nearestObj
-      #elif distResult.distance==nearestElem.distance:
-      #  nearestElem.nearestSubObj+=distResult.nearestObj
+      elif distResult.distance==nearestElem.distance:
+        nearestElem.nearestSubObj+=distResult.nearestObj
     return nearestElem
-
   
   def _searchForPolygons(self):
     """
@@ -1057,13 +1056,15 @@ class distanceResult(object):
     @param distance: The distance to the nearestObj
     @type distance: float
     
-    @param nearestObj: the id and type of the nearest object e.g. ("1",osmData.Relation)
-    @type nearestObj: Tuple(str,str)
+    @param nearestObj: the IDs and types of the nearest objects e.g. [("1",osmData.Relation),..]
+    @type nearestObj: [Tuple(str,str)]
     
     @param nearestSubObj: (optional) the nearest subobject of the current
                           nearest object (a way which is a subobject of a relation)
-                          e.g. ("2",osmData.Way)
-    @type nearestSubObj: Tuple(str,str)
+                          an object in nearestSubObj belongs to an object in nearestObj
+                          if both have the same index
+                          e.g. [("2",osmData.Way),...]
+    @type nearestSubObj: [Tuple(str,str)]
     """
     self.distance = distance
     self.nearestObj = nearestObj
