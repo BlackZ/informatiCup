@@ -117,7 +117,6 @@ class Placemark():
                 (Currently not used)
       @type style: String.
     """
-    print "placemark consts", nodeList
     self.name = name
     self.ruleType = ruleType
     self.style = style
