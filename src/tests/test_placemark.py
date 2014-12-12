@@ -59,10 +59,8 @@ class TestPlacemarkObject(unittest.TestCase):
 
   def test_hasPolygonFailWith2Nodes(self):
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
-    print "first", placemarkObj.polygon
     placemarkObj.addNode(self.nodeList[0])  
     placemarkObj.addNode(self.nodeList[1])
-    print placemarkObj.polygon
     self.assertFalse(placemarkObj.hasPolygon())    
     
   def test_hasPolygon(self):
