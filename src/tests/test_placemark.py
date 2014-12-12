@@ -38,7 +38,7 @@ class TestPlacemarkObject(unittest.TestCase):
     self.assertIsNotNone(placemarkObj.polygon)
     self.assertEqual(len(placemarkObj.polygon),len(self.nodeList))
     
-  def test_createPlacemarkFailNoList(self):
+  def test_createPlacemarkFailNotList(self):
     with self.assertRaises(TypeError):
       placemarkObj = kmlData.Placemark(self.testName, self.ruleType, 42)
         
@@ -59,8 +59,10 @@ class TestPlacemarkObject(unittest.TestCase):
 
   def test_hasPolygonFailWith2Nodes(self):
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
-    placemarkObj.addNode(self.nodeList[0])
+    print "first", placemarkObj.polygon
+    placemarkObj.addNode(self.nodeList[0])  
     placemarkObj.addNode(self.nodeList[1])
+    print placemarkObj.polygon
     self.assertFalse(placemarkObj.hasPolygon())    
     
   def test_hasPolygon(self):

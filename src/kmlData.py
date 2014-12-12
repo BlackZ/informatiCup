@@ -13,15 +13,17 @@ class KMLObject():
   """ Class representing a kml file. Holds a list of contained placemarks.
   """
   
-  def __init__(self, placemark=None):
+  def __init__(self, placemarks=None):
     """
       Constructor for the KMLObject.
       
-      @param placemark: Optional paramter to initialise this KMLObject with a placemark.
+      @param placemarks: Optional paramter to initialise this KMLObject with a list of placemarks.
     """
-    self.placemarks=[]
-    if not placemark==None:
-      self.addPlacemark(placemark)
+    self.placemarks = []
+    if placemarks != None:
+      if not isinstance(placemarks, list):
+        raise TypeError("placemarks must be a list of placemarks.")
+      self.placemarks=placemarks
       
   def addPlacemark(self, placemark):
     """
@@ -114,12 +116,16 @@ class Placemark():
                 (Currently not used)
       @type style: String.
     """
+    print "placemark consts", nodeList
     self.name = name
     self.ruleType = ruleType
     self.style = style
-    self.polygon=[]
-    if not nodeList==None:
-      self.addNodeList(nodeList)
+    self.polygon = []
+    if nodeList != None:
+      if not isinstance(nodeList, list):
+        raise TypeError("nodeList must be a list of nodes")
+      self.polygon = nodeList
+    
     
   def addNode(self, node):
     """

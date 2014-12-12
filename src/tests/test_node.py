@@ -52,7 +52,7 @@ class TestNodeObject(unittest.TestCase):
   def test_createNodeWithIntId(self):
     testNode = osmData.Node(int(self.id), self.lat,self.lon,self.tags)
     self.assertNotEqual(testNode.id, self.id)
-    self.assertEqual(testNode.id, "1")
+    self.assertEqual(testNode.id, int(self.id))
     
   def test_createNodeFailWrongLatType(self):
     with self.assertRaises(ValueError):

@@ -13,8 +13,8 @@ import os
 class TestKMLObject(unittest.TestCase):
   
   def setUp(self):
-    self.testPlacemark = kmlData.Placemark("0002", ("smoking","no"), 
-                        [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
+    self.testPlacemarks = [(kmlData.Placemark("0002", ("smoking","no"), 
+                        [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})]))]
     
 
   def test_createKML(self):  
@@ -24,18 +24,18 @@ class TestKMLObject(unittest.TestCase):
     
     
   def test_createKMLWithPlacemark(self):
-    kmlObj = kmlData.KMLObject(self.testPlacemark)
+    kmlObj = kmlData.KMLObject(self.testPlacemarks)
     self.assertIsNotNone(kmlObj)
     self.assertIsNotNone(kmlObj.placemarks)
     self.assertEqual(len(kmlObj.placemarks), 1)
-    self.assertEqual(kmlObj.placemarks[-1], self.testPlacemark)
+    self.assertEqual(kmlObj.placemarks, self.testPlacemarks)
     
     
   def test_addPlacemark(self):
     kmlObj = kmlData.KMLObject()
-    kmlObj.addPlacemark(self.testPlacemark)
+    kmlObj.addPlacemark(self.testPlacemarks[0])
     self.assertEqual(len(kmlObj.placemarks), 1)
-    self.assertEqual(kmlObj.placemarks[-1], self.testPlacemark)
+    self.assertEqual(kmlObj.placemarks[-1], self.testPlacemarks[0])
     
   def test_addPlacemarkList(self):
     testPlacemark2=kmlData.Placemark("0003", ("smoking","no"), 
@@ -45,9 +45,9 @@ class TestKMLObject(unittest.TestCase):
     testPlacemark4=kmlData.Placemark("0005", ("smoking","no"), 
                         [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})])
     kmlObj=kmlData.KMLObject()
-    kmlObj.addPlacemarkList([self.testPlacemark, testPlacemark2, testPlacemark3])
+    kmlObj.addPlacemarkList([self.testPlacemarks[0], testPlacemark2, testPlacemark3])
     self.assertEqual(len(kmlObj.placemarks),3)
-    self.assertTrue(self.testPlacemark in kmlObj.placemarks)
+    self.assertTrue(self.testPlacemarks[0] in kmlObj.placemarks)
     self.assertTrue(testPlacemark2 in kmlObj.placemarks)
     self.assertTrue(testPlacemark3 in kmlObj.placemarks)
     self.assertFalse(testPlacemark4 in kmlObj.placemarks)
