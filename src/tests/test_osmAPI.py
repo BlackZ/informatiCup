@@ -33,13 +33,13 @@ class TestOsmAPI(unittest.TestCase):
     self.testOsmObj.addNode(osmData.Node("46426098", 52.0375177, 8.4995645, {}))
     self.testOsmObj.addNode(osmData.Node("46426114", 52.0386730, 8.4981747, {}))
     self.testOsmObj.addWay(osmData.Way("46480681", ["593900008", "416938583"],
-                                       {"bicycle":"yes","highway":"footway"}))
+                                       {"bicycle":"yes","highway":"footway"}, self.testOsmObj))
     self.testOsmObj.addRelation(osmData.Relation("152923",
                                                  [("way","35221623","outer")],
-                                                 {"natural":"scrub","type":"multipolygon"}))
+                                                 {"natural":"scrub","type":"multipolygon"}, self.testOsmObj))
     self.testOsmObj.addRelation(osmData.Relation("905522",
                                                  [("way","26582813","outer"),(
-                                                  "way","20213971","inner")],{"type":"multipolygon"}))
+                                                  "way","20213971","inner")],{"type":"multipolygon"}, self.testOsmObj))
   
   def test_getOsmRequestData(self):
     testObj=self.osmAPIobj._getOsmRequestData(self.boundingBox[0],

@@ -14,25 +14,25 @@ import osmData
 class TestOSMObjectEquality(unittest.TestCase):
   
   def setUp(self):
-    
-    self.testNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
-    self.testWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
-    self.testRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
-                                             {"name":"Tween Pond", "natural":"water"})
-    
     self.testOSM = osmData.OSM()
+    self.testNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
+    self.testWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"},self.testOSM)
+    self.testRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
+                                             {"name":"Tween Pond", "natural":"water"},self.testOSM)
+    
+    
     self.testOSM.addNode(self.testNode)
     self.testOSM.addRelation(self.testRelation)
     self.testOSM.addWay(self.testWay)    
     
     
   def test_isOSMEqual(self):
-    
-    compareNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
-    compareWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
-    compareRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
-                                             {"name":"Tween Pond", "natural":"water"})
     compareOSMObject = osmData.OSM()
+    compareNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
+    compareWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"}, compareOSMObject)
+    compareRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
+                                             {"name":"Tween Pond", "natural":"water"}, compareOSMObject)
+    
     compareOSMObject.addNode(compareNode)
     compareOSMObject.addWay(compareWay)
     compareOSMObject.addRelation(compareRelation)
@@ -43,12 +43,13 @@ class TestOSMObjectEquality(unittest.TestCase):
   def test_isOSMNotEqualMoreNodes(self):
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
+    compareOSMObject = osmData.OSM()
     compareNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
     secondCompareNode = osmData.Node(2, 0.1, 2.1, {"highway":"traffic_signals"})
-    compareWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
+    compareWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"},compareOSMObject)
     compareRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
-                                             {"name":"Tween Pond", "natural":"water"})
-    compareOSMObject = osmData.OSM()
+                                             {"name":"Tween Pond", "natural":"water"},compareOSMObject)
+    
     compareOSMObject.addNode(compareNode)
     compareOSMObject.addNode(secondCompareNode)
     compareOSMObject.addWay(compareWay)
@@ -59,11 +60,12 @@ class TestOSMObjectEquality(unittest.TestCase):
   def test_isOSMNotEqualWrongNode(self):
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    compareNode = osmData.Node(2, 0.1, 2.1, {"highway":"traffic_signals"})
-    compareWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
-    compareRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
-                                             {"name":"Tween Pond", "natural":"water"})
     compareOSMObject = osmData.OSM()
+    compareNode = osmData.Node(2, 0.1, 2.1, {"highway":"traffic_signals"})
+    compareWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"},compareOSMObject)
+    compareRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
+                                             {"name":"Tween Pond", "natural":"water"},compareOSMObject)
+    
     compareOSMObject.addNode(compareNode)
     compareOSMObject.addWay(compareWay)
     compareOSMObject.addRelation(compareRelation)
@@ -73,11 +75,12 @@ class TestOSMObjectEquality(unittest.TestCase):
   def test_isOSMNotEqualWrongWay(self):
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    compareNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
-    compareWay = osmData.Way(3, [1,2,4], {"highway":"residential","name":"Clipstone Street"})
-    compareRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
-                                             {"name":"Tween Pond", "natural":"water"})
     compareOSMObject = osmData.OSM()
+    compareNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
+    compareWay = osmData.Way(3, [1,2,4], {"highway":"residential","name":"Clipstone Street"},compareOSMObject)
+    compareRelation = osmData.Relation(5, [("way",8125151,"outer"),("way",249285853,"inner")], 
+                                             {"name":"Tween Pond", "natural":"water"},compareOSMObject)
+    
     compareOSMObject.addNode(compareNode)
     compareOSMObject.addWay(compareWay)
     compareOSMObject.addRelation(compareRelation)
@@ -87,11 +90,12 @@ class TestOSMObjectEquality(unittest.TestCase):
   def test_isOSMNotEqualWrongRelation(self):
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    compareNode = osmData.Node(2, 0.1, 2.1, {"highway":"traffic_signals"})
-    compareWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"})
-    compareRelation = osmData.Relation(8, [("way",8125151,"outer"),("way",249285853,"inner")], 
-                                             {"name":"Tween Pond", "natural":"water"})
     compareOSMObject = osmData.OSM()
+    compareNode = osmData.Node(2, 0.1, 2.1, {"highway":"traffic_signals"})
+    compareWay = osmData.Way(3, [1,2,3], {"highway":"residential","name":"Clipstone Street"},compareOSMObject)
+    compareRelation = osmData.Relation(8, [("way",8125151,"outer"),("way",249285853,"inner")], 
+                                             {"name":"Tween Pond", "natural":"water"},compareOSMObject)
+    
     compareOSMObject.addNode(compareNode)
     compareOSMObject.addWay(compareWay)
     compareOSMObject.addRelation(compareRelation)

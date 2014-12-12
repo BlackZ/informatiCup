@@ -192,9 +192,8 @@ class Placemark():
     linearRing = ET.SubElement(outerBoundary, "LinearRing")
     
     coordinates = ET.SubElement(linearRing, "coordinates")
-    coordinates.text = ""
-    for n in self.polygon:
-      coordinates.text += n.getCoordinateString()
+    coordinates.text = "\n".join([ n.getCoordinateString() for n in self.polygon])
+    coordinates.text += "\n" + self.polygon[0].getCoordinateString()
     
     return root
     

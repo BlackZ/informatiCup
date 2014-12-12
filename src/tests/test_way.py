@@ -151,7 +151,8 @@ class TestWayObject(unittest.TestCase):
     testWay = osmData.Way(self.id, self.refs, self.tags,self.testOSM)
     #Deliberatly not using the self variables to make sure it is filled with
     #other objects
-    otherWay = osmData.Way("0002", ["0001","0002","0003"], {"highway":"residential","name":"Clipstone Street"})
+    otherOSM = osmData.OSM()
+    otherWay = osmData.Way("0002", ["0001","0002","0003"], {"highway":"residential","name":"Clipstone Street"}, otherOSM)
     
     self.assertNotEqual(testWay, otherWay)
   

@@ -82,10 +82,41 @@ class TestPlacemarkObject(unittest.TestCase):
     
   def test_getXMLTree(self):
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.nodeList)
-    trueString = '' #TODO
-    compareString = xmlUtils.unescape(ET.tostring(placemarkObj.getXMLTree(), encoding='utf-8'))
-    #print compareString
-    self.assertEqual(compareString, trueString)
-
+    tree = placemarkObj.getXMLTree()
+    self.assertEqual(tree.tag, "Placemark")
+    nameE = tree.find("name")
+    self.assertIsNotNone(nameE)
+    self.assertEqual(nameE.text, self.testName)
+    trueDescription = "<img src='" + self.testName + ".jpg' width = '400' />"
+    descriptionE = tree.find("description")
+    self.assertIsNotNone(descriptionE)
+    self.assertEqual(descriptionE.text, trueDescription)
+    styleE = tree.find("styleUrl")
+    trueStyle = "#defaultStyle"
+    self.assertIsNotNone(styleE)
+    self.assertEqual(styleE.text, trueStyle)
+    polygonE = tree.find("Polygon")
+    self.assertIsNotNone(polygonE)
+    altitudeE = polygonE.find("altitudeMode")
+    trueAltitude = "clampToGround"
+    self.assertIsNotNone(altitudeE)
+    self.assertEqual(altitudeE.text, trueAltitude)
+    extrudeE = polygonE.find("extrude")
+    self.assertIsNotNone(extrudeE)
+    self.assertEqual(extrudeE.text, "1")
+    tessellateE = polygonE.find("tessellate")
+    self.assertIsNotNone(tessellateE)
+    self.assertEqual(tessellateE.text, "1")
+    outerBoundE = polygonE.find("outerBoundaryIs")
+    self.assertIsNotNone(outerBoundE)
+    linRingE = outerBoundE.find("LinearRing")
+    self.assertIsNotNone(linRingE)
+    coordsE = linRingE.find("coordinates")
+    trueCoords = "\n".join([n.getCoordinateString() for n in self.nodeList])
+    trueCoords += "\n"+self.nodeList[0].getCoordinateString()
+    self.assertIsNotNone(coordsE)
+    self.assertEqual(coordsE.text, trueCoords)
+    
+    
 if __name__ == '__main__':
   unittest.main()

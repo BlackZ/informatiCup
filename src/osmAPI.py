@@ -76,7 +76,7 @@ class osmAPI():
           way_refs = self._getRefs(way)
           way_tags = self._getTags(way)
         
-          wayObj = osmData.Way(way_id, way_refs, way_tags)  
+          wayObj = osmData.Way(way_id, way_refs, way_tags, osmObj)  
           osmObj.addWay(wayObj)
       
     for relation in data.getElementsByTagName('relation'):
@@ -93,7 +93,7 @@ class osmAPI():
           rel_members = self._getMembers(relation)
           rel_tags = self._getTags(relation) 
 
-          relObj = osmData.Relation(rel_id, rel_members, rel_tags)
+          relObj = osmData.Relation(rel_id, rel_members, rel_tags, osmObj)
           osmObj.addRelation(relObj)
 
     return osmObj
