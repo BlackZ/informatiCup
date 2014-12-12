@@ -23,7 +23,8 @@ class KMLObject():
     if placemarks != None:
       if not isinstance(placemarks, list):
         raise TypeError("placemarks must be a list of placemarks.")
-      self.placemarks=placemarks
+      for p in placemarks:
+        self.addPlacemark(p)
       
   def addPlacemark(self, placemark):
     """
@@ -124,7 +125,7 @@ class Placemark():
     if nodeList != None:
       if not isinstance(nodeList, list):
         raise TypeError("nodeList must be a list of nodes")
-      self.polygon = nodeList
+      self.addNodeList(nodeList)
     
     
   def addNode(self, node):
