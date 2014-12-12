@@ -193,6 +193,7 @@ class Placemark():
     
     coordinates = ET.SubElement(linearRing, "coordinates")
     coordinates.text = "\n".join([ n.getCoordinateString() for n in self.polygon])
+    #Placemark polygons are supposed to close with the starting coordinates again.
     coordinates.text += "\n" + self.polygon[0].getCoordinateString()
     
     return root
