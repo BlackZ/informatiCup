@@ -17,7 +17,7 @@ class TestPlacemarkObject(unittest.TestCase):
   def setUp(self):
     self.testName = "0002"
     self.ruleType = ("key", "value")
-    self.pointList = ["4.12,52.12","4.12,52.13","4.13,52.12"]
+    self.nodeList = [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})]
     self.testStyle = "#defaultStyle"
 
   def test_createPlacemark(self):  
@@ -30,58 +30,57 @@ class TestPlacemarkObject(unittest.TestCase):
     self.assertEqual(len(placemarkObj.polygon),0)
     
   def test_createPlacemarkWithPolygon(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.pointList)
+    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.nodeList)
     self.assertIsNotNone(placemarkObj)
     self.assertEqual(placemarkObj.name, self.testName)
     self.assertEqual(placemarkObj.ruleType, self.ruleType)
     self.assertIsNotNone(placemarkObj.polygon)
-    self.assertEqual(len(placemarkObj.polygon),len(self.pointList))
-    self.assertEqual(placemarkObj.polygon, self.pointList)
+    self.assertEqual(len(placemarkObj.polygon),len(self.nodeList))
     
   def test_createPlacemarkFailNotList(self):
     with self.assertRaises(TypeError):
       placemarkObj = kmlData.Placemark(self.testName, self.ruleType, 42)
         
-  def test_addPoint(self):
+  def test_addNode(self):
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
-    placemarkObj.addPoint(self.pointList[0])
+    placemarkObj.addNode(self.nodeList[0])
     self.assertEqual(len(placemarkObj.polygon),1)
-    self.assertEqual(placemarkObj.polygon[-1], self.pointList[0])
+    self.assertEqual(placemarkObj.polygon[-1], self.nodeList[0])
     
-  def test_addPointFailIntGiven(self):
+  def test_addNodeFailStringGiven(self):
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
     with self.assertRaises(TypeError):
-      placemarkObj.addPoint(42)
+      placemarkObj.addNode(self.testName)
     
-  def test_hasPolygonFailNoPoints(self):
+  def test_hasPolygonFailNoNodes(self):
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
     self.assertFalse(placemarkObj.hasPolygon())
 
-  def test_hasPolygonFailWith2Points(self):
+  def test_hasPolygonFailWith2Nodes(self):
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
-    placemarkObj.addPoint(self.pointList[0])  
-    placemarkObj.addPoint(self.pointList[1])
+    placemarkObj.addNode(self.nodeList[0])  
+    placemarkObj.addNode(self.nodeList[1])
     self.assertFalse(placemarkObj.hasPolygon())    
     
   def test_hasPolygon(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.pointList)
+    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.nodeList)
     self.assertTrue(placemarkObj.hasPolygon())    
 
-  def test_addPointList(self):
+  def test_addNodeList(self):
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
-    placemarkObj.addPointList(self.pointList)
-    for point in self.pointList:
-      self.assertTrue(point in placemarkObj.polygon)
+    placemarkObj.addNodeList(self.nodeList)
+    for node in self.nodeList:
+      self.assertTrue(node in placemarkObj.polygon)
   
-  def test_addPointListFailNoOtherNodesAffected(self):
-    firstPoint = "123.2,312.5"
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, [firstPoint])
-    placemarkObj.addPointList(self.pointList)
-    self.assertEqual(len(placemarkObj.polygon), len(self.pointList) + 1)
-    self.assertTrue(firstPoint in placemarkObj.polygon)
+  def test_addNodeListFailNoOtherNodesAffected(self):
+    firstNode = osmData.Node(4,123.2,312.5,{})
+    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, [firstNode])
+    placemarkObj.addNodeList(self.nodeList)
+    self.assertEqual(len(placemarkObj.polygon), len(self.nodeList) + 1)
+    self.assertTrue(firstNode in placemarkObj.polygon)
     
   def test_getXMLTree(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.pointList)
+    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.nodeList)
     tree = placemarkObj.getXMLTree()
     self.assertEqual(tree.tag, "Placemark")
     nameE = tree.find("name")
@@ -112,8 +111,8 @@ class TestPlacemarkObject(unittest.TestCase):
     linRingE = outerBoundE.find("LinearRing")
     self.assertIsNotNone(linRingE)
     coordsE = linRingE.find("coordinates")
-    trueCoords = "\n".join(self.pointList)
-    trueCoords += "\n"+self.pointList[0]
+    trueCoords = "\n".join([n.getCoordinateString() for n in self.nodeList])
+    trueCoords += "\n"+self.nodeList[0].getCoordinateString()
     self.assertIsNotNone(coordsE)
     self.assertEqual(coordsE.text, trueCoords)
     

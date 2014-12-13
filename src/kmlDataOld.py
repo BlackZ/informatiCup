@@ -5,6 +5,7 @@ Created on Sun Nov  9 15:09:52 2014
 @author: jpoeppel & adreyer
 """
 
+import osmData
 #import lxml.etree as ET
 import xml.etree.cElementTree as ET
 import xml.sax.saxutils as xmlUtils
@@ -84,10 +85,10 @@ class KMLObject():
             if startlat==None:
               startlat=lat
               startlon=lon
-              newPlacemark.addPoint(node)
+              newPlacemark.addNode(osmData.Node(nid,lat,lon,{}))
               nid+=1
             elif startlat!=lat or startlon!=lon:
-              newPlacemark.addPoint(node)
+              newPlacemark.addNode(osmData.Node(nid,lat,lon,{}))
               nid+=1
               if nodeNr==numberOfNodes:
                 raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
@@ -125,7 +126,7 @@ class KMLObject():
   
 class Placemark():
   
-  def __init__(self, name, ruleType=None, pointList=None, style="#defaultStyle"):
+  def __init__(self, name, ruleType=None, nodeList=None, style="#defaultStyle"):
     """
       Constructor for the Placemark class.
       
@@ -137,8 +138,7 @@ class Placemark():
       @param ruleType: The rule type of the placemark. (Currently not used)
       @type ruleType: Tupel(key, value)
       
-      @param pointList: Optional pointList that contains the points coordinates that make 
-                          up the polygon this placemark describes.
+      @param nodeList: Optional nodeList that contains the nodes making up the polygon this placemark describes.
       
       @param style: Optional style for the placemark. Relevant for displaying the placemark in googleEarth. 
                 (Currently not used)
@@ -148,36 +148,36 @@ class Placemark():
     self.ruleType = ruleType
     self.style = style
     self.polygon = []
-    if pointList != None:
-      if not isinstance(pointList, list):
+    if nodeList != None:
+      if not isinstance(nodeList, list):
         raise TypeError("nodeList must be a list of nodes")
-      self.addPointList(pointList)
+      self.addNodeList(nodeList)
     
     
-  def addPoint(self, point):
+  def addNode(self, node):
     """
       Function to add a node to the polygon for the placemark.
       
-      @param node: The point coordinate that is to be added to the placemark.
+      @param node: The node that is to be added to the placemark.
       
-      @raise TypeError: If point is not a string.
+      @raise TypeError: If node is not osmData.Node.
     """
-    if not isinstance(point, str):
-      raise TypeError("addPoint only accepts strings for the point coordinates.")
-    self.polygon.append(point)
+    if not isinstance(node, osmData.Node):
+      raise TypeError("addNode only accepts Nodes.")
+    self.polygon.append(node)
   
-  def addPointList(self, pointList):
+  def addNodeList(self, nodeList):
     """
       Function to add a list of nodes to the polygon of the placemark.
       
-      @param pointList: The list of point coordinates that are to be added.
+      @param nodeList: The list of nodes that are to be added.
       
-      @raise TypeError: If pointList is not a list.
+      @raise TypeError: If nodeList is not a list.
     """
-    if not isinstance(pointList, list):
+    if not isinstance(nodeList, list):
       raise TypeError("addNodeList only accepts a list of nodes.")
-    for point in pointList:
-      self.addPoint(point)
+    for node in nodeList:
+      self.addNode(node)
   
   def hasPolygon(self):
     """
@@ -219,9 +219,9 @@ class Placemark():
     linearRing = ET.SubElement(outerBoundary, "LinearRing")
     
     coordinates = ET.SubElement(linearRing, "coordinates")
-    coordinates.text = "\n".join(self.polygon)
+    coordinates.text = "\n".join([ n.getCoordinateString() for n in self.polygon])
     #Placemark polygons are supposed to close with the starting coordinates again.
-    coordinates.text += "\n" + self.polygon[0]
+    coordinates.text += "\n" + self.polygon[0].getCoordinateString()
     
     return root
     

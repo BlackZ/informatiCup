@@ -38,3 +38,6 @@ class TestProgrammPipeline(unittest.TestCase):
     
     self.assertEqual([lowerLeft[0], lowerLeft[1], upperRight[0], upperRight[1]], bBox)
 
+
+if __name__ == '__main__':
+  unittest.main()

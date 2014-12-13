@@ -28,18 +28,18 @@ class Pipeline:
     while isinstance(tmpRel[1], osmData.Relation):
       tmpRel = osmData.getNearestRelation(coords, otherRelations = [tmpRel[0]])
 
-    points = []
+    nodes = []
     if isinstance(tmpRel[1], osmData.Way):
       obj = self.osm.ways[tmpRel[0]]
       for ref in obj.refs:
-        points.append(osmData.nodes[ref].getCoordinateString())
+        nodes.append(osmData.nodes[ref])
     elif isinstance(tmpRel[1], osmData.Node):
-      points.append(self.osm.nodes[tmpRel[0]].getCoordinateString())
+      nodes.append(self.osm.nodes[tmpRel[0]])
     
     for rule in SUR.ruleName:
       self.kmlObj.addPlacemark(kml.Placemark(str(rule) + ":" + str(SUR.ruleName[rule]),
                           rule,
-                          pointList=points))
+                          nodeList=nodes))
     
     return self.kmlObj
   
