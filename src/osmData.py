@@ -379,7 +379,12 @@ class Node(object):
     self.tags = tags
     
   def getCoordinateString(self):
-    return str(self.lat) + "," +str(self.lon)
+    """
+      Returns a string representation of the coordinates for this node.
+      
+      @return: A String with lon, lat. Both with 8 trailing digits
+    """
+    return "%.8f,%.8f" % (self.lon, self.lat)
     
   def __eq__(self,other):
     """

@@ -58,12 +58,12 @@ class TestKMLObject(unittest.TestCase):
     name1="0001"
     name2="0002"
     style="#Poly1"
-    node11=osmData.Node(1,5.33897540,50.93030430,{})
-    node12=osmData.Node(2,5.33890610,50.93033890,{})
-    node13=osmData.Node(3,5.33892360,50.93035480,{})
+    node11=osmData.Node(1,50.93030430,5.33897540,{})
+    node12=osmData.Node(2,50.93033890,5.33890610,{})
+    node13=osmData.Node(3,50.93035480,5.33892360,{})
     node21=node12
     node22=node13
-    node23=osmData.Node(4,5.33897360,50.93040040,{})
+    node23=osmData.Node(4,50.93040040,5.33897360,{})
     
     testKML = kmlData.KMLObject.parseKML(filename);
     self.assertEqual(len(testKML.placemarks),2)
@@ -94,7 +94,13 @@ class TestKMLObject(unittest.TestCase):
     
     
   def test_getXML(self):
-    self.fail("TODO implement")
+    filename="../testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
+    truthFile = open(filename)
+    #Read string from file and remove potential windows return char \r. Also remove
+    #last \n that is added from the read function.
+    truthString = truthFile.read().replace("\r","").rstrip("\n")
+    kmlObj = kmlData.KMLObject.parseKML(filename);
+    self.assertEqual(kmlObj.getXML(), truthString)
       
   #ask me later (mimimi)
   #def test_getAllRequiredStyles(self):

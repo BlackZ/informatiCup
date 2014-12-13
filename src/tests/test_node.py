@@ -79,7 +79,7 @@ class TestNodeObject(unittest.TestCase):
 
   def test_getCoordinateString(self):
     testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
-    testString = str(self.lat) + "," + str(self.lon)
+    testString = "%.8f,%.8f" %(self.lon, self.lat)
     self.assertEqual(testNode.getCoordinateString(), testString)
 
 if __name__ == '__main__':

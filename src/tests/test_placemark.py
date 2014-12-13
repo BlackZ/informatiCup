@@ -10,8 +10,7 @@ import unittest
 import kmlData
 import osmData
 #import lxml.etree as ET
-import xml.etree.cElementTree as ET
-import xml.sax.saxutils as xmlUtils
+
 
 class TestPlacemarkObject(unittest.TestCase):
   
@@ -19,7 +18,7 @@ class TestPlacemarkObject(unittest.TestCase):
     self.testName = "0002"
     self.ruleType = ("key", "value")
     self.nodeList = [osmData.Node(1, 52.12, 4.12, {}), osmData.Node(2, 52.13, 4.12, {}), osmData.Node(3, 52.12, 4.13, {})]
-    self.testStyle = "defaultStyle"
+    self.testStyle = "#defaultStyle"
 
   def test_createPlacemark(self):  
     placemarkObj = kmlData.Placemark(self.testName, self.ruleType)

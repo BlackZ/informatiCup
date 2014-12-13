@@ -8,6 +8,7 @@ Created on Sun Nov  9 15:09:52 2014
 import osmData
 #import lxml.etree as ET
 import xml.etree.cElementTree as ET
+import xml.sax.saxutils as xmlUtils
 
 class KMLObject():
   """ Class representing a kml file. Holds a list of contained placemarks.
@@ -70,8 +71,8 @@ class KMLObject():
       startlat=None
       startlon=None
       for coord in pm.iter("{http://earth.google.com/kml/2.1}coordinates"):
-        coordstring = coord.text
-        nodes = coordstring.split('\n')
+        coordstring = coord.text.replace(" ", "")
+        nodes = filter(None, coordstring.split('\n'))
         numberOfNodes=len(nodes)
         nodeNr=0
         for node in nodes:
@@ -79,8 +80,8 @@ class KMLObject():
           if node.lstrip()!='':#leaves out the first and last entry because
                                #they don't hold coordinates
             pos = node.split(',')
-            lat=pos[0]
-            lon=pos[1]
+            lon=pos[0]
+            lat=pos[1]
             if startlat==None:
               startlat=lat
               startlon=lon
@@ -89,17 +90,43 @@ class KMLObject():
             elif startlat!=lat or startlon!=lon:
               newPlacemark.addNode(osmData.Node(nid,lat,lon,{}))
               nid+=1
-              if nodeNr+1==numberOfNodes:
+              if nodeNr==numberOfNodes:
                 raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
             else:
               startlat=None
               startlon=None
       res.addPlacemark(newPlacemark)
     return res
+    
+    
+  def getXML(self):
+    """
+      Function to return the XML representation for this kml as string.
+      
+      @return: The String-XML representation of this kml object.
+    """
+    root = ET.Element("kml")
+    root.attrib = {"xmlns":"http://earth.google.com/kml/2.1"}
+    documentE = ET.SubElement(root, "Document")
+    styleE = ET.SubElement(documentE, "Style")  
+    styleE.attrib = {"id":"defaultStyle"}
+    lineStyleE = ET.SubElement(styleE, "LineStyle")
+    linColourE = ET.SubElement(lineStyleE, "color")
+    linColourE.text = "7f00ff00"
+    widthE = ET.SubElement(lineStyleE, "width")
+    widthE.text = "2"
+    polyStyleE = ET.SubElement(styleE, "PolyStyle")
+    polyColourE = ET.SubElement(polyStyleE, "color")
+    polyColourE.text = "7f00ff00"
+    
+    for p in self.placemarks:
+      documentE.append(p.getXMLTree())
+    return '<?xml version="1.0" encoding="UTF-8"?>' +xmlUtils.unescape(ET.tostring(root, encoding='utf-8'))
+    
   
 class Placemark():
   
-  def __init__(self, name, ruleType=None, nodeList=None, style="defaultStyle"):
+  def __init__(self, name, ruleType=None, nodeList=None, style="#defaultStyle"):
     """
       Constructor for the Placemark class.
       
@@ -179,7 +206,7 @@ class Placemark():
     description = ET.SubElement(root, "description")
     description.text ="<img src='"+ self.name + ".jpg' width = '400' />"
     style = ET.SubElement(root, "styleUrl")
-    style.text = "#" + self.style
+    style.text = self.style
     
     polygon = ET.SubElement(root, "Polygon")
     altitudeMode = ET.SubElement(polygon, "altitudeMode")
