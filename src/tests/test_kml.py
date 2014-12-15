@@ -89,7 +89,28 @@ class TestKMLObject(unittest.TestCase):
     filename="../testData/dataOnlyForTests/TestOfInvalidKml.kml"
     with self.assertRaises(IOError):
       testKML = kmlData.KMLObject.parseKML(filename);
+      
+  def test_saveAsXML(self):
+    #Not too nice since this works only if the the input file is unformatted.
+    filename="../testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
+    kmlObj = kmlData.KMLObject.parseKML(filename)
+    output = "../testData/dataOnlyForTests/OutputKML.kml"
+    kmlObj.saveAsXML(output)
+    truthFile = open(filename)
+    truthString = truthFile.read().replace("\r","").rstrip("\n")
+    try:
+      outputFile = open(output)
+      outputString = outputFile.read().replace("\r","").rstrip("\n")
+      self.assertEqual(outputString, truthString)
+    except IOError:
+      self.fail("The file was not created.")
     
+  def test_saveAsXMLFailIncorrectPath(self):
+    filename="../testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
+    kmlObj = kmlData.KMLObject.parseKML(filename)
+    output = "../testData/WrongDir/OutputKML.kml"
+    with self.assertRaises(IOError):
+      kmlObj.saveAsXML(output)
     
   def test_getXML(self):
     filename="../testData/dataOnlyForTests/TestOfKmlUnformatted.kml"

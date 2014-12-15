@@ -97,6 +97,25 @@ class KMLObject():
       res.addPlacemark(newPlacemark)
     return res
     
+
+  def saveAsXML(self, filename):
+    """
+      Function to save the kml in it's xml representation in a file with the given
+      filename.
+      
+      @param filename: The name of the file this kml should be written to.
+      @type filename: String
+    """    
+    if not isinstance(filename, str):
+      raise TypeError("filename must be a string.")
+    try:
+      f = open(filename, 'w')
+      xmlString = self.getXML()
+      f.write(xmlString)
+      f.close()
+    except IOError:
+      raise IOError("File %s could not be found." % filename)
+    
     
   def getXML(self):
     """
