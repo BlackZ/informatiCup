@@ -4,6 +4,9 @@
 import osmAPI as api
 import osmData
 import kmlData as kml
+import sur
+import os
+
 
 class Pipeline:
   def __init__(self):
@@ -12,19 +15,37 @@ class Pipeline:
     self.heightBBox = 100
     self.widthBBox = 100
     self.allObjects = {}
-    self.kmlObj = kml.KMLObject()
+    
+  def computeKMLs(self, inPath, outPath):
+    isOutputDir = os.path.isdir(outPath)
+    
+    surs = sur.SUR.fromFile(open(inPath,'r'))
+    
+    completeKML = kml.KMLObject()
+    
+    for s in surs:
+      resKML = self.calcKML(s)
+      if isOutputDir:
+        resKML.saveAsXML(outPath + os.path.sep + s.id + '.kml')
+      #TODO give kml the option to merge to kmls and change this -> Jan
+      completeKML.placemarks.extend(resKML.placemarks)
+      
+    if isOutputDir:
+      completeKML.saveAsXML(outPath + os.path.sep + 'complete.kml')
+    else:
+      completeKML.saveAsXML(outPath)
   
   def calcKML(self, SUR):
     coords = (SUR.latitude, SUR.longitude)
     bBox = self._createBBox(coords)
-    
+    kmlObj = kml.KMLObject()
     self.osm = self.osmAPI.performRequest(bBox)
     
     #self._createDictionary()
-    
     nearObj = self._getNearestObj(coords)
   
     tmpRel = nearObj.nearestSubObj  
+    print "nearest subobj", tmpRel
     while isinstance(tmpRel[1], osmData.Relation):
       tmpRel = osmData.getNearestRelation(coords, otherRelations = [tmpRel[0]])
 
@@ -36,22 +57,23 @@ class Pipeline:
     elif isinstance(tmpRel[1], osmData.Node):
       points.append(self.osm.nodes[tmpRel[0]].getCoordinateString())
     
+    
     for rule in SUR.ruleName:
-      self.kmlObj.addPlacemark(kml.Placemark(str(rule) + ":" + str(SUR.ruleName[rule]),
+      kmlObj.addPlacemark(kml.Placemark(str(rule) + ":" + str(SUR.ruleName[rule]),
                           rule,
                           pointList=points))
     
-    return self.kmlObj
+    return kmlObj
   
   def _getNearestObj(self, coords):
     nearObj = self.osm.getNearestRelation(coords)
     
-    if nearObj.distance == "-1":
-      nearObj = self.osm.getNearestWay(coords)
-      
-    if nearObj.distance == "-1":    
-      nearObj = self.osm.getNearestNode(coords)
-      
+#    if nearObj.distance == "-1":
+#      nearObj = self.osm.getNearestWay(coords)
+#      
+#    if nearObj.distance == "-1":    
+#      nearObj = self.osm.getNearestNode(coords)
+#      
     return nearObj
   
   def _createDictionary(self):

@@ -7,6 +7,7 @@ Created on Thu Nov  6 11:46:54 2014
 
 import unittest
 import osmData
+import osmAPI
 import sys
 
 class TestOSMObject(unittest.TestCase):
@@ -193,6 +194,7 @@ class TestOSMObject(unittest.TestCase):
     self.wayType=self.testOSM8.ways[8].__class__
     self.relType=self.testOSM8.relations[1].__class__
     
+    self.api = osmAPI.osmAPI()
   
   
   #========================================================
@@ -212,6 +214,16 @@ class TestOSMObject(unittest.TestCase):
     self.assertEqual(nearestPoint.distance, result.distance)
     self.assertEqual(nearestPoint.nearestSubObj, result.nearestSubObj)
     
+  def test_getNearestRelationProblem(self):
+    point = (50.9262, 5.3968)
+    bBox = [50.92575, 5.396042, 50.92665, 5.397558]
+    testData = self.api.performRequest(bBox)
+    res = testData.getNearestRelation(point)
+    #print res.nearestSubObj
+    #In the list of nearestSubObjects should not be dublicates
+    self.assertTrue(len(res.nearestSubObj)==len(set(res.nearestSubObj)))
+      
+    
   def test_getNearestNodeFailWithTagFilter(self):
     with self.assertRaises(TypeError):
       self.testOSM4.getNearestNode(self.testPoint, "asd")
@@ -228,7 +240,7 @@ class TestOSMObject(unittest.TestCase):
     with self.assertRaises(TypeError):
       self.testOSM3.getNearestWay(self.testPoint,True,"asd")
   
-  def test_getNearestNodeNothnigFound(self):
+  def test_getNearestNodeNothingFound(self):
     nearestPoint = osmData.distanceResult(sys.float_info.max,[("-1",None)])
     result=self.testOSM4.getNearestNode(self.testPoint, {"asd":"asd"})
     self.assertEqual(nearestPoint.nearestObj, result.nearestObj)
