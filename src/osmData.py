@@ -447,7 +447,7 @@ class Node(object):
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
-    return distanceResult(math.hypot(point[0] - self.lat, point[1] - self.lon),[(self.id,self.__class__)])
+    return distanceResult(round(math.hypot(point[0] - self.lat, point[1] - self.lon),8),[(self.id,self.__class__)])
   
 class Way(object):
   
@@ -581,7 +581,7 @@ class Way(object):
       dx = px - near_x
       dy = py - near_y
   
-    return math.hypot(dx, dy)
+    return round(math.hypot(dx, dy),8)
   
   
   def _isPointInsidePolygon(self, point):

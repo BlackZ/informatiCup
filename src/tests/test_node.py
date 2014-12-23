@@ -19,7 +19,7 @@ class TestNodeObject(unittest.TestCase):
     
   def test_getDistance(self):
     testNode = osmData.Node(self.id, self.lat, self.lon, self.tags)
-    trueObj=osmData.distanceResult(1.2727922061357855,[(testNode.id,testNode.__class__)])
+    trueObj=osmData.distanceResult(1.27279221,[(testNode.id,testNode.__class__)])
     result=testNode.getDistance((1.0,3.0))
     self.assertEqual(result.nearestObj,trueObj.nearestObj)
     self.assertEqual(result.distance,trueObj.distance)
