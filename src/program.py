@@ -46,7 +46,12 @@ class Pipeline:
     #self._createDictionary()
     nearObj = self._getNearestObj(coords)
   
-    tmpRel = nearObj.nearestSubObj  
+    #==============================================
+    #TODO: now the result of getNearestX is a list of distanceResult-Objects. Now a loop is needed
+    #TODO: each distanceResult-Object has a List of SubObj. which have the same distance --> loop needed
+    #==============================================
+    tmpRel = nearObj[0].nearestSubObj[0]  
+    
     #print "nearest subobj", tmpRel
     while isinstance(tmpRel[1], osmData.Relation):
       tmpRel = osmData.getNearestRelation(coords, otherRelations = [tmpRel[0]])

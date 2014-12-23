@@ -71,21 +71,21 @@ class TestWayObject(unittest.TestCase):
       self.testWay.getDistance("asd")
       
   def test_getDistance_inside(self):
-    trueObj=osmData.distanceResult(0.00282843,[(self.testWay.id,self.testWay.__class__)],[([(52.13, 4.12), (52.12, 4.13)],self.nodeType)])
+    trueObj=osmData.distanceResult(0.00282843,(self.testWay.id,self.testWay.__class__),[([(52.13, 4.12), (52.12, 4.13)],self.nodeType)])
     result=self.testWay.getDistance((52.123,4.123))
     self.assertEqual(result.distance,trueObj.distance)
     self.assertEqual(result.nearestObj,trueObj.nearestObj)
     self.assertEqual(result.nearestSubObj,trueObj.nearestSubObj)
   
   def test_getDistance_outside(self):
-    trueObj=osmData.distanceResult(0.00424264,[(self.testWay.id,self.testWay.__class__)],[([(52.12, 4.12), (52.13, 4.12)],self.nodeType)])
+    trueObj=osmData.distanceResult(0.00424264,(self.testWay.id,self.testWay.__class__),[([(52.12, 4.12), (52.13, 4.12)],self.nodeType),([(52.12, 4.13), (52.12, 4.12)], self.nodeType)])
     result=self.testWay.getDistance((52.117,4.117))
     self.assertEqual(result.distance,trueObj.distance)
     self.assertEqual(result.nearestObj,trueObj.nearestObj)
     self.assertEqual(result.nearestSubObj,trueObj.nearestSubObj)
   
   def test_getDistance_border(self):
-    trueObj=osmData.distanceResult(0.0,[(self.testWay.id,self.testWay.__class__)],[([(52.12, 4.12), (52.13, 4.12)],self.nodeType)])
+    trueObj=osmData.distanceResult(0.0,(self.testWay.id,self.testWay.__class__),[([(52.12, 4.12), (52.13, 4.12)],self.nodeType),([(52.12, 4.13), (52.12, 4.12)], self.nodeType)])
     result=self.testWay.getDistance((52.12,4.12))
     self.assertEqual(result.distance,trueObj.distance)
     self.assertEqual(result.nearestObj,trueObj.nearestObj)
