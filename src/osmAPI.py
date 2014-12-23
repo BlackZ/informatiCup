@@ -2,6 +2,7 @@
 
 import requests
 import osmData
+import types
 
 import xml.dom.minidom as dom
 
@@ -37,6 +38,8 @@ class osmAPI():
                         or (["way","node"],"building","") for some kind of wild-card
     @return: an request object with the data-xml in the content property
     """
+    if not isinstance(filterList,types.ListType):
+      raise TypeError('performRequest only accepts a list of filterrules e.g.[(["way","node"],"amenity","univerity"),..]')
     return self._parseData(
       requests.get(self.osmurl,
                     params=self._getOsmRequestData(boundingBox[0],
