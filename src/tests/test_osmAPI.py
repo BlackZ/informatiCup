@@ -67,6 +67,20 @@ class TestOsmAPI(unittest.TestCase):
                      'way["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
                      'relation["amenity"="university"](52.032736,8.486593,52.042113,8.501194););'\
                      'out body;>;out skel qt;')
+                     
+    testObj3 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
+                                                 self.boundingBox[1],
+                                                 self.boundingBox[2],
+                                                 self.boundingBox[3],
+                                                 filterList=[(["node","way","relation"],
+                                                  "building","")])
+    self.assertIsNotNone(testObj3)
+    self.assertEqual(testObj3.has_key('data'),True)
+    self.assertEqual(testObj3['data'],'[out:xml][timeout:25];'\
+                     '(node["building"](52.032736,8.486593,52.042113,8.501194);'\
+                     'way["building"](52.032736,8.486593,52.042113,8.501194);'\
+                     'relation["building"](52.032736,8.486593,52.042113,8.501194););'\
+                     'out body;>;out skel qt;')
    
   #def test_performRequest(self):
     #self.requestData = self.osmAPIobj.performRequest(self.boundingBox)
