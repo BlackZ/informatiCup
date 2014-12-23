@@ -43,7 +43,7 @@ class TestOsmAPI(unittest.TestCase):
   
   def test_performRequestWithWildcard(self):
     bBox = [50.92615995855398,5.396102964878082,50.92663164856874,5.397061854600906]
-    testData = self.osmAPIobj.performRequest(bBox,(["way","relation"],"building",""))
+    testData = self.osmAPIobj.performRequest(bBox,[(["way","relation"],"building","")])
     self.assertTrue(len(testData.nodes)==12)
     self.assertTrue(len(testData.ways)==1)
     self.assertTrue(len(testData.relations)==0)

@@ -33,7 +33,7 @@ class osmAPI():
     """
     This function requests data from openStreetMap
     @param boundingBox: a list of the points of the boundingBox [minLat,minLon,maxLat,maxLon]
-    @param filterList: (optional) list of tripel of filter-rules e.g.(["way","node"],"amenity","univerity")
+    @param filterList: (optional) List of tripel of filter-rules e.g.[(["way","node"],"amenity","univerity"),..]
                         or (["way","node"],"building","") for some kind of wild-card
     @return: an request object with the data-xml in the content property
     """
