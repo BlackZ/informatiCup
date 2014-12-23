@@ -124,20 +124,16 @@ class OSM():
             which holds the following informations:
             
             - distance (float): If an object is found, it contains the
-                                distance to the nearest object, otherwise
-                                it contains the float_max value.
+                                distance to the nearest object
   
             - nearestObj (str, type):   it contains the ID and the type
-                                        of the nearest object, if nothing found the ID equals
-                                        -1 and the type is None.
+                                        of the nearest object
                                       
                                       For example:
                                         found object: ("1", osmData.Node)
-                                        nothing found: ("-1", None)
                                       
             - nearestSubObj [(str, type)]:  Is empty: [("-1",None)]
-        The list, which will be returned, is never empty. If nothing is found, an list with 
-        an empty distanceResult-Object will be returned.
+        If nothing is found, the resulting list is empty.
     """
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
@@ -149,7 +145,6 @@ class OSM():
       raise TypeError("getNearestNode only accepts a list of other nodes")
     
     nearestNodes=[]
-    nearestNodes.append(distanceResult(sys.float_info.max,("-1",None)))
     
     nodes=[]
     if len(otherNodes)>0:
@@ -172,7 +167,7 @@ class OSM():
         distObj=node.getDistance(point)    # calculate distance
           
         # proove if the current node is the current nearest node
-        if distObj.distance<nearestNodes[0].distance:
+        if len(nearestNodes)==0 or distObj.distance<nearestNodes[0].distance:
           nearestNodes=[distObj]
         elif distObj.distance==nearestNodes[0].distance:
           nearestNodes.append(distObj)
@@ -203,16 +198,13 @@ class OSM():
             which holds the following informations:
             
             - distance (float): If an object is found, it contains the
-                                distance to the nearest object, otherwise
-                                it contains the float_max value.
+                                distance to the nearest object
   
             - nearestObj [(str, type)]: If one object is found, it contains the ID and
-                                        the type of the nearest object, otherwise the ID
-                                        equals -1 and the type is None.
+                                        the type of the nearest object
                                       
                                       For example:
                                         found object: ("1", osmData.Way)
-                                        nothing found: ("-1", None)
                                       
             - nearestSubObj [(str, type)]:  If an object is found, it contains the IDs
                                           of the two Nodes, which defines the nearest Edge.
@@ -221,9 +213,7 @@ class OSM():
                                           
                                           For example:
                                             found object: [(["1","2"], osmData.Node),..]
-                                            nothing found: [("-1", None)]
-        The list, which will be returned, is never empty. If nothing is found, an list with 
-        an empty distanceResult-Object will be returned.
+        If nothing is found, the resulting list is empty.
     """
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestWay only accepts Tupels from type types.TupelType with 2 Entries from type float")
@@ -235,7 +225,6 @@ class OSM():
       raise TypeError("getNearestWay only accepts a list of other ways")
     
     nearestWays=[]
-    nearestWays.append(distanceResult(sys.float_info.max,("-1",None)))
     
     ways=[]
     if len(otherWays)>0:
@@ -259,7 +248,7 @@ class OSM():
         distObj=way.getDistance(point)       # calculate distance
         
         # proove if current way is the current nearest way
-        if distObj.distance<nearestWays[0].distance:
+        if len(nearestWays)==0 or distObj.distance<nearestWays[0].distance:
           nearestWays=[distObj]
         elif distObj.distance==nearestWays[0].distance:
           nearestWays.append(distObj)
@@ -291,27 +280,21 @@ class OSM():
             which holds the following informations:
             
             - distance (float): If an object is found, it contains the
-                                distance to the nearest object, otherwise
-                                it contains the float_max value.
+                                distance to the nearest object
   
             - nearestObj (str, type): If one object is found, it contains the ID and
-                                      the type of the nearest object,
-                                      otherwise the ID equals -1 and the type is None.
+                                      the type of the nearest object
                                       
                                       For example:
                                         found object: ("1", osmData.Relation)
-                                        nothing found: ("-1", None)
                                       
             - nearestSubObj [(str, type)]:  If an object is found, it contains the ID
                                           and the type of the neares subobject in
-                                          the relation. Otherwise the ID equals -1
-                                          and the type is None.
+                                          the relation.
                                         
                                           For example:
                                               found object: [("1", osmData.Relation),..]
-                                              nothing found: [("-1", None)]
-        The list, which will be returned, is never empty. If nothing is found, an list with 
-        an empty distanceResult-Object will be returned.
+        If nothing is found, the resulting list is empty.
     """
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestRelation only accepts Tupels from type types.TupelType with 2 Entries from type float")
@@ -323,7 +306,6 @@ class OSM():
       raise TypeError("getNearestRelation only accepts a list of other relations")
     
     nearestRels=[]
-    nearestRels=[distanceResult(sys.float_info.max,("-1",None))]
     
     relations=[]
     if len(otherRelations)>0:
@@ -344,7 +326,7 @@ class OSM():
         continue
       
       distResult=rel.getDistance(point)
-      if distResult.distance<nearestRels[0].distance:
+      if len(nearestRels)==0 or distResult.distance<nearestRels[0].distance:
         nearestRels=[distResult]
       elif distResult.distance==nearestRels[0].distance:
         #nearestRel.nearestObj+=distResult.nearestObj
