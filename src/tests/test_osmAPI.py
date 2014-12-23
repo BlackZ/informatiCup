@@ -41,6 +41,13 @@ class TestOsmAPI(unittest.TestCase):
                                                  [("way","26582813","outer"),(
                                                   "way","20213971","inner")],{"type":"multipolygon"}, self.testOsmObj))
   
+  def test_performRequestWithWildcard(self):
+    bBox = [50.92615995855398,5.396102964878082,50.92663164856874,5.397061854600906]
+    testData = self.osmAPIobj.performRequest(bBox,(["way","relation"],"building",""))
+    self.assertTrue(len(testData.nodes)==12)
+    self.assertTrue(len(testData.ways)==1)
+    self.assertTrue(len(testData.relations)==0)
+  
   def test_getOsmRequestData(self):
     testObj=self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
                                               self.boundingBox[1],
