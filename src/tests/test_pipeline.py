@@ -45,30 +45,32 @@ class TestProgrammPipeline(unittest.TestCase):
     
     self.assertEqual([lowerLeft[0], lowerLeft[1], upperRight[0], upperRight[1]], bBox)
     
-#  def test_computeKMLs_OutputFile(self):
-#    
-#    surFilePath="../testData/dataOnlyForTests/TestData.txt"
-#    kmlFilePath="../testData/dataOnlyForTests/Output.kml"
-#    self.pipeObj.computeKMLs(surFilePath, kmlFilePath)
-#    resultKML = kmlData.KMLObject.parseKML(kmlFilePath)
-#    self.assertIsNotNone(resultKML)
+  def test_computeKMLs_OutputFile(self):
+    self.fail("This test will always fail unless the pipeline gives a valid polygon. \
+      See test_calcKML_simpleSUR and test_calcKML_tupleSUR.")
+    surFilePath="../testData/dataOnlyForTests/TestData.txt"
+    kmlFilePath="../testData/dataOnlyForTests/Output.kml"
+    self.pipeObj.computeKMLs(surFilePath, kmlFilePath)
+    resultKML = kmlData.KMLObject.parseKML(kmlFilePath)
+    self.assertIsNotNone(resultKML)
     
-#    
-#  def test_computeKMLs_OutputPath(self):
-#    #result should be 3 KMLs (2 individual + 1 containing all placemarks)
-#    surFilePath="../testData/dataOnlyForTests/TestData.txt"
-#    kmlDirectoryPath="../testData/dataOnlyForTests/"
-#    self.pipeObj.computeKMLs(surFilePath, kmlDirectoryPath)
-#    kmlFile1Path = "../testData/dataOnlyForTests/0001.kml"
-#    kmlFile2Path = "../testData/dataOnlyForTests/0002.kml"
-#    kmlFile3Path = "../testData/dataOnlyForTests/complete.kml"    
-#    resultKML1 = kmlData.KMLObject.parseKML(kmlFile1Path)
-#    resultKML2 = kmlData.KMLObject.parseKML(kmlFile2Path)
-#    resultKML3 = kmlData.KMLObject.parseKML(kmlFile3Path)
-#    self.assertIsNotNone(resultKML1)
-#    self.assertIsNotNone(resultKML2)
-#    self.assertIsNotNone(resultKML3)
-#    
+  def test_computeKMLs_OutputPath(self):
+    self.fail("This test will always fail unless the pipeline gives a valid polygon. \
+      See test_calcKML_simpleSUR and test_calcKML_tupleSUR.")
+    #result should be 3 KMLs (2 individual + 1 containing all placemarks)
+    surFilePath="../testData/dataOnlyForTests/TestData.txt"
+    kmlDirectoryPath="../testData/dataOnlyForTests/"
+    self.pipeObj.computeKMLs(surFilePath, kmlDirectoryPath)
+    kmlFile1Path = "../testData/dataOnlyForTests/0001.kml"
+    kmlFile2Path = "../testData/dataOnlyForTests/0002.kml"
+    kmlFile3Path = "../testData/dataOnlyForTests/complete.kml"    
+    resultKML1 = kmlData.KMLObject.parseKML(kmlFile1Path)
+    resultKML2 = kmlData.KMLObject.parseKML(kmlFile2Path)
+    resultKML3 = kmlData.KMLObject.parseKML(kmlFile3Path)
+    self.assertIsNotNone(resultKML1)
+    self.assertIsNotNone(resultKML2)
+    self.assertIsNotNone(resultKML3)
+    
 
 if __name__ == '__main__':
   os.chdir("..")

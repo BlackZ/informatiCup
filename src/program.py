@@ -16,6 +16,8 @@ class Pipeline:
     self.widthBBox = 100
     self.allObjects = {}
     
+#TODO this function is not fully tested yet!
+#For further information see the test_pipeline test file.
   def computeKMLs(self, inPath, outPath):
     isOutputDir = os.path.isdir(outPath)
     
@@ -45,7 +47,7 @@ class Pipeline:
     nearObj = self._getNearestObj(coords)
   
     tmpRel = nearObj.nearestSubObj  
-    print "nearest subobj", tmpRel
+    #print "nearest subobj", tmpRel
     while isinstance(tmpRel[1], osmData.Relation):
       tmpRel = osmData.getNearestRelation(coords, otherRelations = [tmpRel[0]])
 
