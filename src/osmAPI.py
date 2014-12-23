@@ -21,7 +21,10 @@ class osmAPI():
       compactOverpassQLstring = '[out:xml][timeout:25];('
       for fil in filterList:
           for obj in fil[0]:
-              compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);'% (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
+              if not fil[2]="":
+                  compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);'% (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
+              else:
+                  compactOverpassQLstring += '%s["%s"](%s,%s,%s,%s);'% (obj, fil[1], minLat, minLon, maxLat, maxLon)
       compactOverpassQLstring += ');out body;>;out skel qt;'
       return  {'data':compactOverpassQLstring}
 
@@ -31,6 +34,7 @@ class osmAPI():
     This function requests data from openStreetMap
     @param boundingBox: a list of the points of the boundingBox [minLat,minLon,maxLat,maxLon]
     @param filterList: (optional) list of tripel of filter-rules e.g.(["way","node"],"amenity","univerity")
+                        or (["way","node"],"building","") for some kind of wild-card
     @return: an request object with the data-xml in the content property
     """
     return self._parseData(
