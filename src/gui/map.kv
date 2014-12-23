@@ -1,0 +1,29 @@
+#:kivy 1.0.9
+
+<Map>:
+    Button:
+        id: menue
+        text: "Menü"
+        background_color: (0,0,1,1)
+        size_hint: 0.15, 0.075
+        pos: 0, 0
+        
+        on_release: root.merry_christmas()
+        
+    Label:
+        id: toast
+        font_size: 20
+        size_hint_y: 0.075
+        pos_hint_x: 0.5
+        color: (1,0,0,1)
+
+    
+    Button:
+        id: kml
+        text: "KML List"
+        background_color: (0,0,1,1)
+        size_hint: 0.15, 0.075
+        pos: root.width - self.width, 0
+        
+        on_release: root.happy()
+   
