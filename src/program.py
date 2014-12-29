@@ -26,62 +26,72 @@ class Pipeline:
     completeKML = kml.KMLObject()
     
     for s in surs:
-      resKML = self.calcKML(s)
-      if isOutputDir:
-        resKML.saveAsXML(outPath + os.path.sep + s.id + '.kml')
-      #TODO give kml the option to merge to kmls and change this -> Jan
-      completeKML.placemarks.extend(resKML.placemarks)
       
-    if isOutputDir:
-      completeKML.saveAsXML(outPath + os.path.sep + 'complete.kml')
+      resKML = self.calcKML(s)
+      if resKML != None:
+        if isOutputDir:
+          resKML.saveAsXML(outPath + os.path.sep + s.id + '.kml')
+      #TODO give kml the option to merge to kmls and change this -> Jan
+        completeKML.placemarks.extend(resKML.placemarks)
+      
+    if len(completeKML.placemarks) > 0:
+      if isOutputDir:
+        completeKML.saveAsXML(outPath + os.path.sep + 'complete.kml')
+      else:
+        completeKML.saveAsXML(outPath)
     else:
-      completeKML.saveAsXML(outPath)
+      print "Error: Could not compute placemarks."
   
-  def calcKML(self, SUR):
-    coords = (SUR.latitude, SUR.longitude)
+  def calcKML(self, surObj):
+    print "working on sur: ", surObj.id
+    coords = (surObj.latitude, surObj.longitude)
     bBox = self._createBBox(coords)
     kmlObj = kml.KMLObject()
-    self.osm = self.osmAPI.performRequest(bBox)
+    #TODO Determine filter depending on rules
+    self.osm = self.osmAPI.performRequest(bBox, [(["node","way","relation"],"building","")])
+    nearObjs = self._getNearestObj(coords)
+    if len(nearObjs) == 0:
+      #Searching for buildings did not help.
+      self.osm = self.osmAPI.performRequest(bBox)
+      nearObjs = self._getNearestObj(coords)
     
-    #self._createDictionary()
-    nearObj = self._getNearestObj(coords)
-  
-    #==============================================
-    #TODO: now the result of getNearestX is a list of distanceResult-Objects. Now a loop is needed
-    #TODO: each distanceResult-Object has a List of SubObj. which have the same distance --> loop needed
-    #==============================================
-    tmpRel = nearObj[0].nearestSubObj[0]  
-    
-    #print "nearest subobj", tmpRel
-    while isinstance(tmpRel[1], osmData.Relation):
-      tmpRel = osmData.getNearestRelation(coords, otherRelations = [tmpRel[0]])
 
     points = []
-    if isinstance(tmpRel[1], osmData.Way):
-      obj = self.osm.ways[tmpRel[0]]
-      for ref in obj.refs:
-        points.append(osmData.nodes[ref].getCoordinateString())
-    elif isinstance(tmpRel[1], osmData.Node):
-      points.append(self.osm.nodes[tmpRel[0]].getCoordinateString())
-    
-    
-    for rule in SUR.ruleName:
-      kmlObj.addPlacemark(kml.Placemark(str(rule) + ":" + str(SUR.ruleName[rule]),
+    for obj in nearObjs:
+      tmpObj = obj.nearestObj
+      tmpWay = None
+      if tmpObj[1] == osmData.Relation:
+        tmpRel = self.osm.relations[tmpObj[0]]
+        for mem in tmpRel.members:
+          if mem[2] == "outer":
+            tmpWay = self.osm.ways[mem[1]]
+      if tmpObj[1] == osmData.Way:
+        tmpWay = self.osm.ways[tmpObj[0]]
+      if tmpWay != None:
+        for ref in tmpWay.refs:
+          points.append(self.osm.nodes[ref].getCoordinateString())
+      
+    if len(points) > 0:
+      for rule in surObj.ruleName:
+        kmlObj.addPlacemark(kml.Placemark(str(rule) + ":" + str(surObj.ruleName[rule]),
                           rule,
                           pointList=points))
+    else:
+      print "Error: No polygon found for SUR %s." % surObj.id
+      return None
     
     return kmlObj
   
   def _getNearestObj(self, coords):
-    nearObj = self.osm.getNearestRelation(coords)
+    nearObjs = self.osm.getNearestRelation(coords)
     
-#    if nearObj.distance == "-1":
-#      nearObj = self.osm.getNearestWay(coords)
-#      
+    if len(nearObjs) == 0:
+      nearObjs = self.osm.getNearestWay(coords, True)
+      
 #    if nearObj.distance == "-1":    
 #      nearObj = self.osm.getNearestNode(coords)
 #      
-    return nearObj
+    return nearObjs
   
   def _createDictionary(self):
     self.allObjects.update({self.osm.relations.__class__:self.osm.relations})

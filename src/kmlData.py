@@ -130,12 +130,12 @@ class KMLObject():
     styleE.attrib = {"id":"defaultStyle"}
     lineStyleE = ET.SubElement(styleE, "LineStyle")
     linColourE = ET.SubElement(lineStyleE, "color")
-    linColourE.text = "7f00ff00"
+    linColourE.text = "7f0000ff"
     widthE = ET.SubElement(lineStyleE, "width")
     widthE.text = "2"
     polyStyleE = ET.SubElement(styleE, "PolyStyle")
     polyColourE = ET.SubElement(polyStyleE, "color")
-    polyColourE.text = "7f00ff00"
+    polyColourE.text = "7fff0000"
     
     for p in self.placemarks:
       documentE.append(p.getXMLTree())

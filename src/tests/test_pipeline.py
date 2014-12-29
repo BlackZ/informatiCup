@@ -15,7 +15,7 @@ class TestProgrammPipeline(unittest.TestCase):
   
   def setUp(self):
     self.kmlObject = None
-    self.pipeObj = pipeObj = program.Pipeline()
+    self.pipeObj = program.Pipeline()
     self.SUR_with_one = sur.SUR.fromString('0001, 50.9262, 5.39680, smoking="no"')
     
     self.SUR_with_two = sur.SUR.fromString('0002, 50.9304, 5.33901, access:dog="no"')
@@ -46,17 +46,13 @@ class TestProgrammPipeline(unittest.TestCase):
     self.assertEqual([lowerLeft[0], lowerLeft[1], upperRight[0], upperRight[1]], bBox)
     
   def test_computeKMLs_OutputFile(self):
-    self.fail("This test will always fail unless the pipeline gives a valid polygon. \
-      See test_calcKML_simpleSUR and test_calcKML_tupleSUR.")
-    surFilePath="../testData/dataOnlyForTests/TestData.txt"
+    surFilePath="../testData/dataOnlyForTests/TestData3.txt"
     kmlFilePath="../testData/dataOnlyForTests/Output.kml"
     self.pipeObj.computeKMLs(surFilePath, kmlFilePath)
     resultKML = kmlData.KMLObject.parseKML(kmlFilePath)
     self.assertIsNotNone(resultKML)
     
   def test_computeKMLs_OutputPath(self):
-    self.fail("This test will always fail unless the pipeline gives a valid polygon. \
-      See test_calcKML_simpleSUR and test_calcKML_tupleSUR.")
     #result should be 3 KMLs (2 individual + 1 containing all placemarks)
     surFilePath="../testData/dataOnlyForTests/TestData.txt"
     kmlDirectoryPath="../testData/dataOnlyForTests/"

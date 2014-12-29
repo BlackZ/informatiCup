@@ -833,7 +833,7 @@ class distanceResult(object):
     @type distance: float
     
     @param nearestObj: the ID and type of the nearest object e.g. ("1",osmData.Relation)
-    @type nearestObj: Tuple(str,str)
+    @type nearestObj: Tuple(str,type)
     
     @param nearestSubObj: (optional) the nearest subobject of the current
                           nearest object (a way which is a subobject of a relation)

@@ -22,5 +22,4 @@ def parseArguments():
 
 if __name__ == '__main__':
   args = parseArguments()
-  #TODO finish testing of computeKMLs and include it.
-  #program.Pipeline().computeKMLs(HIER PFADE EINFÜGEN)
+  program.Pipeline().computeKMLs(args.input, args.output)
