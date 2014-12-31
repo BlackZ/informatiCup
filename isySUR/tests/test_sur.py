@@ -6,7 +6,7 @@ Created on Thu Oct 30 13:20:21 2014
 """
 
 import unittest
-import sur
+from isySUR import sur
 import os
 
 class TestSURObject(unittest.TestCase):
@@ -37,7 +37,7 @@ class TestSURObject(unittest.TestCase):
     
   def test_parseSURFromFile(self):
     # set up
-    testFile = open('../testData/dataOnlyForTests/TestData.txt','r')
+    testFile = open('testData/dataOnlyForTests/TestData.txt','r')
     ruleName1_2 = {"smoking": "no", "access:dog": "no"}
     id2 = "0002"
     lat2 = 50.9325
@@ -61,5 +61,5 @@ class TestSURObject(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  os.chdir("..")
+  os.chdir("../..")
   unittest.main()

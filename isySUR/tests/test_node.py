@@ -7,7 +7,7 @@ Created on Thu Nov  6 12:23:35 2014
 
 
 import unittest
-import osmData
+from isySUR import osmData
 
 class TestNodeObject(unittest.TestCase):
   

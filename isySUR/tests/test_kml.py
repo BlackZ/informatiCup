@@ -6,8 +6,8 @@ Created on Sun Nov  9 14:10:52 2014
 """
 
 import unittest
-import kmlData
-import osmData
+from isySUR import kmlData
+from isySUR import osmData
 import os
 
 class TestKMLObject(unittest.TestCase):
@@ -54,7 +54,7 @@ class TestKMLObject(unittest.TestCase):
     
     
   def test_parseKML(self):
-    filename="../testData/dataOnlyForTests/TestOfKml.kml"
+    filename="testData/dataOnlyForTests/TestOfKml.kml"
     name1="0001"
     name2="0002"
     style="#Poly1"
@@ -86,15 +86,15 @@ class TestKMLObject(unittest.TestCase):
     self.assertEqual(testKML.placemarks[1].polygon[2],point23)
     
   def test_parseKMLWithInvalidDataFile(self):
-    filename="../testData/dataOnlyForTests/TestOfInvalidKml.kml"
+    filename="testData/dataOnlyForTests/TestOfInvalidKml.kml"
     with self.assertRaises(IOError):
       testKML = kmlData.KMLObject.parseKML(filename);
       
   def test_saveAsXML(self):
     #Not too nice since this works only if the the input file is unformatted.
-    filename="../testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
+    filename="testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
     kmlObj = kmlData.KMLObject.parseKML(filename)
-    output = "../testData/dataOnlyForTests/OutputKML.kml"
+    output = "testData/dataOnlyForTests/OutputKML.kml"
     kmlObj.saveAsXML(output)
     truthFile = open(filename)
     truthString = truthFile.read().replace("\r","").rstrip("\n")
@@ -106,14 +106,14 @@ class TestKMLObject(unittest.TestCase):
       self.fail("The file was not created.")
     
   def test_saveAsXMLFailIncorrectPath(self):
-    filename="../testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
+    filename="testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
     kmlObj = kmlData.KMLObject.parseKML(filename)
-    output = "../testData/WrongDir/OutputKML.kml"
+    output = "testData/WrongDir/OutputKML.kml"
     with self.assertRaises(IOError):
       kmlObj.saveAsXML(output)
     
   def test_getXML(self):
-    filename="../testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
+    filename="testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
     truthFile = open(filename)
     #Read string from file and remove potential windows return char \r. Also remove
     #last \n that is added from the read function.
@@ -127,5 +127,5 @@ class TestKMLObject(unittest.TestCase):
   
 
 if __name__ == '__main__':
-  os.chdir("..")
+  os.chdir("../..")
   unittest.main()

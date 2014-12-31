@@ -6,9 +6,9 @@ Created on Thu Nov  6 11:53:07 2014
 """
 
 import unittest
-import program
-import sur
-import kmlData
+from isySUR import program
+from isySUR import sur
+from isySUR import kmlData
 import os
 
 class TestProgrammPipeline(unittest.TestCase):
@@ -46,20 +46,20 @@ class TestProgrammPipeline(unittest.TestCase):
     self.assertEqual([lowerLeft[0], lowerLeft[1], upperRight[0], upperRight[1]], bBox)
     
   def test_computeKMLs_OutputFile(self):
-    surFilePath="../testData/dataOnlyForTests/TestData3.txt"
-    kmlFilePath="../testData/dataOnlyForTests/Output.kml"
+    surFilePath="testData/dataOnlyForTests/TestData3.txt"
+    kmlFilePath="testData/dataOnlyForTests/Output.kml"
     self.pipeObj.computeKMLs(surFilePath, kmlFilePath)
     resultKML = kmlData.KMLObject.parseKML(kmlFilePath)
     self.assertIsNotNone(resultKML)
     
   def test_computeKMLs_OutputPath(self):
     #result should be 3 KMLs (2 individual + 1 containing all placemarks)
-    surFilePath="../testData/dataOnlyForTests/TestData.txt"
-    kmlDirectoryPath="../testData/dataOnlyForTests/"
+    surFilePath="testData/dataOnlyForTests/TestData.txt"
+    kmlDirectoryPath="testData/dataOnlyForTests/"
     self.pipeObj.computeKMLs(surFilePath, kmlDirectoryPath)
-    kmlFile1Path = "../testData/dataOnlyForTests/0001.kml"
-    kmlFile2Path = "../testData/dataOnlyForTests/0002.kml"
-    kmlFile3Path = "../testData/dataOnlyForTests/complete.kml"    
+    kmlFile1Path = "testData/dataOnlyForTests/0001.kml"
+    kmlFile2Path = "testData/dataOnlyForTests/0002.kml"
+    kmlFile3Path = "testData/dataOnlyForTests/complete.kml"    
     resultKML1 = kmlData.KMLObject.parseKML(kmlFile1Path)
     resultKML2 = kmlData.KMLObject.parseKML(kmlFile2Path)
     resultKML3 = kmlData.KMLObject.parseKML(kmlFile3Path)
@@ -69,5 +69,5 @@ class TestProgrammPipeline(unittest.TestCase):
     
 
 if __name__ == '__main__':
-  os.chdir("..")
+  os.chdir("../..")
   unittest.main()

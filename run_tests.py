@@ -19,6 +19,6 @@ def parseArguments():
 if __name__ == '__main__':
   args = parseArguments()
   testLoader = unittest.TestLoader()
-  suite = testLoader.discover('./tests',pattern = args.pattern)
+  suite = testLoader.discover('isySUR/tests',pattern = args.pattern)
   unittest.TextTestRunner(verbosity=args.verbosity).run(suite)
   

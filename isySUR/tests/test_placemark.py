@@ -7,8 +7,8 @@ Created on Sun Nov  9 15:17:08 2014
 
 
 import unittest
-import kmlData
-import osmData
+from isySUR import kmlData
+from isySUR import osmData
 #import lxml.etree as ET
 
 

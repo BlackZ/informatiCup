@@ -6,8 +6,8 @@ Created on Thu Nov  6 11:47:29 2014
 """
 
 import unittest
-import osmAPI
-import osmData
+from isySUR import osmAPI
+from isySUR import osmData
 import os
 import xml.dom.minidom as dom
 
@@ -15,7 +15,7 @@ class TestOsmAPI(unittest.TestCase):
   def setUp(self):
     self.osmAPIobj=osmAPI.osmAPI()
     self.boundingBox = [52.032736,8.486593,52.042113,8.501194]
-    self.osmDataFilename = "test.xml"
+    self.osmDataFilename = "testData/dataOnlyForTests/test.xml"
 
     self.testXMLString = "<relation id='152483'>"\
                          "<nd ref='43682400'/>"\
@@ -132,5 +132,5 @@ class TestOsmAPI(unittest.TestCase):
     self.assertEqual(members, testMembers)
 
 if __name__ == '__main__':
-  os.chdir("..")
+  os.chdir("../..")
   unittest.main()

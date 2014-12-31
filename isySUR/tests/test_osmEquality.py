@@ -9,7 +9,7 @@ as of now.
 """
 
 import unittest
-import osmData
+from isySUR import osmData
 
 class TestOSMObjectEquality(unittest.TestCase):
   

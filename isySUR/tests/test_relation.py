@@ -6,7 +6,7 @@ Created on Thu Nov  6 12:53:23 2014
 """
 
 import unittest
-import osmData
+from isySUR import osmData
 
 class TestRelationObject(unittest.TestCase):
   

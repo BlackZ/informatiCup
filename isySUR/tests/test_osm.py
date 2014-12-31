@@ -6,8 +6,8 @@ Created on Thu Nov  6 11:46:54 2014
 """
 
 import unittest
-import osmData
-import osmAPI
+from isySUR import osmData
+from isySUR import osmAPI
 import sys
 
 class TestOSMObject(unittest.TestCase):

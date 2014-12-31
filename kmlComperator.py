@@ -6,7 +6,7 @@ Created on Sat Nov 22 16:48:55 2014
 """
 
 import Polygon
-import kmlData
+from isySUR import kmlData
 import argparse
 
 class KMLComperator():
