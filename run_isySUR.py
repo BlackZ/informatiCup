@@ -19,8 +19,10 @@ def parseArguments():
                         help='Path for the resulting KML(s). If the path points to a file, only one KML \
                           file will be created, containing all calculated areas. If path points to a directory \
                           a KML file for each SUR will be created as well as one containing all areas.')
+    parser.add_argument('-c','--config', type=str, default='',
+                        help='Path to config file for SUR classification (indoor, outdoor, both).')
     return parser.parse_args()
 
 if __name__ == '__main__':
   args = parseArguments()
-  isySUR.program.Pipeline().computeKMLs(args.input, args.output)
+  isySUR.program.Pipeline().computeKMLs(args.input, args.output, args.config)

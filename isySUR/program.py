@@ -16,9 +16,7 @@ class Pipeline:
     self.widthBBox = 100
     self.allObjects = {}
     
-#TODO this function is not fully tested yet!
-#For further information see the test_pipeline test file.
-  def computeKMLs(self, inPath, outPath):
+  def computeKMLs(self, inPath, outPath, configPath):
     isOutputDir = os.path.isdir(outPath)
     
     surs = sur.SUR.fromFile(open(inPath,'r'))
