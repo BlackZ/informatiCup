@@ -1,0 +1,3 @@
+recursive-include isySUR/tests test_*.py
+recursive-include testData/dataOnlyForTests *
+include testData/Data.txt
