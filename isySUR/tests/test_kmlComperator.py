@@ -7,7 +7,7 @@ Created on Thu Nov  6 11:52:04 2014
 import os
 import unittest
 from isySUR import kmlData
-from isySUR import kmlComperator
+import kmlComperator
 import Polygon
 
 class TestKMLComperator(unittest.TestCase):

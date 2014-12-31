@@ -1,3 +1,6 @@
 recursive-include isySUR/tests test_*.py
+include run_tests.py
+include kmlComperator.py
+
 recursive-include testData/dataOnlyForTests *
 include testData/Data.txt
