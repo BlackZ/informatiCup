@@ -3,4 +3,5 @@ include run_tests.py
 include kmlComperator.py
 
 recursive-include testData/dataOnlyForTests *
+recursive-include doc/Documentation *
 include testData/Data.txt
