@@ -67,6 +67,15 @@ class Pipeline:
       print "Error: Could not compute placemarks."
   
   def calcKML(self, surObj):
+    """
+      Function to work on a single sur.SUR object and computes it's kml.
+      
+      @param surObj: The sur object whose kml is to be calculated.
+      @type surObj: sur.SUR
+      
+      @return: KML object containing the calculated area for the given sur.
+      @rtype: kmlData.KMLObject
+    """
     print "working on sur: ", surObj.id
     coords = (surObj.latitude, surObj.longitude)
     bBox = self._createBBox(coords)
@@ -107,6 +116,16 @@ class Pipeline:
     return kmlObj
   
   def _getNearestObj(self, coords):
+    """
+      Helper function to return the nearest osmObjects to the given coordinates.
+      First tries to find relations, if there is no nearest relation, the nearest way, with closed
+      polygon, is used.
+      
+      @param coords: The coordinates (lat,lon) around which the nearest objects are to be found.
+      @type coords: Tuple(float,float)
+      
+      @return: A list of nearstObjects (see osmData.getNearestX for more details)
+    """
     nearObjs = self.osm.getNearestRelation(coords)
     
     if len(nearObjs) == 0:
