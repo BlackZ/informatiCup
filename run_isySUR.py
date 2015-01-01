@@ -25,4 +25,4 @@ def parseArguments():
 
 if __name__ == '__main__':
   args = parseArguments()
-  isySUR.program.Pipeline().computeKMLs(args.input, args.output, args.config)
+  isySUR.program.Pipeline().computeKMLsAndStore(args.input, args.output, args.config)

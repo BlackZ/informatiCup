@@ -48,7 +48,7 @@ class TestProgrammPipeline(unittest.TestCase):
   def test_computeKMLs_OutputFile(self):
     surFilePath="testData/dataOnlyForTests/TestData3.txt"
     kmlFilePath="testData/dataOnlyForTests/Output.kml"
-    self.pipeObj.computeKMLs(surFilePath, kmlFilePath, '')
+    self.pipeObj.computeKMLsAndStore(surFilePath, kmlFilePath)
     resultKML = kmlData.KMLObject.parseKML(kmlFilePath)
     self.assertIsNotNone(resultKML)
     
@@ -56,7 +56,7 @@ class TestProgrammPipeline(unittest.TestCase):
     #result should be 3 KMLs (2 individual + 1 containing all placemarks)
     surFilePath="testData/dataOnlyForTests/TestData.txt"
     kmlDirectoryPath="testData/dataOnlyForTests/"
-    self.pipeObj.computeKMLs(surFilePath, kmlDirectoryPath, '')
+    self.pipeObj.computeKMLsAndStore(surFilePath, kmlDirectoryPath, '')
     kmlFile1Path = "testData/dataOnlyForTests/0001.kml"
     kmlFile2Path = "testData/dataOnlyForTests/0002.kml"
     kmlFile3Path = "testData/dataOnlyForTests/complete.kml"    

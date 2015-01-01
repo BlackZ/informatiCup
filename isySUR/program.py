@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+"""
+Last modified on Thu Jan 01 13:05:00 2015
+Main pipeline to compute kml from a given SUR(file).
+@author: jpoeppel 
+"""
 import osmAPI as api
 import osmData
 import kmlData as kml
@@ -10,18 +14,40 @@ import os
 
 class Pipeline:
   def __init__(self):
+    """
+      Constructor for the pipeline. Sets up the osmAPI as well as the desired bounding box, 
+      that is to be used to request osm data.
+    """
     self.osmAPI = api.osmAPI()
     self.osm = None
     self.heightBBox = 100
     self.widthBBox = 100
     self.allObjects = {}
     
-  def computeKMLs(self, inPath, outPath, configPath):
+  def computeKMLsAndStore(self, inPath, outPath, configPath=''):
+    """
+      Function to compute kmls from a given file of SURs. Stores them either in one kml or in 
+      individual kmls plus one containing all of them. W
+      
+      @param inPath: Path to the file containing the SURs which areas are to be computed.
+      @type inPath: String
+      
+      @param outPath: Path to the file or directory where the results should be saved. If outPath points
+        to a file, all placemarks are stored in one kml. If outPath points to a directory, one kml for
+        each SUR will be computed plus one, containing all others.
+      @type outPath: String
+      
+      @param configPath: Optional path to a config file, containing information about the classification of rules
+        (indoor, outdoor or both).
+      @type configPath: String
+            
+    """
     isOutputDir = os.path.isdir(outPath)
     
-    surs = sur.SUR.fromFile(open(inPath,'r'))
+    surs = sur.SUR.fromFile(open(inPath,'r'), configPath)
     
     completeKML = kml.KMLObject()
+    
     
     for s in surs:
       
@@ -106,6 +132,7 @@ class Pipeline:
     @param coords:  Central point coordinates - (lat, long) - of the
                     calculated bounding box
     @type coords:   Tuple(float, float)
+    
     @return:        Returns a list of the lower left and upper right coordinates
                     for the bounding box
     """

@@ -5,7 +5,6 @@ Created on Sun Nov  9 15:09:52 2014
 @author: jpoeppel & adreyer
 """
 
-#import lxml.etree as ET
 import xml.etree.cElementTree as ET
 import xml.sax.saxutils as xmlUtils
 
