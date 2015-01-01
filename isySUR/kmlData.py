@@ -65,7 +65,11 @@ class KMLObject():
     nid=1
     res=cls()
     for pm in root.iter("{http://earth.google.com/kml/2.1}Placemark"):
-      newPlacemark=Placemark(pm[0].text,None,None,pm[2].text)
+      pmName = pm[0].text
+      imageName = pmName + ".jpg"
+      for img in pm.iter("{http://earth.google.com/kml/2.1}img"):
+        imageName = img.attrib["src"]
+      newPlacemark=Placemark(pmName, imageName ,None,None,pm[2].text)
       startlat=None
       startlon=None
       for coord in pm.iter("{http://earth.google.com/kml/2.1}coordinates"):
@@ -138,12 +142,12 @@ class KMLObject():
     
     for p in self.placemarks:
       documentE.append(p.getXMLTree())
-    return '<?xml version="1.0" encoding="UTF-8"?>' +xmlUtils.unescape(ET.tostring(root, encoding='utf-8'))
+    return '<?xml version="1.0" encoding="UTF-8"?>' + xmlUtils.unescape(ET.tostring(root, encoding='utf-8'))
     
   
 class Placemark():
   
-  def __init__(self, name, ruleType=None, pointList=None, style="#defaultStyle"):
+  def __init__(self, name, imageName, ruleType=None, pointList=None, style="#defaultStyle"):
     """
       Constructor for the Placemark class.
       
@@ -151,6 +155,9 @@ class Placemark():
       
       @param name: The name of the placemark.
       @type name: String
+      
+      @param imageName: The name/src of the image in the placemark description.
+      @type imageName: String
       
       @param ruleType: The rule type of the placemark. (Currently not used)
       @type ruleType: Tupel(key, value)
@@ -166,6 +173,7 @@ class Placemark():
     self.ruleType = ruleType
     self.style = style
     self.polygon = []
+    self.imageName = imageName
     if pointList != None:
       if not isinstance(pointList, list):
         raise TypeError("nodeList must be a list of nodes")
@@ -222,7 +230,12 @@ class Placemark():
     name.text = self.name
     
     description = ET.SubElement(root, "description")
-    description.text ="<img src='"+ self.name + ".jpg' width = '400' />"
+    #Add this line by hand in order to be able to compare with truth string better.
+    #Results in having to unescape the <> in the kmlObject though
+    description.text ="<img src='"+ self.imageName + "' width = '400' />"
+#    image = ET.SubElement(description, "img")
+#    image.attrib["src"] = self.name
+#    image.attrib["width"] = '400'
     style = ET.SubElement(root, "styleUrl")
     style.text = self.style
     

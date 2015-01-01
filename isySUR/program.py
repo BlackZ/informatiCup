@@ -105,8 +105,11 @@ class Pipeline:
           points.append(self.osm.nodes[ref].getCoordinateString())
       
     if len(points) > 0:
+      placemarkName = surObj.id
       for rule in surObj.ruleName:
-        kmlObj.addPlacemark(kml.Placemark(str(rule) + ":" + str(surObj.ruleName[rule]),
+        placemarkName += "-" + rule + ":" + surObj.ruleName[rule]
+      
+      kmlObj.addPlacemark(kml.Placemark(placemarkName, surObj.id + ".jpg",
                           rule,
                           pointList=points))
     else:

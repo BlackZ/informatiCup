@@ -16,12 +16,13 @@ class TestPlacemarkObject(unittest.TestCase):
   
   def setUp(self):
     self.testName = "0002"
+    self.imageName = "0002.jpg"
     self.ruleType = ("key", "value")
     self.pointList = ["4.12,52.12","4.12,52.13","4.13,52.12"]
     self.testStyle = "#defaultStyle"
 
   def test_createPlacemark(self):  
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType)
     self.assertIsNotNone(placemarkObj)
     self.assertEqual(placemarkObj.name, self.testName)
     self.assertEqual(placemarkObj.ruleType, self.ruleType)
@@ -30,7 +31,7 @@ class TestPlacemarkObject(unittest.TestCase):
     self.assertEqual(len(placemarkObj.polygon),0)
     
   def test_createPlacemarkWithPolygon(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.pointList)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, self.pointList)
     self.assertIsNotNone(placemarkObj)
     self.assertEqual(placemarkObj.name, self.testName)
     self.assertEqual(placemarkObj.ruleType, self.ruleType)
@@ -40,54 +41,54 @@ class TestPlacemarkObject(unittest.TestCase):
     
   def test_createPlacemarkFailNotList(self):
     with self.assertRaises(TypeError):
-      placemarkObj = kmlData.Placemark(self.testName, self.ruleType, 42)
+      placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, 42)
         
   def test_addPoint(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType)
     placemarkObj.addPoint(self.pointList[0])
     self.assertEqual(len(placemarkObj.polygon),1)
     self.assertEqual(placemarkObj.polygon[-1], self.pointList[0])
     
   def test_addPointFailIntGiven(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType)
     with self.assertRaises(TypeError):
       placemarkObj.addPoint(42)
     
   def test_hasPolygonFailNoPoints(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType)
     self.assertFalse(placemarkObj.hasPolygon())
 
   def test_hasPolygonFailWith2Points(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType)
     placemarkObj.addPoint(self.pointList[0])  
     placemarkObj.addPoint(self.pointList[1])
     self.assertFalse(placemarkObj.hasPolygon())    
     
   def test_hasPolygon(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.pointList)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, self.pointList)
     self.assertTrue(placemarkObj.hasPolygon())    
 
   def test_addPointList(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType)
     placemarkObj.addPointList(self.pointList)
     for point in self.pointList:
       self.assertTrue(point in placemarkObj.polygon)
   
   def test_addPointListFailNoOtherNodesAffected(self):
     firstPoint = "123.2,312.5"
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, [firstPoint])
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, [firstPoint])
     placemarkObj.addPointList(self.pointList)
     self.assertEqual(len(placemarkObj.polygon), len(self.pointList) + 1)
     self.assertTrue(firstPoint in placemarkObj.polygon)
     
   def test_getXMLTree(self):
-    placemarkObj = kmlData.Placemark(self.testName, self.ruleType, self.pointList)
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, self.pointList)
     tree = placemarkObj.getXMLTree()
     self.assertEqual(tree.tag, "Placemark")
     nameE = tree.find("name")
     self.assertIsNotNone(nameE)
     self.assertEqual(nameE.text, self.testName)
-    trueDescription = "<img src='" + self.testName + ".jpg' width = '400' />"
+    trueDescription = "<img src='" + self.imageName + "' width = '400' />"
     descriptionE = tree.find("description")
     self.assertIsNotNone(descriptionE)
     self.assertEqual(descriptionE.text, trueDescription)
