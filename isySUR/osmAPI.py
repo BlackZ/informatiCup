@@ -12,6 +12,10 @@ class osmAPI():
     self.osmurl='http://overpass-api.de/api/interpreter'
       
   def _getOsmRequestData(self, minLat, minLon, maxLat, maxLon, filterList):
+    """
+    Builds the paramter string for the OSM Request depending if a filterList is
+    given or not.
+    """
     if len(filterList) == 0:
       return {'data': '[out:xml][timeout:25];'\
               '(node[""=""]({minLat},{minLon},{maxLat},{maxLon});'\
@@ -49,7 +53,10 @@ class osmAPI():
                                                    filterList)).content)
 
   def _parseData(self, obj):
-    """ """
+    """
+    Splits the incoming OSM Date into Nodes, Ways and Relations
+    and stores it into an OSMObject for further calculations.
+    """
     osmObj=osmData.OSM()
     
     data = dom.parseString(obj)
@@ -105,23 +112,32 @@ class osmAPI():
 
     return osmObj
 
-  def _getTags(self, node):
+  def _getTags(self, elem):
+    """
+    Returns a dictionary of tags for a given element.    
+    """
     tags = {}
-    for element in node.getElementsByTagName('tag'):
+    for element in elem.getElementsByTagName('tag'):
         tags[element.getAttribute('k').encode('utf-8')] = element.getAttribute('v').encode('utf-8')
     
     return tags
   
   def _getRefs(self, node):
+    """
+    Returns a list of refereences for a given element.
+    """
     refs = []
     for element in node.getElementsByTagName('nd'):
       refs.append(element.getAttribute('ref').encode( "utf-8" ))
       
     return refs
 
-  def _getMembers(self, node):
+  def _getMembers(self, rel):
+    """
+    Returns a list of members for a given relation. 
+    """
     members = []
-    for element in node.getElementsByTagName('member'):
+    for element in rel.getElementsByTagName('member'):
       type = element.getAttribute('type').encode("utf-8")
       ref = element.getAttribute('ref').encode("utf-8")
       role = element.getAttribute('role').encode("utf-8")
