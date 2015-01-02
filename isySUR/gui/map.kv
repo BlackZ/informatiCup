@@ -7,14 +7,16 @@
         background_color: (0,0,1,1)
         size_hint: 0.15, 0.075
         pos: 0, 0
+        bold: True
         on_release: root.open_menue()   
         
     Label:
         id: toast
+        color: (0.1, 0.1, 0.1,1) 
         font_size: 20
         size_hint_y: 0.075
         pos_hint_x: 0.5
-        color: (1,0,0,1)
+        bold: True
 
     
     Button:
@@ -23,6 +25,7 @@
         background_color: (0,0,1,1)
         size_hint: 0.15, 0.075
         pos: root.width - self.width, 0
+        bold: True
     
 
 <Menue>:

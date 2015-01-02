@@ -43,10 +43,11 @@ if __name__ == '__main__':
   else:
     sys = sys.platform
     if "linux" in sys:
-        isySUR.gui_start.MapApp().run()
+      isySUR.gui.MapGUI.MapApp().run()
     elif "win" in sys:
+      try:
+        isySUR.gui.MapGUI.MapApp().run()
+      except:
         if args.kivy == '':
-            raise Exception('Unknown location of kivy.bat!')
-        print args.kivy
-        
-        os.system(args.kivy + " ./isySUR/gui_start.py")
+          raise Exception('Unknown location of kivy.bat!')        
+        os.system(args.kivy + " ./isySUR/gui/MapGUI.py")
