@@ -1,14 +1,13 @@
-#:kivy 1.0.9
-
+#:kivy 1.4.0
+       
 <Map>:
     Button:
-        id: menue
+        id: menueBut
         text: "Menü"
         background_color: (0,0,1,1)
         size_hint: 0.15, 0.075
         pos: 0, 0
-        
-        on_release: root.merry_christmas()
+        on_release: root.open_menue()   
         
     Label:
         id: toast
@@ -24,6 +23,75 @@
         background_color: (0,0,1,1)
         size_hint: 0.15, 0.075
         pos: root.width - self.width, 0
+    
+
+<Menue>:
+    id: menue
+    Button:
+        text: 'Load'
+        size_hint_y: None
+        height: 44
+        background_color: (0,0,2,1)
+        on_release: root.show_load()
+    Button:
+        text: 'Save'
+        size_hint_y: None
+        height: 44
+        background_color: (0,0,2,1)
+        on_release: root.show_save()
+    Button:
+        text: 'Config'
+        size_hint_y: None
+        height: 44
+        background_color: (0,0,2,1)
+        on_release: root.select('item3')
+
+<KMLList>:
         
-        on_release: root.happy()
-   
+
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            filters: ['*.kml']
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Load"
+                on_release: root.load(filechooser.path, filechooser.selection)
+ 
+<SaveDialog>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release: root.save(filechooser.path, text_input.text)
