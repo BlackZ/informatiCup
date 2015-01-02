@@ -90,6 +90,11 @@ class TestKMLObject(unittest.TestCase):
     with self.assertRaises(IOError):
       testKML = kmlData.KMLObject.parseKML(filename);
       
+  def test_parseKMLTruthFile(self):
+    filename="testData/truth/0040.truth.kml"
+    with self.assertRaises(IOError):
+      testKML = kmlData.KMLObject.parseKML(filename);
+      
   def test_saveAsXML(self):
     #Not too nice since this works only if the the input file is unformatted.
     filename="testData/dataOnlyForTests/TestOfKmlUnformatted.kml"

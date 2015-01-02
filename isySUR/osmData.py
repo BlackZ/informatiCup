@@ -515,9 +515,6 @@ class Way(object):
     """
     This function returns a list of lists of tuples, which describes all edges of the polygone
     
-    @param vertices: all points of the polygon
-    @type vertices: [(float,float),...]
-    
     @return edgeList: a list of lists of tuples (e.g. [[(0,0),(0,1)],[(0,1),(1,1)]]) a sublist represents an edge 
     """
     edgeList = []
