@@ -62,7 +62,6 @@ class KMLObject():
     """
     tree=ET.parse(filename)
     root=tree.getroot()
-    nid=1
     res=cls()
     for pm in root.iter("{http://earth.google.com/kml/2.1}Placemark"):
       pmName = pm[0].text
@@ -88,10 +87,8 @@ class KMLObject():
               startlat=lat
               startlon=lon
               newPlacemark.addPoint(node)
-              nid+=1
             elif startlat!=lat or startlon!=lon:
               newPlacemark.addPoint(node)
-              nid+=1
               if nodeNr==numberOfNodes:
                 raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
       res.addPlacemark(newPlacemark)
