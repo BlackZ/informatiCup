@@ -3,8 +3,8 @@
 
 import os
 import sys
-sys.path.append("..")
-
+#sys.path.append("..")
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 import kmlData
 
 from kivy.app import App
@@ -15,10 +15,10 @@ from kivy.uix.popup import Popup
 from kivy.uix.listview import ListView
 from kivy.uix.dropdown import DropDown
 from kivy.factory import Factory
-from sidepanel import SidePanel
-from MapViewer import MapViewer
-import WMSTileServer
-from WMSOverlayServer import *
+from gui.sidepanel import SidePanel
+from gui.MapViewer import MapViewer
+import gui.WMSTileServer
+from gui.WMSOverlayServer import *
 
 class Map(FloatLayout):
     def __init__(self, app):
@@ -117,8 +117,8 @@ class MapApp(App):
         
         print placemark
 
-if __name__ == '__main__':
-    MapApp().run()
+#if __name__ == '__main__':
+#    MapApp().run()
     
 
 
