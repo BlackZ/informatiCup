@@ -183,6 +183,11 @@ class OSM():
     @param point: The point - (lat, lon) - for which the function has
                   to compute the closest way.
     @type point: Tuple(float,float)
+    
+    @param onlyPolygons: True for only using Ways with complete Polygons for computation
+                         False for use all
+    
+    @type onlyPolygons: boolean
 
     @param tags: A dictionary of tags, given as a key value pair, which
                 will be used to filter the ways.
