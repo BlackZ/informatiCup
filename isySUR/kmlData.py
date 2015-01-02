@@ -94,9 +94,6 @@ class KMLObject():
               nid+=1
               if nodeNr==numberOfNodes:
                 raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
-            else:
-              startlat=None
-              startlon=None
       res.addPlacemark(newPlacemark)
     return res
     

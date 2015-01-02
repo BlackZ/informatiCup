@@ -69,7 +69,7 @@ class TestKMLObject(unittest.TestCase):
 
     point23 = "5.33897360,50.93040040"
     
-    testKML = kmlData.KMLObject.parseKML(filename);
+    testKML = kmlData.KMLObject.parseKML(filename)
     self.assertEqual(len(testKML.placemarks),2)
     self.assertEqual(testKML.placemarks[0].name,name1)
     self.assertEqual(testKML.placemarks[0].style,style)
@@ -84,6 +84,13 @@ class TestKMLObject(unittest.TestCase):
     self.assertEqual(testKML.placemarks[1].polygon[0],point21)
     self.assertEqual(testKML.placemarks[1].polygon[1],point22)
     self.assertEqual(testKML.placemarks[1].polygon[2],point23)
+    
+  def test_parseKMLTruth40(self):
+    filename="testData/dataOnlyForTests/truth40.kml"
+    name = "0040"
+    testKML = kmlData.KMLObject.parseKML(filename)
+    self.assertEqual(len(testKML.placemarks),1)
+    self.assertEqual(testKML.placemarks[0].name,name)
     
   def test_parseKMLWithInvalidDataFile(self):
     filename="testData/dataOnlyForTests/TestOfInvalidKml.kml"
@@ -128,4 +135,8 @@ class TestKMLObject(unittest.TestCase):
 
 if __name__ == '__main__':
   os.chdir("../..")
+#  suite = unittest.TestSuite()
+#  suite.addTest(TestKMLObject("test_parseKMLTruth40"))
+#  runner = unittest.TextTestRunner()
+#  runner.run(suite)
   unittest.main()
