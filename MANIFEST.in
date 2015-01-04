@@ -6,6 +6,7 @@ recursive-include testData/dataOnlyForTests *
 
 include testData/Data.txt
 
-recursive-include doc/Documentation *
+# TODO chance this to manual.pdf in main directory when finished
+include doc/Documentation/main.pdf
 
 include surConfig.cfg
