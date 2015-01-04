@@ -66,10 +66,9 @@
 
 \begingroup
 \thispagestyle{empty}
-\AddToShipoutPicture*{\put(6,5){\includegraphics[scale=1]{bg}}} % Image background
+\AddToShipoutPicture*{\put(6,5){\includegraphics[scale=1]{bgschilder}}} % Image background
 \centering
-\vspace*{9cm}
-\todol{Create a nice background image}
+\vspace*{6cm}
 \par\normalfont\fontsize{35}{35}\sffamily\selectfont
 \includegraphics[width=\textwidth]{LogoWithName.jpg}
 %\ProjectTitle\par % Book title
@@ -81,9 +80,10 @@
 %	COPYRIGHT PAGE
 %----------------------------------------------------------------------------------------
 
-%\newpage
-%~\vfill
-%\thispagestyle{empty}
+\newpage
+~\vfill
+\thispagestyle{empty}
+Published \today
 
 %\noindent Copyright \copyright\ 2013 John Smith\\ % Copyright notice
 
@@ -136,7 +136,7 @@ First decide if you like to use the command line version of \pt\ or if you prefe
 %	Using the program
 %----------------------------------------------------------------------------------------
 
-\chapterimage{Kollage.jpg}
+%\chapterimage{Kollage.jpg}
 \chapter{Using \ProjectTitle}
 In this chapter the usage of \pt\ is described in detail. First you can find installation instructions in section \ref{sec:installation}, detailed usage instruction for both program versions are following in section \ref{sec:usage}.
 
@@ -192,7 +192,7 @@ Now you are able to start \pt\ anytime through
 %	Technical and implementation details
 %----------------------------------------------------------------------------------------
 
-\chapterimage{Kollage.jpg}
+%\chapterimage{Kollage.jpg}
 \chapter{Technical and implementation details}
 \todol{create sections}
 \section{}
@@ -212,49 +212,49 @@ Now you are able to start \pt\ anytime through
 %	CHAPTER 1
 %----------------------------------------------------------------------------------------
 
-\chapterimage{chapter_head_2.pdf} % Chapter heading image
-
-\chapter{EXAMPLE Chapter}
-
-\section{Paragraphs of Text}\index{Paragraphs of Text}
-
-\lipsum[1-7] % Dummy text
-
-%------------------------------------------------
-
-\section{Citation}\index{Citation}
-
-This statement requires citation \cite{book_key}; this one is more specific \cite[122]{article_key}.
+%\chapterimage{chapter_head_2.pdf} % Chapter heading image
+%
+%\chapter{EXAMPLE Chapter}
+%
+%\section{Paragraphs of Text}\index{Paragraphs of Text}
+%
+%\lipsum[1-7] % Dummy text
 
 %------------------------------------------------
 
-\section{Lists}\index{Lists}
+%\section{Citation}\index{Citation}
+%
+%This statement requires citation \cite{book_key}; this one is more specific \cite[122]{article_key}.
 
-Lists are useful to present information in a concise and/or ordered way\footnote{Footnote example...}.
+%------------------------------------------------
 
-\subsection{Numbered List}\index{Lists!Numbered List}
-
-\begin{enumerate}
-\item The first item
-\item The second item
-\item The third item
-\end{enumerate}
-
-\subsection{Bullet Points}\index{Lists!Bullet Points}
-
-\begin{itemize}
-\item The first item
-\item The second item
-\item The third item
-\end{itemize}
-
-\subsection{Descriptions and Definitions}\index{Lists!Descriptions and Definitions}
-
-\begin{description}
-\item[Name] Description
-\item[Word] Definition
-\item[Comment] Elaboration
-\end{description}
+%\section{Lists}\index{Lists}
+%
+%Lists are useful to present information in a concise and/or ordered way\footnote{Footnote example...}.
+%
+%\subsection{Numbered List}\index{Lists!Numbered List}
+%
+%\begin{enumerate}
+%\item The first item
+%\item The second item
+%\item The third item
+%\end{enumerate}
+%
+%\subsection{Bullet Points}\index{Lists!Bullet Points}
+%
+%\begin{itemize}
+%\item The first item
+%\item The second item
+%\item The third item
+%\end{itemize}
+%
+%\subsection{Descriptions and Definitions}\index{Lists!Descriptions and Definitions}
+%
+%\begin{description}
+%\item[Name] Description
+%\item[Word] Definition
+%\item[Comment] Elaboration
+%\end{description}
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 2
@@ -461,4 +461,6 @@ Lists are useful to present information in a concise and/or ordered way\footnote
 %\addcontentsline{toc}{chapter}{\textcolor{ocre}{Index}}
 %\printindex
 
-%-------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------
+
+\end{document}
