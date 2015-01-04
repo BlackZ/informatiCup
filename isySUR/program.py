@@ -10,6 +10,7 @@ import osmData
 import kmlData as kml
 import sur
 import os
+import sys
 
 
 class Pipeline:
@@ -43,8 +44,9 @@ class Pipeline:
             
     """
     isOutputDir = os.path.isdir(outPath)
-    
-    surs = sur.SUR.fromFile(open(inPath,'r'), configPath)
+    surFile = open(inPath,'r')
+    surs = sur.SUR.fromFile(surFile, configPath)
+    surFile.close()
     
     completeKML = kml.KMLObject()
     
@@ -80,16 +82,19 @@ class Pipeline:
     coords = (surObj.latitude, surObj.longitude)
     bBox = self._createBBox(coords)
     kmlObj = kml.KMLObject()
-    #TODO Determine filter depending on rules
-    self.osm = self.osmAPI.performRequest(bBox, [(["node","way","relation"],"building","")])
-    nearObjs = self._getNearestObj(coords)
-    if len(nearObjs) == 0:
-      #Searching for buildings did not help.
+    if surObj.classification == "I":
+      self.osm = self.osmAPI.performRequest(bBox, [(["node","way","relation"],"building","")])
+    else:
       self.osm = self.osmAPI.performRequest(bBox)
+      
+    if surObj.classification in ["I","IO"]:
+      nearObjs = self._getNearestObj(coords, {"building":"*"})
+    else:
       nearObjs = self._getNearestObj(coords)
     
 
-    points = []
+    
+    possibleWays = []
     for obj in nearObjs:
       tmpObj = obj.nearestObj
       tmpWay = None
@@ -101,8 +106,22 @@ class Pipeline:
       if tmpObj[1] == osmData.Way:
         tmpWay = self.osm.ways[tmpObj[0]]
       if tmpWay != None:
-        for ref in tmpWay.refs:
-          points.append(self.osm.nodes[ref].getCoordinateString())
+        possibleWays.append(tmpWay)
+          
+    bestWay = None
+    closestDist = sys.float_info.max
+    for way in possibleWays:
+      dist = 0
+      for ref in way.refs:
+        dist += self.osm.nodes[ref].getDistance(coords).distance
+      dist /= len(way.refs)
+      if dist < closestDist:
+        closestDist = dist
+        bestWay = way
+            
+    points = []  
+    for ref in bestWay.refs:
+      points.append(self.osm.nodes[ref].getCoordinateString())
       
     if len(points) > 0:
       placemarkName = surObj.id
@@ -118,7 +137,7 @@ class Pipeline:
     
     return kmlObj
   
-  def _getNearestObj(self, coords):
+  def _getNearestObj(self, coords, tags={}):
     """
       Helper function to return the nearest osmObjects to the given coordinates.
       First tries to find relations, if there is no nearest relation, the nearest way, with closed
@@ -127,13 +146,17 @@ class Pipeline:
       @param coords: The coordinates (lat,lon) around which the nearest objects are to be found.
       @type coords: Tuple(float,float)
       
+      @param tags: Tags the nearest objects should have
+      @type tags: Dict of Key:Value pars
+      
       @return: A list of nearstObjects (see osmData.getNearestX for more details)
     """
-    nearObjs = self.osm.getNearestRelation(coords)
+    nearObjs = self.osm.getNearestRelation(coords, tags=tags)
     
     if len(nearObjs) == 0:
       nearObjs = self.osm.getNearestWay(coords, True)
-      
+    if len(nearObjs) == 0:
+      nearObjs = self.osm.getNearestWay(coords, False)  
 #    if nearObj.distance == "-1":    
 #      nearObj = self.osm.getNearestNode(coords)
 #      
