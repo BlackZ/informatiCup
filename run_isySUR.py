@@ -9,16 +9,11 @@ Name should change once a final name for the program has been found.
 
 import isySUR.program
 import os
-try:
-    import isySUR.gui_start
-except:
-    pass
 import argparse
-import subprocess
 import sys
 
 def parseArguments():
-    parser = argparse.ArgumentParser(description='[NAME] to calculate the subjective area of \
+    parser = argparse.ArgumentParser(description='isySUR script to calculate the subjective area of \
           influence of space usage rules (SURs).')
     parser.add_argument('-in', '--input', type=str,
                         help='Input file containing the SURs which area of influence is to be computed.')

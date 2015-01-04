@@ -12,7 +12,7 @@
         
     Label:
         id: toast
-        color: (0.1, 0.1, 0.1,1) 
+        color: (0.3, 0.3, 0.3, 1) 
         font_size: 20
         size_hint_y: 0.075
         pos_hint_x: 0.5
@@ -26,10 +26,13 @@
         size_hint: 0.15, 0.075
         pos: root.width - self.width, 0
         bold: True
+        
+        on_release: root.open_kmlList()
     
 
 <Menue>:
     id: menue
+    
     Button:
         text: 'Load'
         size_hint_y: None
@@ -48,9 +51,6 @@
         height: 44
         background_color: (0,0,2,1)
         on_release: root.select('item3')
-
-<KMLList>:
-        
 
 <LoadDialog>:
     BoxLayout:

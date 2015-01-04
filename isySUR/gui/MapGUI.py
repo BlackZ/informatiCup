@@ -9,30 +9,35 @@ import kmlData
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import ObjectProperty
+from kivy.uix.button import Button
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
-from kivy.uix.listview import ListView
 from kivy.uix.dropdown import DropDown
+from kivy.uix.listview import ListView, ListItemButton
+from kivy.adapters.dictadapter import DictAdapter
 from kivy.factory import Factory
-from gui.sidepanel import SidePanel
-from gui.MapViewer import MapViewer
-import gui.WMSTileServer
-from gui.WMSOverlayServer import *
+from sidepanel import SidePanel
+from MapViewer import MapViewer
+import WMSTileServer
+from WMSOverlayServer import *
 
 class Map(FloatLayout):
+  
   def __init__(self, app):
     super(Map, self).__init__()
     
-    Factory.register('Map', cls=Map)
-    
+    self.app = app
     self.maps = MapViewer(maptype="Roadmap", provider="openstreetmap")
     self.add_widget(self.maps, 20)
     
-    self.menue = Menue(app)
+    self.menue = Menue(self)
     self.menue.auto_dismiss = False
     
     self.menue.setToast(self.ids.toast)
+    
+    self.kmlList = KMLList(self)
+    self.kmlList.auto_dismiss = False
       
   def open_menue(self):
     if self.menue.isOpen:
@@ -40,6 +45,15 @@ class Map(FloatLayout):
     else:
       self.menue.open(self.ids.menueBut)
     self.menue.isOpen = not self.menue.isOpen
+    
+  def open_kmlList(self):
+    if len(self.app.loaded_kmls) == 0:
+      self.ids.toast.text = "No KML files loaded!"
+    elif self.kmlList.is_open:
+      self.kmlList.dismiss(self.ids.kml)
+    else:
+      self.kmlList.open(self.ids.kml)
+    self.kmlList.is_open = not self.kmlList.is_open
   
 class Menue(DropDown):
   loadfile = ObjectProperty(None)
@@ -76,11 +90,12 @@ class Menue(DropDown):
   def load(self, path, filename):
     if filename != []:
       try:
-        self.app.addKML(os.path.join(path, filename[0]))
+        item_name = self.app.app.addKML(os.path.join(path, filename[0]))
       except:
         self.toast.text = "The loaded file is incomplete!"
       #with open(os.path.join(path, filename[0])) as stream:
       #    self.app.addKML(stream.read())
+      self.app.kmlList.addItem(item_name)
   
     self.dismiss_popup()
   
@@ -95,10 +110,57 @@ class Menue(DropDown):
 
     self.dismiss_popup()
 
-#class KMLList(ListView):
-  #def __init__(self, app):
-  #    super(KMLList, self).__init__()
-  #    self.app = app
+class KMLList(DropDown):
+  def __init__(self, app):
+    super(KMLList, self).__init__()
+    
+    self.app = app
+    self.is_open = False
+    self.createList()
+  
+  def createList(self):
+    if len(self.app.app.loaded_kmls) != 0:
+      for kml in self.app.loaded_kmls:
+        btn = Button(text=self.app.loaded_kmls['name'], size_hint_y=None, height=44, background_color=(0,0,2,1))
+        btn.bind(on_release=self.selectBut)
+        self.add_widget(btn)
+    
+  def selectBut(self, obj):
+    print obj.text
+    selected = self.app.app.loaded_kmls[obj.text]['selected']
+    if selected:
+      obj.background_color = (0,0,2,1)
+    else:
+      obj.background_color = (1,1,1,1)
+    self.app.app.loaded_kmls[obj.text]['selected'] = not selected
+
+  def addItem(self, name):
+    print name
+    btn = Button(text=name, size_hint_y=None, height=44,background_color=(0,0,2,1))
+    btn.bind(on_release=self.selectBut)
+    self.add_widget(btn)
+    
+#class KMLList(BoxLayout):
+#  def __init__(self, app, posi):
+#    super(KMLList, self).__init__()
+#    self.app = app
+#    self.is_open = False
+#    
+#    list_item_args_converter = \
+#          lambda row_index, rec: {'text':rec['name'],
+#                                  'size_hint': (0.15, None)}
+#    
+#    kml_dict_adapter = \
+#          DictAdapter(
+#            sorted_keys=sorted(self.app.loaded_kmls.keys()),
+#            data = self.app.loaded_kmls,
+#            args_converter=list_item_args_converter,
+#            selection_mode='multiple',
+#            cls=ListItemButton)
+#    
+#    kml_view = ListView(adapter=kml_dict_adapter, size_hint=(0.2,1.0))
+#    
+#    self.add_widget(kml_view)
       
   #def createData(self):
   #    check_list = []
@@ -121,16 +183,18 @@ class MapApp(App):
   def __init__(self):
     super(MapApp, self).__init__()
     
-    self.loaded_kmls = []
+    self.loaded_kmls = {}
   
   def build(self):
     return Map(self)
   
   def addKML(self, kml):
     placemark = kmlData.KMLObject.parseKML(kml)
-    self.loaded_kmls.append(placemark)
+    name = "KML" + str(len(self.loaded_kmls) + 1)
+    self.loaded_kmls.update({name:{'data':placemark, 'selected':False}})
     
-    print placemark
+    return name
+    
 
 if __name__ == '__main__':
   MapApp().run()
