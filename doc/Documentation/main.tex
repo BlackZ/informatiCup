@@ -46,11 +46,11 @@
 %\usepackage{makeidx} % Required to make an index
 %\makeindex % Tells LaTeX to create the files required for indexing
 
-\usepackage{todonotes}
+\usepackage{todonotes} %to be deleated in the end
+\newcommand{\todol}{\todo[inline]} %to be deleated in the end
 
 \newcommand{\ProjectTitle}{isySUR}
 \newcommand{\pt}{\ProjectTitle}
-\newcommand{\todol}{\todo[inline]}
 
 \usepackage{scrextend} %used for footref - repetition of footnotes
 
@@ -132,11 +132,33 @@ First decide if you like to use the command line version of \pt\ or if you prefe
 \todol{using OSM}
 \todol{Features: why to use this software}
 
+\section{Content of \ProjectTitle}
+In the archive you can find the following data (bold printed files will be installed with the install command):
+\todol{noch up-to-date?}
+\todol{add GUI when finished}
+\begin{itemize}
+	\item \textbf{isySUR} (directory) - the source files for the isySUR Python package
+	\begin{itemize}
+		\item tests (directory) - \pt\ was developed using test driven development. In this directory you will find the test files.
+	\end{itemize}
+	\item testData (directory) - in here one possible input file named Data.txt is found
+	\begin{itemize}
+		\item dataOnlyForTests (directory) - Some of the test files need data that is stored in this directory
+	\end{itemize}
+	\item kmlComperator.py - comparison tool for comparing our computed .kml-files with the given .truth.kml-files (the areas of the placemarks), used for development
+	\item manual.pdf - this manual
+	\item README.txt
+	\item \textbf{run\_isySUR.py} - the Python script to run the command line version of \pt
+	\item run\_tests.py - script that runs all tests in isySUR/tests/, used for development\todo{funktionieren die patterns eigentlich noch?}
+	\item setup.py - the setup script to install \pt
+	\item surConfig.cfg - a configuration file that can optionally be used for computation (see section \ref{sec:usage})
+\end{itemize}
+
+
 %----------------------------------------------------------------------------------------
 %	Using the program
 %----------------------------------------------------------------------------------------
 
-%\chapterimage{Kollage.jpg}
 \chapter{Using \ProjectTitle}
 In this chapter the usage of \pt\ is described in detail. First you can find installation instructions in section \ref{sec:installation}, detailed usage instruction for both program versions are following in section \ref{sec:usage}.
 
@@ -146,7 +168,7 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 \begin{enumerate}
 	\item \textbf{requirements for the command line version:}
 	\begin{itemize}
-		\item Python 2.7 \todo{3 auch ok?} %Thorsten: Maybe importent: 32/64 bit? - Is this important for us? As far as I know it works for both.
+		\item Python 2.7
 		\item requests (HTTP library)
 		\item internet connection
 	\end{itemize}
@@ -161,11 +183,12 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 		\item \todol{requirements for GUI}
 	\end{itemize}
 \end{enumerate}
+
 \subsection{Installation}
 \todol{Unterschiede bei GUI?} %Thorsten: Most packages are published as .zip for windows too. do we need it? - No, no zip, we publish ONE archiv. Windows user can also unpack .tar.gz
 You got an archive of type .tar.gz. Please unpack the archive into a directory you want. Because \pt\ is a Python script you do not need to install it. It is also possible to install only the dependencies and run \pt\ through typing:
 \begin{verbatim}
-	$ python run_isySUR.py
+	$ python run_isySUR.py [parameters]
 \end{verbatim}
 ~\\
 
@@ -175,18 +198,64 @@ For installing the script and tool package browse the directory you chose and in
 \end{verbatim}
 Now you are able to start \pt\ anytime through
 \begin{verbatim}
-	$ run_isySUR.py
+	$ run_isySUR.py [parameters]
 \end{verbatim}
+
+\section{Input and output}\label{sec:io}
+The input of the space usage rules was specified in the programming task as well as the output in .kml format. For more information about the decision to add a configuration file please see section \ref{sec:config}.
+
+\subsection{Space usage rules}
+The SUR file is a plain text file. The first line holds the number of space usage rules in the file. Line-serially the SURs follow. Each of this lines starts with the id of the SUR. Then latitude and longitude follow and the last entry is the name or description of the SUR. The entries are comma separated. Decimal separator in latitude and longitude is a point.
+\\~\\
+Example file:
+\begin{verbatim}
+1
+0072, 50.9313, 5.39570, smoking="no"
+\end{verbatim}
+
+\subsection{Configuration file}
+The configuration file is a plain text file. In this file one or more blocks starting with '[Indoor]', '[Outdoor]' or '[Both]' are found. After these headlines the names of the SURs follow that belongs to these categories of area of influence.
+\\~\\
+Example file:
+\begin{verbatim}
+[Indoor]
+access:age="21+"
+camera="no"
+[Outdoor]
+fishing="no"
+littering="no"
+[Both]
+access:dog="no"
+open_fire="no"
+\end{verbatim}
+
+\subsection{Output: Keyhole Markup Language}
+Output files are in .kml format where kml stands for Keyhole Markup Language. For syntax definition and documentation please visit \url{https://developers.google.com/kml}.
 
 \section{Command line and GUI version}\label{sec:usage}
 \pt\ comes with two version: One for command line use and another one for users who prefer to use a graphical user interface.
+
 \subsection{Command line version}
+Usage of the command line version:
+\begin{verbatim}
+	$ run_isySUR.py [-h] [-c CONFIG] input output
+\end{verbatim}
+
 \subsubsection{Parameters}
-\todol{what parameters and how to use it}
+\todol{up to date?}
+The parameters of run\_isySUR.py (bold arguments are required):
+\begin{itemize}
+	\item \textbf{input} - Path to the input file containing the SURs. See \ref{sec:io} for the required format.
+	\item \textbf{output} - Path where to put the output file(s). If this path points to a file, a single output .kml-file containing all computed areas is created. If it points to a directory, one .kml-file for each SUR is created in this directory as well as one .kml-file containing all computed areas.
+	\item -h - If this parameter is given, a short help message containing all parameters is shown.
+	\item -c CONFIG (--config CONFIG) - With this parameter an optional config file with SUR classifications (indoor, outdoor, both) is used for computation. For the format of the file see \ref{sec:io}.
+\end{itemize}
+
 \subsection{GUI version}
+\todol{fill me!}
+
 \subsection{Using android}\label{sec:android}
-
-
+\todol{fill me!}
 
 %----------------------------------------------------------------------------------------
 %	Technical and implementation details
@@ -194,14 +263,28 @@ Now you are able to start \pt\ anytime through
 
 %\chapterimage{Kollage.jpg}
 \chapter{Technical and implementation details}
+\todol{Berechnen Sie nun die Geltungsbereiche der Space Usage Rules aus Ihrer Umgebung mit Ihrer Implementierung aus der ersten Runde.
+Diskutieren Sie die Korrektheit und die Präzision der von Ihnen berechneten Lösungen für die Space
+Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie dazu die berechneten mit den intuitiv beabsichtigten Geltungsbereichen.}
+
 \todol{create sections}
-\section{}
+
+\section{The configuration file}\label{sec:config}
+\todol{why do we have it?}
+
+%----------------------------------------------------------------------------------------
+%	Own SURs
+%----------------------------------------------------------------------------------------
+
+\chapter{Added SURs}
+For the competition ten new space usage rules should be found.
+\todol{Add our SURs (maybe with screenshot of intuitive area?)}
 
 %----------------------------------------------------------------------------------------
 %	List of TODOS
 %----------------------------------------------------------------------------------------
 
-\listoftodos
+\listoftodos  %to be deleated in the end
 
 %========================================================================================
 %   EVERYTHINGS BELOW IS EXAMPLE TEXT - TO BE DELEATED IN THE END
