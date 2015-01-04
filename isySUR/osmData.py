@@ -111,9 +111,10 @@ class OSM():
     @type point: Tuple(float,float)
 
     @param tags: A dictionary of tags, given as a key value pair, which
-                will be used to filter the nodes.
+                will be used to filter the nodes. You can use * as wildcard
+                for the value or key but NOT both.
                 
-                e.g. dict("type":"xyz")                
+                e.g. dict("type":"xyz") or dict("type":"*")               
     @type tags: dict(str:str)
     
     @param otherNodes: Use only this nodes, given by a list of
@@ -158,7 +159,13 @@ class OSM():
       # proove if current node fullfill all filter-rules 
       nodeOk=True
       for tag in tags:
-        if not node.tags.has_key(tag) or not node.tags[tag]==tags[tag]:
+        if tag=="*" and tags[tag]=="*":
+          nodeOk=True
+          break
+        if tag=="*" and not tags[tag] in node.tags.values():
+          nodeOk=False
+          break
+        if not node.tags.has_key(tag) or not (node.tags[tag]==tags[tag] or tags[tag]=="*"):
           nodeOk=False
           break
       if not nodeOk:
@@ -171,7 +178,6 @@ class OSM():
           nearestNodes=[distObj]
         elif distObj.distance==nearestNodes[0].distance:
           nearestNodes.append(distObj)
-          
       except TypeError:
         pass
     return nearestNodes 
@@ -190,9 +196,10 @@ class OSM():
     @type onlyPolygons: boolean
 
     @param tags: A dictionary of tags, given as a key value pair, which
-                will be used to filter the ways.
+                will be used to filter the ways. You can use * as wildcard
+                for the value or key but NOT both.
                 
-                e.g. dict("type":"xyz")                
+                e.g. dict("type":"xyz") or dict("type":"*")       
     @type tags: dict(str:str)
     
     @param otherWays: Use only this ways, given by a list of
@@ -244,7 +251,13 @@ class OSM():
       if onlyPolygons and not way.isPolygon():
         continue
       for tag in tags:
-        if not way.tags.has_key(tag) or not way.tags[tag]==tags[tag]:
+        if tag=="*" and tags[tag]=="*":
+          wayOk=True
+          break
+        if tag=="*" and not tags[tag] in way.tags.values():
+          wayOk=False
+          break
+        if not way.tags.has_key(tag) or not (way.tags[tag]==tags[tag] or tags[tag]=="*"):
           wayOk=False
           break
       if not wayOk:
@@ -257,8 +270,6 @@ class OSM():
           nearestWays=[distObj]
         elif distObj.distance==nearestWays[0].distance:
           nearestWays.append(distObj)
-          #nearestWay.nearestObj+=distObj.nearestObj
-          #nearestWay.nearestSubObj+=distObj.nearestSubObj
       except TypeError:
         pass
     return nearestWays
@@ -272,9 +283,10 @@ class OSM():
     @type point: Tuple(float,float)
 
     @param tags: A dictionary of tags, given as a key value pair, which
-                will be used to filter the realtions.
+                will be used to filter the realtions. You can use * as wildcard
+                for the value or key but NOT both.
                 
-                e.g. dict("type":"multipolyon")                
+                e.g. dict("type":"multipolyon")  or dict("type":"*")         
     @type tags: dict(str:str)
     
     @param otherRelations: Use only this relations, given by a list of
@@ -324,7 +336,13 @@ class OSM():
       # does this relation fullfill all filter-rules?
       relOk=True
       for tag in tags:
-        if not rel.tags.has_key(tag) or not rel.tags[tag]==tags[tag]:
+        if tag=="*" and tags[tag]=="*":
+          relOk=True
+          break
+        if tag=="*" and not tags[tag] in rel.tags.values():
+          relOk=False
+          break
+        if not rel.tags.has_key(tag) or not (rel.tags[tag]==tags[tag] or tags[tag]=="*"):
           relOk=False
           break
       if not relOk:
@@ -334,8 +352,6 @@ class OSM():
       if len(nearestRels)==0 or distResult.distance<nearestRels[0].distance:
         nearestRels=[distResult]
       elif distResult.distance==nearestRels[0].distance:
-        #nearestRel.nearestObj+=distResult.nearestObj
-        #nearestRel.nearestSubObj+=distResult.nearestSubObj
         nearestRels.append(distResult)
     
     # take only top-lvl relations
