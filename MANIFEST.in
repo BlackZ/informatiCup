@@ -1,7 +1,12 @@
-recursive-include isySUR/tests test_*.py
 include run_tests.py
 include kmlComperator.py
 
+recursive-include isySUR/tests test_*.py
 recursive-include testData/dataOnlyForTests *
-recursive-include doc/Documentation *
+
 include testData/Data.txt
+
+# TODO chance this to manual.pdf in main directory when finished
+include doc/Documentation/main.pdf
+
+include surConfig.cfg

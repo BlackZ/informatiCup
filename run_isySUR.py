@@ -11,7 +11,7 @@ import isySUR.program
 import argparse
 
 def parseArguments():
-    parser = argparse.ArgumentParser(description='[NAME] to calculate the subjective area of \
+    parser = argparse.ArgumentParser(description='isySUR script to calculate the subjective area of \
           influence of space usage rules (SURs).')
     parser.add_argument('input', type=str,
                         help='Input file containing the SURs which area of influence is to be computed.')
