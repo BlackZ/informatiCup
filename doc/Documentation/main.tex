@@ -5,31 +5,10 @@
 %
 % This template has been downloaded from:
 % http://www.LaTeXTemplates.com
-%
 % Original author:
 % Mathias Legrand (legrand.mathias@gmail.com)
-%
 % License:
 % CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-% Compiling this template:
-% This template uses biber for its bibliography and makeindex for its index.
-% When you first open the template, compile it from the command line with the 
-% commands below to make sure your LaTeX distribution is configured correctly:
-%
-% 1) pdflatex main
-% 2) makeindex main.idx -s StyleInd.ist
-% 3) biber main
-% 4) pdflatex main x 2
-%
-% After this, when you wish to update the bibliography/index use the appropriate
-% command above and make sure to compile with pdflatex several times 
-% afterwards to propagate your changes to the document.
-%
-% This template also uses a number of packages which may need to be
-% updated to the newest versions for the template to compile. It is strongly
-% recommended you update your LaTeX distribution if you have any
-% compilation errors.
 %
 % Important note:
 % Chapter heading images should have a 2:1 width:height ratio,
@@ -69,8 +48,11 @@
 
 \usepackage{todonotes}
 
-\newcommand{\ProjectTitle}{NameToBeChosen}
+\newcommand{\ProjectTitle}{isySUR}
+\newcommand{\pt}{\ProjectTitle}
 \newcommand{\todol}{\todo[inline]}
+
+\usepackage{scrextend} %used for footref - repetition of footnotes
 
 %----------------------------------------------------------------------------------------
 
@@ -84,12 +66,12 @@
 
 \begingroup
 \thispagestyle{empty}
-\AddToShipoutPicture*{\put(6,5){\includegraphics[scale=1]{bg}}} % Image background
+\AddToShipoutPicture*{\put(6,5){\includegraphics[scale=1]{bgschilder}}} % Image background
 \centering
-\vspace*{9cm}
-\todo[inline]{Create a nice background image}
+\vspace*{6cm}
 \par\normalfont\fontsize{35}{35}\sffamily\selectfont
-\ProjectTitle\par % Book title
+\includegraphics[width=\textwidth]{LogoWithName.jpg}
+%\ProjectTitle\par % Book title
 \vspace*{1cm}
 {\Huge Manual}\par
 \endgroup
@@ -98,9 +80,10 @@
 %	COPYRIGHT PAGE
 %----------------------------------------------------------------------------------------
 
-%\newpage
-%~\vfill
-%\thispagestyle{empty}
+\newpage
+~\vfill
+\thispagestyle{empty}
+Published \today
 
 %\noindent Copyright \copyright\ 2013 John Smith\\ % Copyright notice
 
@@ -116,13 +99,11 @@
 %	TABLE OF CONTENTS
 %----------------------------------------------------------------------------------------
 
-\chapterimage{chapter_head_1.pdf} % Table of contents heading image
+\chapterimage{Kollage.jpg} % Table of contents heading image
 
 \pagestyle{empty} % No headers
 
 \tableofcontents % Print the table of contents itself
-
-\todol{make a nice background picture for TOC}
 
 \cleardoublepage % Forces the first chapter to start on an odd page so it's on the right
 
@@ -132,41 +113,78 @@
 %	Introduction
 %----------------------------------------------------------------------------------------
 
-\chapterimage{chapter_head_1.pdf}
+\chapterimage{Kollage.jpg}
 \chapter{Introduction to \ProjectTitle}
-\todol{make a nice background picture}
+Welcome to isySUR (pronounce isy as ['i:zi]), a tool helping you to find the sphere of influence of a space usage rule. For starting the command line version please see section \ref{sec:QuickstartTerminal}. For using the window version please read section \ref{sec:QuickstartWindow}. You can also run the window version on your android device. This is described in section \ref{sec:android}. For more details about the program see section \ref{sec:whatFor}.
 
 \section{Quick start}
+First decide if you like to use the command line version of \pt\ or if you prefer a graphical user interface. Please proceed with section \ref{sec:QuickstartTerminal} or section \ref{sec:QuickstartWindow} depending on your choice.
+
+\subsection{\ProjectTitle\ in command line version}\label{sec:QuickstartTerminal}
 \todol{Explain how to quick start}
 
-\subsection{\ProjectTitle\ in command line version}
+\subsection{\ProjectTitle\ in window version}\label{sec:QuickstartWindow}
+\todol{Explain how to quick start}
 
-\subsection{\ProjectTitle\ in window version}
+\section{What is \ProjectTitle?}\label{sec:whatFor}
+\pt is a program that calculates the sphere of influence of a space usage rule by its coordinates. It was developed within the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called isy and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `intelligent systems' at Bielefeld University.
 
-\section{\ProjectTitle\ -- what is it for?}
-\todol{Add an explanation why to use this software}
+\todol{using OSM}
+\todol{Features: why to use this software}
 
 %----------------------------------------------------------------------------------------
 %	Using the program
 %----------------------------------------------------------------------------------------
 
-\chapterimage{chapter_head_1.pdf}
+%\chapterimage{Kollage.jpg}
 \chapter{Using \ProjectTitle}
-\todol{make a nice background picture}
+In this chapter the usage of \pt\ is described in detail. First you can find installation instructions in section \ref{sec:installation}, detailed usage instruction for both program versions are following in section \ref{sec:usage}.
 
-\section{Requirements and installation}
-\todol{installation, dependencies, requirements...}
-\begin{itemize}
-	\item python
-	\item internet connection
-\end{itemize}
+\section{Requirements and installation}\label{sec:installation}
+\pt\ is written in Python so you get a Python script, which is the main program, and a package with the tools. For running the command line version you need not much more than basic Python. If you prefer to use a graphical user interface you will have to install some more packages.
+\subsection{Requirements}
+\begin{enumerate}
+	\item \textbf{requirements for the command line version:}
+	\begin{itemize}
+		\item Python 2.7 \todo{3 auch ok?} %Thorsten: Maybe importent: 32/64 bit? - Is this important for us? As far as I know it works for both.
+		\item requests (HTTP library)
+		\item internet connection
+	\end{itemize}
+	~\\
+	To run a Python script you need Python. Python comes with most Linux distributions. For the use on Windows machines you will have to install Python manually\footnote{get Python here: https://www.python.org}. \pt\ uses data from OpenStreetMap\footnote{http://www.openstreetmap.org} to calculate the sphere of influence. Therefore an internet connection is required. The data transfer in Python is realised with the requests\footnote{http://docs.python-requests.org\label{fn:requests}} library. You can easily install it using pip\footnote{https://pip.pypa.io}, a Python installation tool
+	\begin{verbatim}
+	$ pip install requests
+	\end{verbatim}
+	or see requests web page\footref{fn:requests}.
+	\item \textbf{additional requirements for the GUI version:}
+	\begin{itemize}
+		\item \todol{requirements for GUI}
+	\end{itemize}
+\end{enumerate}
+\subsection{Installation}
+\todol{Unterschiede bei GUI?} %Thorsten: Most packages are published as .zip for windows too. do we need it? - No, no zip, we publish ONE archiv. Windows user can also unpack .tar.gz
+You got an archive of type .tar.gz. Please unpack the archive into a directory you want. Because \pt\ is a Python script you do not need to install it. It is also possible to install only the dependencies and run \pt\ through typing:
+\begin{verbatim}
+	$ python run_isySUR.py
+\end{verbatim}
+~\\
 
-\section{Command line and GUI version}
-\ProjectTitle\ comes with two version: One for command line use and another one for users who prefer to use a graphical user interface.
+For installing the script and tool package browse the directory you chose and install \pt\ with help of Python:
+\begin{verbatim}
+	$ python setup.py install
+\end{verbatim}
+Now you are able to start \pt\ anytime through
+\begin{verbatim}
+	$ run_isySUR.py
+\end{verbatim}
+
+\section{Command line and GUI version}\label{sec:usage}
+\pt\ comes with two version: One for command line use and another one for users who prefer to use a graphical user interface.
 \subsection{Command line version}
 \subsubsection{Parameters}
 \todol{what parameters and how to use it}
 \subsection{GUI version}
+\subsection{Using android}\label{sec:android}
 
 
 
@@ -174,9 +192,8 @@
 %	Technical and implementation details
 %----------------------------------------------------------------------------------------
 
-\chapterimage{chapter_head_2.pdf}
+%\chapterimage{Kollage.jpg}
 \chapter{Technical and implementation details}
-\todol{make a nice background picture}
 \todol{create sections}
 \section{}
 
@@ -195,49 +212,49 @@
 %	CHAPTER 1
 %----------------------------------------------------------------------------------------
 
-\chapterimage{chapter_head_2.pdf} % Chapter heading image
-
-\chapter{EXAMPLE Chapter}
-
-\section{Paragraphs of Text}\index{Paragraphs of Text}
-
-\lipsum[1-7] % Dummy text
-
-%------------------------------------------------
-
-\section{Citation}\index{Citation}
-
-This statement requires citation \cite{book_key}; this one is more specific \cite[122]{article_key}.
+%\chapterimage{chapter_head_2.pdf} % Chapter heading image
+%
+%\chapter{EXAMPLE Chapter}
+%
+%\section{Paragraphs of Text}\index{Paragraphs of Text}
+%
+%\lipsum[1-7] % Dummy text
 
 %------------------------------------------------
 
-\section{Lists}\index{Lists}
+%\section{Citation}\index{Citation}
+%
+%This statement requires citation \cite{book_key}; this one is more specific \cite[122]{article_key}.
 
-Lists are useful to present information in a concise and/or ordered way\footnote{Footnote example...}.
+%------------------------------------------------
 
-\subsection{Numbered List}\index{Lists!Numbered List}
-
-\begin{enumerate}
-\item The first item
-\item The second item
-\item The third item
-\end{enumerate}
-
-\subsection{Bullet Points}\index{Lists!Bullet Points}
-
-\begin{itemize}
-\item The first item
-\item The second item
-\item The third item
-\end{itemize}
-
-\subsection{Descriptions and Definitions}\index{Lists!Descriptions and Definitions}
-
-\begin{description}
-\item[Name] Description
-\item[Word] Definition
-\item[Comment] Elaboration
-\end{description}
+%\section{Lists}\index{Lists}
+%
+%Lists are useful to present information in a concise and/or ordered way\footnote{Footnote example...}.
+%
+%\subsection{Numbered List}\index{Lists!Numbered List}
+%
+%\begin{enumerate}
+%\item The first item
+%\item The second item
+%\item The third item
+%\end{enumerate}
+%
+%\subsection{Bullet Points}\index{Lists!Bullet Points}
+%
+%\begin{itemize}
+%\item The first item
+%\item The second item
+%\item The third item
+%\end{itemize}
+%
+%\subsection{Descriptions and Definitions}\index{Lists!Descriptions and Definitions}
+%
+%\begin{description}
+%\item[Name] Description
+%\item[Word] Definition
+%\item[Comment] Elaboration
+%\end{description}
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 2
