@@ -2,10 +2,7 @@
 #!/usr/bin/kivy
 
 import os
-import sys
-#sys.path.append("..")
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-import kmlData
+from isySUR import kmlData
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
@@ -197,7 +194,6 @@ class MapApp(App):
     
 
 if __name__ == '__main__':
-  MapApp().run()
-  
+  MapApp().run()  
 
 

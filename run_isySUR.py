@@ -36,13 +36,18 @@ if __name__ == '__main__':
   if not args.gui:
     isySUR.program.Pipeline().computeKMLsAndStore(args.input, args.output, args.config)
   else:
-    sys = sys.platform
-    if "linux" in sys:
-      isySUR.gui.MapGUI.MapApp().run()
-    elif "win" in sys:
-      try:
-        isySUR.gui.MapGUI.MapApp().run()
-      except:
-        if args.kivy == '':
-          raise Exception('Unknown location of kivy.bat!')        
-        os.system(args.kivy + " ./isySUR/gui/MapGUI.py")
+    try:
+      sys.argv = ['']
+      import isySUR.gui.MapGUI as gui
+      
+      if "linux" in sys.platform:
+        gui.MapApp().run()
+      elif "win" in sys.platform:
+        try:
+          gui.MapApp().run()
+        except:
+          if args.kivy == '':
+            raise Exception('Unknown location of kivy.bat!')        
+          os.system(args.kivy + " ./isySUR/gui/MapGUI.py")
+    except:
+      print "GUI could not be loaded. Is kivy installed correctly?"
