@@ -1,0 +1,4 @@
+*.pyc
+isySUR/gui/cache/*
+*~
+dist/*
