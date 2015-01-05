@@ -595,7 +595,7 @@ class Way(object):
     return round(math.hypot(dx, dy),8)
   
   
-  def _isPointInsidePolygon(self, point):
+  def isInside(self, point):
     """
     This function proves if a points is envolved in a polygone
     
@@ -778,7 +778,7 @@ class Relation(object):
           vertices=way._vertices()
         else:
           vertices=[self.osmObj.ways[i]._vertices() for i in rel.polygons]
-        if len(vertices)>0 and way._isPointInsidePolygon(point):
+        if len(vertices)>0 and way.isInside(point):
           distResult=way.getDistance(point)
           if result[0]>distResult.distance:
             result=(distResult.distance,([x for y in rel.polygons for x in y if way.id in y],way.__class__))
