@@ -42,6 +42,17 @@ class Map(FloatLayout):
     else:
       self.kmlList.open(self.ids.kml)
     self.kmlList.is_open = not self.kmlList.is_open
+    
+  
+  def addPolygon(self, polyList):
+    for poly in polyList:
+        self.maps.kmls.append(app.getPolygon(poly))
+        self.maps.drawPolygon()
+    
+  def removePolygon(self, polygon):
+    print polygon
+    self.maps.kmls.remove(polygon)
+    self.maps.drawPolygon()
   
 class Menue(DropDown):
   loadfile = ObjectProperty(None)
@@ -75,21 +86,11 @@ class Menue(DropDown):
     if filename != []:
       try:
         item_name, polyList = app.addKML(os.path.join(path, filename[0]))
+        #add new kml to dropdown menue
+        map_view.kmlList.addItem(item_name)
+        map_view.addPolygon(polyList)
       except:
         map_view.ids.toast.text = "The loaded file is incomplete!"
-      #add new kml to dropdown menue
-      map_view.kmlList.addItem(item_name)
-      
-      for poly in polyList:
-        polygone = []
-        for i in range(len(poly.polygon)):
-          coords = poly.polygon[i].split(',')
-          if i == 0:
-            first = coords
-          polygone.append((float(coords[0]),float(coords[1])))
-        
-        polygone.append((float(first[0]),float(first[1])))
-        map_view.maps.addPolygone(polygone)
   
     self.dismiss_popup()
   
@@ -123,14 +124,18 @@ class KMLList(DropDown):
     
   def selectBut(self, obj):
     selected = app.loaded_kmls[obj.text]['selected']
-    if selected:
-      obj.background_color = (1,1,1,1)
-    else:
+    placemarks = app.loaded_kmls[obj.text]['data'].placemarks
+    print placemarks
+    if not selected:
       obj.background_color = (0,0,2,1)
+      map_view.addPolygon(placemarks)
+    else:
+      obj.background_color = (1,1,1,1)
+      for poly in placemarks:
+        map_view.removePolygon(app.getPolygon(poly))
     app.loaded_kmls[obj.text]['selected'] = not selected
 
   def addItem(self, name):
-    print name
     btn = Button(text=name, size_hint_y=None, height=44,background_color=(0,0,2,1))
     btn.bind(on_release=self.selectBut)
     self.add_widget(btn)
@@ -163,6 +168,17 @@ class MapApp(App):
     self.loaded_kmls.update({name:{'data':placemark, 'selected':True}})
     
     return name, placemark.placemarks
+  
+  def getPolygon(self, poly):
+    polygon = []
+    for i in range(len(poly.polygon)):
+      coords = poly.polygon[i].split(',')
+      if i == 0:
+        first = coords
+      polygon.append((float(coords[0]),float(coords[1])))
+    
+    polygon.append((float(first[0]),float(first[1])))
+    return polygon
     
 
 if __name__ == '__main__':

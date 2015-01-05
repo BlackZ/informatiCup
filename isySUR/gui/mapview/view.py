@@ -10,7 +10,7 @@ from kivy.uix.image import Image
 from kivy.uix.scatter import Scatter
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.properties import NumericProperty, ObjectProperty, ListProperty, \
-    AliasProperty, BooleanProperty
+    AliasProperty, BooleanProperty, DictProperty
 from kivy.graphics import Canvas, Color, Rectangle, Mesh
 from kivy.graphics.transformation import Matrix
 from kivy.lang import Builder
@@ -410,7 +410,6 @@ class MapView(Widget):
         
         
     def drawPolygon(self):
-      
         self.polyLayer.canvas.clear()            
         for kml in self.kmls:
             vertices = []
@@ -428,11 +427,12 @@ class MapView(Widget):
                 Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
 
     def addPolygone(self, polygone):
-        self.kmls.append(polygone)
+        self.kmls.update(polygone)
         self.drawPolygon()
     
-    def removePolygone(self):
-        pass
+    def removePolygone(self, polyName):
+        del self.kmls[polyName]
+        self.drawPolygon()
 
     def remove_marker(self, marker):
         """Remove a marker from its layer
