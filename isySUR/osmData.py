@@ -603,8 +603,10 @@ class Way(object):
     @type point: Tupel(float,float)
 
     @return: true if point is inside
-             false if point is outside or on edge
+             false if point is outside or on edge or way isn't a polygon
     """
+    if not self.isPolygon():
+      return False
     vertices=self._vertices()
     cn = 0    # the crossing number counter
 
