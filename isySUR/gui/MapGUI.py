@@ -15,20 +15,17 @@ from mapview import MapView
 
 class Map(FloatLayout):
   
-  def __init__(self, app):
+  def __init__(self):
     super(Map, self).__init__()
     
-    self.app = app
-    self.maps = MapView(zoom=11, lat=50.6394, lon=3.057)
+    global map_view
+    map_view = self
+    self.maps = MapView(app=app, zoom=11, lat=50.6394, lon=3.057)
     self.add_widget(self.maps, 20)
     
-    self.menue = Menue(self)
-    self.menue.auto_dismiss = False
+    self.menue = Menue()
     
-    self.menue.setToast(self.ids.toast)
-    
-    self.kmlList = KMLList(self)
-    self.kmlList.auto_dismiss = False
+    self.kmlList = KMLList()
       
   def open_menue(self):
     if self.menue.isOpen:
@@ -38,7 +35,7 @@ class Map(FloatLayout):
     self.menue.isOpen = not self.menue.isOpen
     
   def open_kmlList(self):
-    if len(self.app.loaded_kmls) == 0:
+    if len(app.loaded_kmls) == 0:
       self.ids.toast.text = "No KML files loaded!"
     elif self.kmlList.is_open:
       self.kmlList.dismiss(self.ids.kml)
@@ -51,15 +48,11 @@ class Menue(DropDown):
   savefile = ObjectProperty(None)
   text_input = ObjectProperty(None)
   
-  def __init__(self, app):
+  def __init__(self):
     super(Menue, self).__init__()
     self.text_input = TextInput()
     self.isOpen = False
-    self.app = app
-    self.toast = None
-  
-  def setToast(self, toast):
-    self.toast = toast
+    self.auto_dismiss = False
   
   def dismiss_popup(self):
     self._popup.dismiss()
@@ -81,12 +74,22 @@ class Menue(DropDown):
   def load(self, path, filename):
     if filename != []:
       try:
-        item_name = self.app.app.addKML(os.path.join(path, filename[0]))
+        item_name, polyList = app.addKML(os.path.join(path, filename[0]))
       except:
-        self.toast.text = "The loaded file is incomplete!"
-      #with open(os.path.join(path, filename[0])) as stream:
-      #    self.app.addKML(stream.read())
-      self.app.kmlList.addItem(item_name)
+        map_view.ids.toast.text = "The loaded file is incomplete!"
+      #add new kml to dropdown menue
+      map_view.kmlList.addItem(item_name)
+      
+      for poly in polyList:
+        polygone = []
+        for i in range(len(poly.polygon)):
+          coords = poly.polygon[i].split(',')
+          if i == 0:
+            first = coords
+          polygone.append((float(coords[0]),float(coords[1])))
+        
+        polygone.append((float(first[0]),float(first[1])))
+        map_view.maps.addPolygone(polygone)
   
     self.dismiss_popup()
   
@@ -94,36 +97,37 @@ class Menue(DropDown):
     if filename != []:
       try:
         with open(os.path.join(path, filename), 'w') as stream:
-          for kml in self.app.loaded_kmls:
-            stream.write(kml.getXML())
-      except:
-        self.toast.text = "An error occured while saving!"
+          for kml in app.loaded_kmls:
+            stream.write(app.loaded_kmls[kml]['data'].getXML())
+      except Exception as e:
+        print e
+        map_view.ids.toast.text = "An error occured while saving!"
 
     self.dismiss_popup()
 
 class KMLList(DropDown):
-  def __init__(self, app):
+  def __init__(self):
     super(KMLList, self).__init__()
     
     self.app = app
     self.is_open = False
     self.createList()
+    self.auto_dismiss = False
   
   def createList(self):
-    if len(self.app.app.loaded_kmls) != 0:
+    if len(app.loaded_kmls) != 0:
       for kml in self.app.loaded_kmls:
         btn = Button(text=self.app.loaded_kmls['name'], size_hint_y=None, height=44, background_color=(0,0,2,1))
         btn.bind(on_release=self.selectBut)
         self.add_widget(btn)
     
   def selectBut(self, obj):
-    print obj.text
-    selected = self.app.app.loaded_kmls[obj.text]['selected']
+    selected = app.loaded_kmls[obj.text]['selected']
     if selected:
-      obj.background_color = (0,0,2,1)
-    else:
       obj.background_color = (1,1,1,1)
-    self.app.app.loaded_kmls[obj.text]['selected'] = not selected
+    else:
+      obj.background_color = (0,0,2,1)
+    app.loaded_kmls[obj.text]['selected'] = not selected
 
   def addItem(self, name):
     print name
@@ -131,34 +135,6 @@ class KMLList(DropDown):
     btn.bind(on_release=self.selectBut)
     self.add_widget(btn)
     
-#class KMLList(BoxLayout):
-#  def __init__(self, app, posi):
-#    super(KMLList, self).__init__()
-#    self.app = app
-#    self.is_open = False
-#    
-#    list_item_args_converter = \
-#          lambda row_index, rec: {'text':rec['name'],
-#                                  'size_hint': (0.15, None)}
-#    
-#    kml_dict_adapter = \
-#          DictAdapter(
-#            sorted_keys=sorted(self.app.loaded_kmls.keys()),
-#            data = self.app.loaded_kmls,
-#            args_converter=list_item_args_converter,
-#            selection_mode='multiple',
-#            cls=ListItemButton)
-#    
-#    kml_view = ListView(adapter=kml_dict_adapter, size_hint=(0.2,1.0))
-#    
-#    self.add_widget(kml_view)
-      
-  #def createData(self):
-  #    check_list = []
-  #    for kml in self.app.loaded_kmls:
-  #        checkList.append(CheckBox())
-  
-
 class LoadDialog(FloatLayout):
   load = ObjectProperty(None)
   cancel = ObjectProperty(None)
@@ -175,16 +151,18 @@ class MapApp(App):
     super(MapApp, self).__init__()
     
     self.loaded_kmls = {}
+    global app
+    app = self
   
   def build(self):
-    return Map(self)
+    return Map()
   
   def addKML(self, kml):
     placemark = kmlData.KMLObject.parseKML(kml)
     name = "KML" + str(len(self.loaded_kmls) + 1)
-    self.loaded_kmls.update({name:{'data':placemark, 'selected':False}})
+    self.loaded_kmls.update({name:{'data':placemark, 'selected':True}})
     
-    return name
+    return name, placemark.placemarks
     
 
 if __name__ == '__main__':

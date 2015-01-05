@@ -267,6 +267,8 @@ class MapView(Widget):
     """If True, this will activate the double-tap to zoom.
     """
 
+    kmls = ListProperty()
+
     delta_x = NumericProperty(0)
     delta_y = NumericProperty(0)
     background_color = ListProperty([181 / 255., 208 / 255., 208 / 255., 1])
@@ -409,28 +411,28 @@ class MapView(Widget):
         
     def drawPolygon(self):
       
-      self.polyLayer.canvas.clear()
-      self.kmls = [[(5.34109800,50.93274000),(5.34114700,50.93278900),(5.34116100,50.93278200),
-                  (5.34169600,50.93300200),(5.34174800,50.93295100),(5.34183200,50.93298500),
-                  (5.34209100,50.93273400),(5.34206900,50.93272500),(5.34212200,50.93268000),
-                  (5.34213600,50.93268600),(5.34223900,50.93258700),(5.34184300,50.93242600),
-                  (5.34109800,50.93274000)]]                
-      for kml in self.kmls:
-        vertices = []
-        indices = []
-        i = 0
-        for coords in kml:
-  #        x,y = self.get_xy_from_latlon(coords[1],coords[0])
-          x,y = self.get_window_xy_from(coords[1],coords[0], self._zoom)
-        
-          vertices.extend([x,y,0,0])
-          indices.append(i)
-          i+=1
-  #        points.append(y)
-        with self.polyLayer.canvas:
-          Color(1,0,0,0.8, mode='rgba')
-  #        Line(points=points)
-          Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
+        self.polyLayer.canvas.clear()            
+        for kml in self.kmls:
+            vertices = []
+            indices = []
+            i = 0
+            for coords in kml:
+                x,y = self.get_window_xy_from(coords[1],coords[0], self._zoom)
+                print x,y
+              
+                vertices.extend([x,y,0,0])
+                indices.append(i)
+                i+=1
+            with self.polyLayer.canvas:
+                Color(1,0,0,0.8, mode='rgba')
+                Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
+
+    def addPolygone(self, polygone):
+        self.kmls.append(polygone)
+        self.drawPolygon()
+    
+    def removePolygone(self):
+        pass
 
     def remove_marker(self, marker):
         """Remove a marker from its layer

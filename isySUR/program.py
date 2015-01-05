@@ -68,6 +68,28 @@ class Pipeline:
     else:
       print "Error: Could not compute placemarks."
   
+  def _computeKMLs(self, inpath, configPath=''):
+    """
+    Function to compute kmls from a given file of SURs. Only needed for GUI.
+    
+    @param inPath: Path to the file containing the SURs which areas are to be computed.
+    @type inPath: String
+    
+    @param configPath: Optional path to a config file, containing information about the classification of rules
+      (indoor, outdoor or both).
+    @type configPath: String
+    """
+    
+    surFile = open(inPath,'r')
+    surs = sur.SUR.fromFile(surFile, configPath)
+    surFile.close()
+    
+    kmlList = []
+    
+    for s in surs:
+      
+      kmlList.append(self.calcKML(s))
+  
   def calcKML(self, surObj):
     """
       Function to work on a single sur.SUR object and computes it's kml.
