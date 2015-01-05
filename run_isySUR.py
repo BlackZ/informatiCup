@@ -8,7 +8,6 @@ Name should change once a final name for the program has been found.
 """
 
 import isySUR.program
-import os
 import argparse
 import sys
 
