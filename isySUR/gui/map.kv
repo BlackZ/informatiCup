@@ -8,17 +8,8 @@
         size_hint: 0.15, 0.075
         pos: 0, 0
         bold: True
-        on_release: root.open_menue()   
+        on_release: root.open_menue()
         
-    Label:
-        id: toast
-        color: (0.3, 0.3, 0.3, 1) 
-        font_size: 20
-        size_hint_y: 0.075
-        pos_hint_x: 0.5
-        bold: True
-
-    
     Button:
         id: kml
         text: "KML List"
@@ -98,3 +89,13 @@
             Button:
                 text: "Save"
                 on_release: root.save(filechooser.path, text_input.text)
+
+<Toast@Label>:
+    font_size: 20
+    size_hint: None, 0.075
+    background_color:
+    color: (1, 1, 1, 1)
+    bold: True
+    canvas.before:
+        Color:
+            rgba: self._background
