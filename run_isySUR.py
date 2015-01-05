@@ -47,8 +47,11 @@ def gui(args):
         if args.kivy == '':
           raise Exception('Unknown location of kivy.bat!')        
         os.system(args.kivy + " ./isySUR/gui/MapGUI.py")
-  except:
+  except Exception, e:
     print "GUI could not be loaded. Is kivy installed correctly?"
+    import traceback
+    traceback.print_exc()
+    
   
 def cli(args):
   isySUR.program.Pipeline().computeKMLsAndStore(args.input, args.output, args.config)

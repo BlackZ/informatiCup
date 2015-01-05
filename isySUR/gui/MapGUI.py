@@ -11,8 +11,7 @@ from kivy.properties import ObjectProperty
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.dropdown import DropDown
-from MapViewer import MapViewer
-from WMSOverlayServer import *
+from mapview import MapView
 
 class Map(FloatLayout):
   
@@ -20,7 +19,7 @@ class Map(FloatLayout):
     super(Map, self).__init__()
     
     self.app = app
-    self.maps = MapViewer(maptype="Roadmap", provider="openstreetmap")
+    self.maps = MapView(zoom=11, lat=50.6394, lon=3.057)
     self.add_widget(self.maps, 20)
     
     self.menue = Menue(self)
