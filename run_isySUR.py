@@ -35,14 +35,13 @@ def parseArguments():
 def gui(args):
   try:
     sys.argv = ['']
-    print 1
-    import isySUR.gui.MapGUI as gui
-    print 2
+    
     if "linux" in sys.platform:
+      import isySUR.gui.MapGUI as gui
       gui.MapApp().run()
-      print 3
     elif "win" in sys.platform:
       try:
+        import isySUR.gui.MapGUI as gui
         gui.MapApp().run()
       except:
         if args.kivy == '':
