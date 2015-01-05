@@ -50,16 +50,16 @@ class TestWayObject(unittest.TestCase):
   
   
   #============================================================
-  #isPointInsidePolygon()-Tests
+  #isInside()-Tests
   #============================================================  
-  def test_isPointInsidePolygon_inside(self):
-    self.assertTrue(self.testWay._isPointInsidePolygon((52.123,4.12003)))
+  def test_isInside_inside(self):
+    self.assertTrue(self.testWay.isInside((52.123,4.12003)))
     
-  def test_isPointInsidePolygon_outside(self):
-    self.assertFalse(self.testWay._isPointInsidePolygon((52.11,4.11)))
+  def test_isInside_outside(self):
+    self.assertFalse(self.testWay.isInside((52.11,4.11)))
     
-  def test_isPointInsidePolygon_border(self):
-    self.assertTrue(self.testWay._isPointInsidePolygon((52.12,4.12)))
+  def test_isInside_border(self):
+    self.assertTrue(self.testWay.isInside((52.12,4.12)))
   #============================================================
   
   
