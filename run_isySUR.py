@@ -35,23 +35,12 @@ def parseArguments():
 def gui(args):
   try:
     sys.argv = ['']
-    
-    if "linux" in sys.platform:
-      import isySUR.gui.MapGUI as gui
-      gui.MapApp().run()
-    elif "win" in sys.platform:
-      try:
-        import isySUR.gui.MapGUI as gui
-        gui.MapApp().run()
-      except:
-        if args.kivy == '':
-          raise Exception('Unknown location of kivy.bat!')        
-        os.system(args.kivy + " ./isySUR/gui/MapGUI.py")
+    import isySUR.gui.MapGUI as gui
+    gui.MapApp().run()
   except Exception, e:
     print "GUI could not be loaded. Is kivy installed correctly?"
     import traceback
     traceback.print_exc()
-    
   
 def cli(args):
   isySUR.program.Pipeline().computeKMLsAndStore(args.input, args.output, args.config)

@@ -13,5 +13,6 @@ setup(
      author = "Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel, Thorsten Schodde", 
      author_email = "adreyer@techfak.uni-bielefeld.de, jhemming@techfak.uni-bielefeld.de, jpoeppel@techfak.uni-bielefeld.de, tschodde@techfak.uni-bielefeld.de", 
      scripts = ["run_isySUR.py"],
-     packages = ["isySUR"]
+     packages = ["isySUR", "isySUR.gui", "isySUR.gui.mapview"],
+     package_data = {"isySUR.gui.mapview" : ["./isySUR/gui/mapview/icons/marker.png"]}
      )
