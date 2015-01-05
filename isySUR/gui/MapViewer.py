@@ -24,7 +24,7 @@ from kivy.uix.image import Image
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 
-from kivy.graphics import Color, Rectangle, Ellipse, Line
+from kivy.graphics import Color, Rectangle, Ellipse, Line, Mesh
 from kivy.graphics.transformation import Matrix
 from kivy.vector import Vector
 
@@ -384,15 +384,19 @@ class MapViewerPlane(ScatterPlane):
                   (5.34213600,50.93268600),(5.34223900,50.93258700),(5.34184300,50.93242600),
                   (5.34109800,50.93274000)]]                
     for kml in self.kmls:
-      points = []
+      vertices = []
+      indices = []
+      i = 0
       for coords in kml:
         x,y = self.get_xy_from_latlon(coords[1],coords[0])
-        points.append(x)
-        points.append(y)
+        vertices.extend([x,y,0,0])
+        indices.append(i)
+        i+=1
+#        points.append(y)
       with self.canvas:
-        Color(1,0,0, mode='rgb')
-        Line(points=points)
-        
+        Color(1,0,0,0.8, mode='rgba')
+#        Line(points=points)
+        Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
          
     if self.status_cb:
       self.status_cb(self.tileserver.q_count, self.tilecount)

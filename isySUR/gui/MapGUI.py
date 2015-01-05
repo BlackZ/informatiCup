@@ -7,16 +7,11 @@ from isySUR import kmlData
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
-from kivy.properties import ObjectProperty, StringProperty
+from kivy.properties import ObjectProperty
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.dropdown import DropDown
-from kivy.uix.listview import ListView, ListItemButton
-from kivy.adapters.dictadapter import DictAdapter
-from kivy.factory import Factory
-from sidepanel import SidePanel
 from MapViewer import MapViewer
-import WMSTileServer
 from WMSOverlayServer import *
 
 class Map(FloatLayout):
