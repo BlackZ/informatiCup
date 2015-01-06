@@ -52,7 +52,7 @@ class TestKMLObject(unittest.TestCase):
     self.assertFalse(testPlacemark4 in kmlObj.placemarks)
     
     
-  def test_parseKML(self):
+  def test_parseKML2_1(self):
     filename="testData/dataOnlyForTests/TestOfKml.kml"
     name1="0001"
     name2="0002"
@@ -83,6 +83,49 @@ class TestKMLObject(unittest.TestCase):
     self.assertEqual(testKML.placemarks[1].polygon[0],point21)
     self.assertEqual(testKML.placemarks[1].polygon[1],point22)
     self.assertEqual(testKML.placemarks[1].polygon[2],point23)
+    
+  def test_parseKML2_2(self):
+    filename="testData/dataOnlyForTests/TestOfKml2_2.kml"
+    name1="0049"
+    style="#Poly10"
+    point1 = "5.36569825321936,50.93923090709453"
+
+    point2 = "5.366281448276046,50.93917323443537"
+
+    point3 = "5.366351933439293,50.93953260729314"
+    point4 = "5.36576126354174,50.9395691930783"
+
+    
+    testKML = kmlData.KMLObject.parseKML(filename)
+    self.assertEqual(len(testKML.placemarks),1)
+    self.assertEqual(testKML.placemarks[0].name,name1)
+    self.assertEqual(testKML.placemarks[0].style,style)
+    self.assertEqual(len(testKML.placemarks[0].polygon),4)
+    self.assertEqual(testKML.placemarks[0].polygon[0],point1)
+    self.assertEqual(testKML.placemarks[0].polygon[1],point2)
+    self.assertEqual(testKML.placemarks[0].polygon[2],point3)
+    self.assertEqual(testKML.placemarks[0].polygon[3],point4)
+
+    
+  def test_parseKML21Coords(self):
+    testString = "5.5,50.9\n5.3,50.8\n4.2,49.9\n5.5,50.9\n"
+    truthPointList= ["5.5,50.9","5.3,50.8","4.2,49.9"]
+    self.assertEqual(truthPointList, kmlData.KMLObject._parseKML21Coords(testString))
+    
+  def test_parseKML21CoordsFailNoPolygon(self):
+    testString = "5.5,50.9\n5.3,50.8\n4.2,49.9\n"
+    with self.assertRaises(IOError):
+      kmlData.KMLObject._parseKML21Coords(testString)
+      
+  def test_parseKML22Coords(self):
+    testString = "5.3,50.9,0 5.4,50.9,0 5.1,50.7,0 5.3,50.9,0 "
+    truthPointList= ["5.3,50.9","5.4,50.9","5.1,50.7"]
+    self.assertEqual(truthPointList, kmlData.KMLObject._parseKML22Coords(testString))
+    
+  def test_parseKML22CoordsFailNoPolygon(self):
+    testString = "5.3,50.9,0 5.4,50.9,0 5.1,50.7,0 "
+    with self.assertRaises(IOError):
+      kmlData.KMLObject._parseKML22Coords(testString)
     
   def test_parseKMLTruth40(self):
     filename="testData/dataOnlyForTests/truth40.kml"
@@ -147,7 +190,7 @@ class TestKMLObject(unittest.TestCase):
 if __name__ == '__main__':
   os.chdir("../..")
 #  suite = unittest.TestSuite()
-#  suite.addTest(TestKMLObject("test_parseKMLTruth40"))
+#  suite.addTest(TestKMLObject("test_parseKML22CoordsFailNoPolygon"))
 #  runner = unittest.TextTestRunner()
 #  runner.run(suite)
   unittest.main()

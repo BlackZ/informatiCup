@@ -63,45 +63,96 @@ class KMLObject():
     tree=ET.parse(filename)
     root=tree.getroot()
     res=cls()
-    for pm in root.iter("{http://earth.google.com/kml/2.1}Placemark"):
+    namespace = root.tag[:root.tag.find("}")+1]
+    for pm in root.iter(namespace + "Placemark"):
       pmName = pm[0].text
       imageName = pmName + ".jpg"
-      for img in pm.iter("{http://earth.google.com/kml/2.1}img"):
-        imageName = img.attrib["src"]
+      if "2.2" in namespace:
+        for desc in pm.iter(namespace + "description"):
+          imageRoot = ET.fromstring(desc.text)
+          imageName = imageRoot.attrib["src"]
+      elif "2.1" in namespace:
+        for img in pm.iter(namespace + "img"):
+          imageName = img.attrib["src"]
       newPlacemark=Placemark(pmName, imageName ,None,None,pm[2].text)
-      startlat=None
-      startlon=None
-      lastlat=None
-      lastlon=None
-      for coord in pm.iter("{http://earth.google.com/kml/2.1}coordinates"):
-        coordstring = coord.text.replace(" ", "")
-        nodes = filter(None, coordstring.split('\n'))
-        numberOfNodes=len(nodes)
-        nodeNr=0
-        for node in nodes:
-          nodeNr+=1
-          if node.lstrip()!='':#leaves out the first and last entry because
-                               #they don't hold coordinates
-            pos = node.split(',')
-            lon=pos[0]
-            lat=pos[1]
-            if startlat==None:
-              #store first lat/lon
-              startlat=lat
-              startlon=lon
-            else:
-              #store last lat/lon
-              lastlat=lat
-              lastlon=lon
-            if nodeNr!=numberOfNodes:
-              #if it's not the last node - save it
-              newPlacemark.addPoint(node)
-            elif startlat!=lastlat or startlon!=lastlon:
-              #if it's the last node: check equality of first and last node
-              raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
+      for coord in pm.iter(namespace + "coordinates"):
+        points = []
+        if "2.1" in namespace:
+          points = cls._parseKML21Coords(coord.text)
+        elif "2.2" in namespace:
+          points = cls._parseKML22Coords(coord.text)
+        else:
+          raise IOError("Can only parse KML2.1 and KML2.2 files.")
+        
+        if len(points) > 0:
+          newPlacemark.addPointList(points)
       res.addPlacemark(newPlacemark)
     return res
     
+  @classmethod
+  def _parseKML22Coords(cls, coordstring):
+    """
+      Private classmethod to parse kml2.2 coordinates to a list of points.
+      
+      @param coordstring: String including the coordinates in a placemark xml.
+      @type coordstring: String
+      
+      @return: List of points (lon,lat). Points are still strings.
+      @rtype: [str,]
+    """
+    pointList = []
+    coords = coordstring.lstrip().rstrip().split(" ")
+    if coords[0] != coords[-1]:
+      raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
+      
+    pointList = [coord[:coord.rfind(',')] for coord in coords[:-1] ]
+    
+    return pointList
+    
+    
+  @classmethod
+  def _parseKML21Coords(cls, coordstring):
+    """
+      Private classmethod to parse kml2.1 coordinates to a list of points.
+      
+      @param coordstring: String including the coordinates in a placemark xml.
+      @type coordstring: String
+      
+      @return: List of points (lon,lat). Points are still strings.
+      @rtype: [str,]
+    """
+    pointList = []
+    startlat=None
+    startlon=None
+    lastlat=None
+    lastlon=None
+    coordstring = coordstring.replace(" ", "")
+    nodes = filter(None, coordstring.split('\n'))
+    numberOfNodes=len(nodes)
+    nodeNr=0
+    for node in nodes:
+      nodeNr+=1
+      if node.lstrip()!='':#leaves out the first and last entry because
+                           #they don't hold coordinates
+        pos = node.split(',')
+        lon=pos[0]
+        lat=pos[1]
+        if startlat==None:
+          #store first lat/lon
+          startlat=lat
+          startlon=lon
+        else:
+          #store last lat/lon
+          lastlat=lat
+          lastlon=lon
+        if nodeNr!=numberOfNodes:
+          #if it's not the last node - save it
+          pointList.append(node)
+        elif startlat!=lastlat or startlon!=lastlon:
+          #if it's the last node: check equality of first and last node
+          raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
+          
+    return pointList
 
   def saveAsXML(self, filename):
     """
