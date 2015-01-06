@@ -30,7 +30,7 @@ browse into the directory and call the script run_isySUR.py with Python.
 For installation you also use Python:
  $ python setup.py install
 Afterwards you can call run_isySUR.py from every directory you want and can
-import the isySUR package in your one scripts.
+import the isySUR package in your own projects.
 
 -------------------------------------------------------------------------------
 Further information
