@@ -16,10 +16,11 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 
 # (list) Source files to exclude (let empty to not exclude anything)
-#source.exclude_exts = spec
+source.exclude_exts = spec,kml,txt,in,pyc
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-#source.exclude_dirs = tests, bin
+source.exclude_dirs = android,bin,build,cache,data,dist,doc,testData,thirdPartyModules
+#tests, bin
 
 # (list) List of exclusions using pattern matching
 #source.exclude_patterns = license,images/*/*.jpg
@@ -39,10 +40,12 @@ requirements = openssl,kivy,requests,futures,isyenv
 #garden_requirements =
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/data/presplash.png
+presplash.filename = Logo.png
+#%(source.dir)s/data/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = Logo.png
+#%(source.dir)s/data/icon.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
 orientation = landscape
