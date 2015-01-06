@@ -12,7 +12,9 @@ from mapview import MapMarker
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.checkbox import CheckBox
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
@@ -22,7 +24,7 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.graphics import Color, Rectangle
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty,\
-                          ListProperty
+                          ListProperty, DictProperty
 
 class Map(FloatLayout):
   
@@ -116,6 +118,7 @@ class Map(FloatLayout):
       self.lock.acquire()
       self.kmlList.addItem(name)
       self.toast('Calculating ...', True)
+
       self.lock.release()
       move_to = self.addPolygonsFromKML(item[1])
     
@@ -135,56 +138,43 @@ class Menue(DropDown):
     self.auto_dismiss = False
     
     self.queue = Queue()
-    
-    #list of tupel e.g. (access:age="21+","inner")
-    self.SURConfigList=[]
   
-  def dismiss_popup(self):
-    self._popup.dismiss()
+  def dismiss_load(self):
+    self._popup_load.dismiss()
+  
+  def dismiss_save(self):
+   self._popup_save.dismiss()
+  
+  def dismiss_config(self):
+   self._popup_config.dismiss()
+  
   
   def show_load(self, obj):
     self.isOpen = not self.isOpen
     self.dismiss()
-    content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
+    content = LoadDialog(load=self.load, cancel=self.dismiss_load)
     if 'KML' in obj.text:
       content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
       content.ids.filechooser.filters = ['*.txt']
-    self._popup = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
-    self._popup.open()
+    self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
+    self._popup_load.open()
   
   def show_save(self):
     self.isOpen = not self.isOpen
     self.dismiss()
-    content = SaveDialog(save=self.save, cancel=self.dismiss_popup)
-    self._popup = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
-    self._popup.open()
+    content = SaveDialog(save=self.save, cancel=self.dismiss_save)
+    self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
+    self._popup_save.open()
     
       
   def show_config(self):
     self.isOpen = not self.isOpen
     self.dismiss()
-    content=BoxLayout(orientation='horizontal')
     
-    for item in self.SURConfigList:
-        self.addConfigEntry(content,item[0],optionSelected=item[1])
-
-    self._popup = Popup(title="Configurate SUR-Rules", content=content, size_hint=(0.9, 0.9))
-    self._popup.open()
-    
-  def addConfigEntry(self,content,text,optionSelected=""):
-    selected={"inner":"normal","outer":"normal","both":"normal"}
-    if not optionSelected=="":
-        selected[optionSelected]="down"
-      
-    label=Label(text=text,size_hint=(.4,.1))
-    tglBtn1=ToggleButton(text='inner',group='g1', state=selected["inner"], size_hint=(.2,.1))
-    tglBtn2=ToggleButton(text='outer',group='g1', state=selected["outer"],size_hint=(.2,.1))
-    tglBtn3=ToggleButton(text='both',group='g1', state=selected["both"],size_hint=(.2,.1))
-    content.add_widget(label)
-    content.add_widget(tglBtn1)
-    content.add_widget(tglBtn2)
-    content.add_widget(tglBtn3)
+    content = ConfigDialog(save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
+    self._popup_config = Popup(title="Configurate SUR-Rules", content=content, size_hint=(0.9, 0.9))
+    self._popup_config.open()
   
   def load(self, filename):    
     if filename != []:
@@ -198,7 +188,8 @@ class Menue(DropDown):
           #add new kml to dropdown menue
           map_view.kmlList.addItem(item_name)
           map_view.addPolygon(polyList)
-        except:
+        except Exception as e:
+          print e
           map_view.toast('The loaded KML file is incomplete!')
       
       self.dismiss_popup()
@@ -309,14 +300,83 @@ class SaveDialog(FloatLayout):
   cancel = ObjectProperty(None)
   
 class ConfigDialog(FloatLayout):
-  pass
+  
+  def __init__(self, save, load, cancel):
+    super(ConfigDialog, self).__init__()
+    
+    self.load = load
+    self.save = save
+    self.cancel = cancel
+    
+    self.counter = 0
+    
+    if len(app.configContent) > 0:
+      self.addConfigContent()
+  
+  def addConfigContent(self):  
+    layout = GridLayout(cols=4)
+    
+    self.addContentHeader(layout)
+    for ruleArea in app.configContent:
+      for rule in app.configContent[ruleArea]:
+        self.addConfigEntry(layout, ruleArea, rule)
+    
+    self.ids.view.add_widget(layout)
+    #    self.addConfigEntry(content,item[0],optionSelected=item[1])
+  
+  def addContentHeader(self, layout):
+    label1 = Label(text='', size_hint=(.4,.1))
+    label2 = Label(text='Inside', size_hint=(.1,.1))
+    label3 = Label(text='Outside', size_hint=(.1,.1))
+    label4 = Label(text='Both', size_hint=(.1,.1))
+    
+    layout.add_widget(label1)
+    layout.add_widget(label2)
+    layout.add_widget(label3)
+    layout.add_widget(label4)
+  
+  def addConfigEntry(self, layout, ruleArea, rule):
+    active={"[Indoor]":False,"[Outdoor]":False,"[Both]":False}
+    active[ruleArea] = True
+    
+
+    label = Label(text=rule, size_hint=(.4,.1))
+    btn1 = CheckBox(group=('g' + str(self.counter)), active=active['[Indoor]'], size_hint=(.1,.1))
+    btn2 = CheckBox(group=('g' + str(self.counter)), active=active['[Outdoor]'], size_hint=(.1,.1))
+    btn3 = CheckBox(group=('g' + str(self.counter)), active=active['[Both]'], size_hint=(.1,.1))
+    
+    layout.add_widget(label)
+    layout.add_widget(btn1)
+    layout.add_widget(btn2)
+    layout.add_widget(btn3)
+    
+    self.counter += 1
+    
+    
+  def addConfigEntry_old(self,content,text,optionSelected=""):
+    selected={"inner":"normal","outer":"normal","both":"normal"}
+    if not optionSelected=="":
+        selected[optionSelected]="down"
+      
+    label=Label(text=text,size_hint=(.4,.1))
+    tglBtn1=ToggleButton(text='inner',group='g1', state=selected["inner"], size_hint=(.2,.1))
+    tglBtn2=ToggleButton(text='outer',group='g1', state=selected["outer"],size_hint=(.2,.1))
+    tglBtn3=ToggleButton(text='both',group='g1', state=selected["both"],size_hint=(.2,.1))
+    content.add_widget(label)
+    content.add_widget(tglBtn1)
+    content.add_widget(tglBtn2)
+    content.add_widget(tglBtn3)
+  
   
 class MapApp(App):
   
-  def __init__(self, config):
+  def __init__(self, configPath):
     super(MapApp, self).__init__()
     
-    self.configPath = config
+    self.configContent = {}
+    self.loadConfig(configPath)
+    
+    print self.config
     
     self.pipe = program.Pipeline()
     self.loaded_kmls = {}
@@ -326,6 +386,17 @@ class MapApp(App):
   def build(self):
     return Map()
   
+  def loadConfig(self, configPath):
+    if configPath != '':
+      with open(configPath, 'r') as stream:
+        for line in stream:
+          line = line.replace('\n','')
+          if line.startswith('['):
+            key = line
+            self.configContent.update({key:[]})
+          else:
+            self.configContent[key].append(line)
+          
   def addKML(self, name, kmlObj):
     newName = name
     i = 1

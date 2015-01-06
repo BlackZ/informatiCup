@@ -48,6 +48,30 @@
         background_color: (0,0,2,1)
         on_release: root.show_config()
 
+<ConfigDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        
+        ScrollView:
+            size_hint: 1, 0.8
+            pos: root.pos
+            id: view
+        
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Load"
+                on_release: root.load(self)
+            Button:
+                text: "Save"
+                on_release: root.save()
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+                
 <LoadDialog>:
     BoxLayout:
         size: root.size

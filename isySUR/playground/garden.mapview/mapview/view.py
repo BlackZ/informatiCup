@@ -464,6 +464,7 @@ class MapView(Widget):
         """Remove the layer
         """
         self._layers.remove(layer)
+        c = self.canvas
         self.canvas = layer.canvas_parent
         super(MapView, self).remove_widget(layer)
         self.canvas = c
