@@ -595,19 +595,28 @@ class Way(object):
     return round(math.hypot(dx, dy),8)
   
   
-  def isInside(self, point):
+  def isInside(self, point, vertices=[]):
     """
     This function proves if a points is envolved in a polygone
     
     @param point: x and y-coord of the point
     @type point: Tupel(float,float)
+    
+    @param vertices: list of points to calculate with (e.g used for combined polygons)
+    @type vertices: [Tupel(float,float),..]
 
     @return: true if point is inside
              false if point is outside or on edge or way isn't a polygon
     """
-    if not self.isPolygon():
-      return False
-    vertices=self._vertices()
+    if len(vertices)==0:  
+        vertices=self._vertices()
+        print self.isPolygon()
+        if not self.isPolygon():
+            return False
+    else:
+        if not vertices[0]==vertices[-1]:
+            return False
+    #vertices=self._vertices()
     cn = 0    # the crossing number counter
 
     # repeat the first vertex at end if not already done
@@ -776,11 +785,11 @@ class Relation(object):
       way=self.osmObj.ways[w]
       if any([w in x for x in rel.polygons]):
         vertices=[]
-        if way.isPolygon:
+        if way.isPolygon():
           vertices=way._vertices()
         else:
-          vertices=[self.osmObj.ways[i]._vertices() for i in rel.polygons]
-        if len(vertices)>0 and way.isInside(point):
+          vertices=[z for y in rel.polygons for x in y for z in self.osmObj.ways[x]._vertices() if way.id in y]
+        if len(vertices)>0 and way.isInside(point,vertices):
           distResult=way.getDistance(point)
           if result[0]>distResult.distance:
             result=(distResult.distance,([x for y in rel.polygons for x in y if way.id in y],way.__class__))
