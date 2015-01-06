@@ -90,6 +90,7 @@ class Map(FloatLayout):
   def removePolygon(self, polygon):
     self.maps.kmls.remove(polygon)
     self.maps.drawPolygon()
+  
   def computeAndShowKmls(self, path):
     map_view.toast('Calculating ...', True)
     kmlList = Queue()
@@ -99,6 +100,7 @@ class Map(FloatLayout):
     while not kmlList.empty() or thread.isAlive():
       map_view.toast('Calculating ...', True)
       item = kmlList.get()
+      print item
       app.addKML(item[0], item[1])
       map_view.kmlList.addItem(str(item[0]))
       move_to = self.addPolygonsFromKML(item[1])
