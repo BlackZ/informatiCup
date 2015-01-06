@@ -6,6 +6,7 @@ Created on Thu Nov  6 11:53:07 2014
 """
 
 import unittest
+from Queue import Queue
 from isySUR import program
 from isySUR import sur
 from isySUR import kmlData
@@ -69,10 +70,10 @@ class TestProgrammPipeline(unittest.TestCase):
   
   def test_computeKMLs(self):
     surFilePath = "testData/dataOnlyForTests/TestData.txt"
-    kmlList = []
+    kmlList = Queue()
     self.pipeObj._computeKMLs(surFilePath, kmlList)
     self.assertIsNotNone(kmlList)
-    self.assertEqual(len(kmlList), 2)
+    self.assertEqual(kmlList.qsize(), 2)
   
 
 if __name__ == '__main__':
