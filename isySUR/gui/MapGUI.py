@@ -118,13 +118,13 @@ class Map(FloatLayout):
       self.toast('Calculating ...', True)
       item = kmlList.get()
       queue.put(item)
-      name = app.addKML(str(item[0]), item[1])
-      self.lock.acquire()
-      self.kmlList.addItem(name)
-      self.toast('Calculating ...', True)
-
-      self.lock.release()
-      move_to = self.addPolygonsFromKML(item[1])
+      if not item[1].placemarks == []:
+        self.lock.acquire()
+        name = app.addKML(str(item[0]), item[1])
+        self.kmlList.addItem(name)
+        self.toast('Calculating ...', True)
+        self.lock.release()
+        move_to = self.addPolygonsFromKML(item[1])
     
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
@@ -188,16 +188,16 @@ class Menue(DropDown):
       name = (name.replace('\\','/').split('/'))[-1]
       if ext == '.kml':
         try:
-          item_name, polyList = app.addKMLFromPath(path, name)
+          item_name, placemarks = app.addKMLFromPath(path, name)
+          if not placemarks==[]:
+            map_view.kmlList.addItem(item_name)
+            map_view.addPolygon(placemarks)
+          else:
+            map_view.toast('The loaded KML has no polygon!')
         except Exception as e:
           print e
           map_view.toast('The loaded KML file is incomplete!')
           #add new kml to dropdown menue
-        if not polyList==[]:
-          map_view.kmlList.addItem(item_name)
-          map_view.addPolygon(polyList)
-        else:
-          map_view.toast('The loaded KML has no polygon!')
       
       self.dismiss_load()
       
