@@ -7,7 +7,6 @@ Created on Sun Nov  9 14:10:52 2014
 
 import unittest
 from isySUR import kmlData
-from isySUR import osmData
 import os
 
 class TestKMLObject(unittest.TestCase):

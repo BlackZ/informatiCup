@@ -71,6 +71,8 @@ class KMLObject():
       newPlacemark=Placemark(pmName, imageName ,None,None,pm[2].text)
       startlat=None
       startlon=None
+      lastlat=None
+      lastlon=None
       for coord in pm.iter("{http://earth.google.com/kml/2.1}coordinates"):
         coordstring = coord.text.replace(" ", "")
         nodes = filter(None, coordstring.split('\n'))
@@ -84,13 +86,19 @@ class KMLObject():
             lon=pos[0]
             lat=pos[1]
             if startlat==None:
+              #store first lat/lon
               startlat=lat
               startlon=lon
+            else:
+              #store last lat/lon
+              lastlat=lat
+              lastlon=lon
+            if nodeNr!=numberOfNodes:
+              #if it's not the last node - save it
               newPlacemark.addPoint(node)
-            elif startlat!=lat or startlon!=lon:
-              newPlacemark.addPoint(node)
-              if nodeNr==numberOfNodes:
-                raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
+            elif startlat!=lastlat or startlon!=lastlon:
+              #if it's the last node: check equality of first and last node
+              raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
       res.addPlacemark(newPlacemark)
     return res
     
