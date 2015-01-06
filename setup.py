@@ -14,5 +14,5 @@ setup(
      author_email = "adreyer@techfak.uni-bielefeld.de, jhemming@techfak.uni-bielefeld.de, jpoeppel@techfak.uni-bielefeld.de, tschodde@techfak.uni-bielefeld.de", 
      scripts = ["run_isySUR.py"],
      packages = ["isySUR", "isySUR.gui", "isySUR.gui.mapview"],
-     package_data = {"isySUR.gui.mapview" : ["./isySUR/gui/mapview/icons/marker.png"]}
+     package_data = {"isySUR.gui.mapview" : ["icons/marker.png"],"isySUR.gui" : ["map.kv"]}
      )
