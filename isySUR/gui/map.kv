@@ -3,7 +3,7 @@
 <Map>:
     Button:
         id: menueBut
-        text: "Menü"
+        text: "Menu"
         background_color: (0,0,1,1)
         size_hint: 0.15, 0.075
         pos: 0, 0
@@ -11,7 +11,7 @@
         on_release: root.open_menue()
         
     Button:
-        id: kml
+        id: kmlList
         text: "KML List"
         background_color: (0,0,1,1)
         size_hint: 0.15, 0.075
@@ -23,13 +23,18 @@
 
 <Menue>:
     id: menue
-    
     Button:
-        text: 'Load'
+        text: 'Load SUR'
         size_hint_y: None
         height: 44
         background_color: (0,0,2,1)
-        on_release: root.show_load()
+        on_release: root.show_load(self)
+    Button:
+        text: 'Load KML'
+        size_hint_y: None
+        height: 44
+        background_color: (0,0,2,1)
+        on_release: root.show_load(self)
     Button:
         text: 'Save'
         size_hint_y: None
@@ -50,7 +55,7 @@
         orientation: "vertical"
         FileChooserListView:
             id: filechooser
-            filters: ['*.kml']
+            path: '.'            
 
         BoxLayout:
             size_hint_y: None
@@ -72,6 +77,7 @@
         FileChooserListView:
             id: filechooser
             on_selection: text_input.text = self.selection and self.selection[0] or ''
+            path: '.'
 
         TextInput:
             id: text_input

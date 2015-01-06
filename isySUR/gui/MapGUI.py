@@ -48,9 +48,9 @@ class Map(FloatLayout):
       self.toast("No KML files loaded!")
       #self.ids.toast.text = "No KML files loaded!"
     elif self.kmlList.is_open:
-      self.kmlList.dismiss(self.ids.kml)
+      self.kmlList.dismiss(self.ids.kmlList)
     else:
-      self.kmlList.open(self.ids.kml)
+      self.kmlList.open(self.ids.kmlList)
     self.kmlList.is_open = not self.kmlList.is_open
     
   
@@ -78,10 +78,14 @@ class Menue(DropDown):
   def dismiss_popup(self):
     self._popup.dismiss()
   
-  def show_load(self):
+  def show_load(self, obj):
     self.isOpen = not self.isOpen
     self.dismiss()
     content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
+    if 'KML' in obj.text:
+      content.ids.filechooser.filters = ['*.kml']
+    elif 'SUR' in obj.text:
+      content.ids.filechooser.filters = ['*.txt']
     self._popup = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
     self._popup.open()
   
@@ -94,23 +98,42 @@ class Menue(DropDown):
   
   def load(self, path, filename):
     if filename != []:
-      try:
-        item_name, polyList = app.addKML(os.path.join(path, filename[0]))
-        #add new kml to dropdown menue
-        map_view.kmlList.addItem(item_name)
-        map_view.addPolygon(polyList)
-      except:
-        map_view.toast('The loaded file is incomplete!')
-        #map_view.ids.toast.text = "The loaded file is incomplete!"
+      path = os.path.join(path, filename[0])
+      if (path.split('.'))[-1] == 'kml':
+        try:
+          item_name, polyList = app.addKML(path)
+          #add new kml to dropdown menue
+          map_view.kmlList.addItem(item_name)
+          map_view.addPolygon(polyList)
+        except:
+          map_view.toast('The loaded file is incomplete!')
+          #map_view.ids.toast.text = "The loaded file is incomplete!"
+      elif (path.split('.'))[-1] == 'txt':        
+        map_view.toast('Ich sollte KMLS berechnen!')
   
     self.dismiss_popup()
   
   def save(self, path, filename):
-    if filename != []:
+    isDir = os.path.isdir(os.path.join(path, filename))
+    print isDir
+    completeKML = kmlData.KMLObject()
+    selection = app.getSelectedPolygons()
+    for elem in selection:
+      if isDir:  
+        try:
+          selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
+        except:
+          map_view.toast(elem + " could not be saved!")
+      completeKML.placemarks.extend(selection[elem].placemarks)
+    if len(completeKML.placemarks) > 0:
       try:
-        with open(os.path.join(path, filename), 'w') as stream:
-          for kml in app.loaded_kmls:
-            stream.write(app.loaded_kmls[kml]['data'].getXML())
+        if isDir:
+          completeKML.saveAsXML(path + os.path.sep + 'complete.kml')
+        else:
+          print isDir
+          print path, filename
+          with open(os.path.join(path, filename), 'w') as stream:
+            stream.write(completeKML.getXML())
       except Exception as e:
         print e
         map_view.toast('An error occured while saving!')
@@ -226,6 +249,14 @@ class MapApp(App):
     
     polygon.append((float(first[0]),float(first[1])))
     return polygon
+  
+  def getSelectedPolygons(self):
+    selection = {}
+    for kml in self.loaded_kmls:
+      if self.loaded_kmls[kml]['selected']:
+        selection.update({kml:self.loaded_kmls[kml]['data']})
+    
+    return selection
     
 
 if __name__ == '__main__':
