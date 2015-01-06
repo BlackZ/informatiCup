@@ -184,7 +184,7 @@ class Menue(DropDown):
       name = (name.replace('\\','/').split('/'))[-1]
       if ext == '.kml':
         try:
-          item_name, polyList = app.addKML(path, name)
+          item_name, polyList = app.addKMLFromPath(path, name)
           #add new kml to dropdown menue
           map_view.kmlList.addItem(item_name)
           map_view.addPolygon(polyList)
