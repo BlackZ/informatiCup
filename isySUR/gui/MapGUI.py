@@ -101,19 +101,22 @@ class Menue(DropDown):
     self._popup = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
     self._popup.open()
   
-  def load(self, path, filename):
+  def load(self, filename):
     if filename != []:
-      path = os.path.join(path, filename[0])
-      if (path.split('.'))[-1] == 'kml':
+      #path = os.path.join(path, filename[0])
+      path = filename[0]
+      name, ext = os.path.splitext(filename[0])
+      name = (name.replace('\\','/').split('/'))[-1]
+      if ext == '.kml':
         try:
-          item_name, polyList = app.addKML(path)
+          item_name, polyList = app.addKML(path, name)
           #add new kml to dropdown menue
           map_view.kmlList.addItem(item_name)
           map_view.addPolygon(polyList)
         except:
           map_view.toast('The loaded KML file is incomplete!')
           #map_view.ids.toast.text = "The loaded file is incomplete!"
-      elif (path.split('.'))[-1] == 'txt':        
+      elif ext == '.txt':        
         map_view.toast('Ich sollte KMLS berechnen!')
   
     self.dismiss_popup()
@@ -237,9 +240,13 @@ class MapApp(App):
   def build(self):
     return Map()
   
-  def addKML(self, kml):
+  def addKML(self, kml, filename):
     placemark = kmlData.KMLObject.parseKML(kml)
-    name = "KML" + str(len(self.loaded_kmls) + 1)
+    name = filename
+    i = 1
+    while self.loaded_kmls.has_key(name):
+      name = filename + '(' + str(i) + ')'
+      i += 1
     self.loaded_kmls.update({name:{'data':placemark, 'selected':True}})
     
     return name, placemark.placemarks

@@ -54,8 +54,7 @@
         pos: root.pos
         orientation: "vertical"
         FileChooserListView:
-            id: filechooser
-            path: '.'            
+            id: filechooser          
 
         BoxLayout:
             size_hint_y: None
@@ -66,7 +65,7 @@
 
             Button:
                 text: "Load"
-                on_release: root.load(filechooser.path, filechooser.selection)
+                on_release: root.load(filechooser.selection)
  
 <SaveDialog>:
     text_input: text_input
