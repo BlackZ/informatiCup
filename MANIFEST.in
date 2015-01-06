@@ -2,8 +2,6 @@ recursive-include isySUR/tests test_*.py
 include run_tests.py
 include kmlComperator.py
 
-include isySUR/gui/mapview/icons/marker.png
-
 # TODO chance this to manual.pdf in main directory when finished
 include doc/Documentation/main.pdf
 
