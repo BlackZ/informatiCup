@@ -417,7 +417,6 @@ class MapView(Widget):
             i = 0
             for coords in kml:
                 x,y = self.get_window_xy_from(coords[1],coords[0], self._zoom)
-                print x,y
               
                 vertices.extend([x,y,0,0])
                 indices.append(i)

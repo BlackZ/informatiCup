@@ -26,7 +26,9 @@ class Map(FloatLayout):
     
     global map_view
     map_view = self
-    self.maps = MapView(app=app, zoom=11, lat=50.6394, lon=3.057)
+    self.maps = MapView(zoom=11, lat=50.6394, lon=3.057)
+    self.maps.center_on(52.023368, 8.538291)
+    #self.maps = MapView(app=app, zoom=11, lat=52.023368, lon=8.538291)
     self.add_widget(self.maps, 20)
     
     self.menue = Menue()
@@ -58,6 +60,9 @@ class Map(FloatLayout):
     for poly in polyList:
         self.maps.kmls.append(app.getPolygon(poly))
         self.maps.drawPolygon()
+    move_to = polyList[0].polygon[0]
+    move_to = move_to.split(',')
+    self.maps.center_on(float(move_to[1]), float(move_to[0]))
     
   def removePolygon(self, polygon):
     print polygon
@@ -106,7 +111,7 @@ class Menue(DropDown):
           map_view.kmlList.addItem(item_name)
           map_view.addPolygon(polyList)
         except:
-          map_view.toast('The loaded file is incomplete!')
+          map_view.toast('The loaded KML file is incomplete!')
           #map_view.ids.toast.text = "The loaded file is incomplete!"
       elif (path.split('.'))[-1] == 'txt':        
         map_view.toast('Ich sollte KMLS berechnen!')
