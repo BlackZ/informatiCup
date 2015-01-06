@@ -156,7 +156,7 @@ class Placemark():
       @param ruleType: The rule type of the placemark. (Currently not used)
       @type ruleType: Tupel(key, value)
       
-      @param pointList: Optional pointList that contains the points coordinates that make 
+      @param pointList: Optional pointList that contains the points coordinates (lon,lat) that make 
                           up the polygon this placemark describes.
       
       @param style: Optional style for the placemark. Relevant for displaying the placemark in googleEarth. 
@@ -178,7 +178,7 @@ class Placemark():
     """
       Function to add a node to the polygon for the placemark.
       
-      @param node: The point coordinate that is to be added to the placemark.
+      @param node: The point coordinate (lon,lat) that is to be added to the placemark. 
       
       @raise TypeError: If point is not a string.
     """
@@ -190,7 +190,7 @@ class Placemark():
     """
       Function to add a list of nodes to the polygon of the placemark.
       
-      @param pointList: The list of point coordinates that are to be added.
+      @param pointList: The list of point coordinates(lon,lat) that are to be added.
       
       @raise TypeError: If pointList is not a list.
     """
