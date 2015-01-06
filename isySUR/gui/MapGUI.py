@@ -92,9 +92,13 @@ class Map(FloatLayout):
     Adds all polygons from one KML. Moves map to the
     added Polygon.
     """
+    print placemarks
     for placemark in placemarks:
+      try:  
         self.maps.kmls.append(app.getPolygonFromPlacemark(placemark))
-        self.maps.drawPolygon()
+      except:
+        print 'getPolygonFromPlacemark'
+      self.maps.drawPolygon()
     move_to = placemarks[0].polygon[0]
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
@@ -185,12 +189,15 @@ class Menue(DropDown):
       if ext == '.kml':
         try:
           item_name, polyList = app.addKMLFromPath(path, name)
-          #add new kml to dropdown menue
-          map_view.kmlList.addItem(item_name)
-          map_view.addPolygon(polyList)
         except Exception as e:
           print e
           map_view.toast('The loaded KML file is incomplete!')
+          #add new kml to dropdown menue
+        if not polyList==[]:
+          map_view.kmlList.addItem(item_name)
+          map_view.addPolygon(polyList)
+        else:
+          map_view.toast('The loaded KML has no polygon!')
       
       self.dismiss_load()
       
@@ -420,6 +427,7 @@ class MapApp(App):
   
   def getPolygonFromPlacemark(self, placemark):
     polygon = []
+    print len(placemark.polygon)
     for i in range(len(placemark.polygon)):
       coords = placemark.polygon[i].split(',')
       if i == 0:
