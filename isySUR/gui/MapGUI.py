@@ -40,9 +40,6 @@ class Map(FloatLayout):
     self.menue = Menue()
     
     self.kmlList = KMLList()
-    
-    #list of tupel e.g. (access:age="21+","inner")
-    self.SURConfigList=[]
   
   def toast(self, text, duration=False):
     Toast().show(text, duration)
@@ -106,6 +103,9 @@ class Menue(DropDown):
     self.text_input = TextInput()
     self.isOpen = False
     self.auto_dismiss = False
+    
+    #list of tupel e.g. (access:age="21+","inner")
+    self.SURConfigList=[]
   
   def dismiss_popup(self):
     self._popup.dismiss()
@@ -134,7 +134,7 @@ class Menue(DropDown):
     self.dismiss()
     content=BoxLayout(orientation='horizontal')
     
-    for item in SURConfigList:
+    for item in self.SURConfigList:
         self.addConfigEntry(content,item[0],optionSelected=item[1])
 
     self._popup = Popup(title="Configurate SUR-Rules", content=content, size_hint=(0.9, 0.9))
