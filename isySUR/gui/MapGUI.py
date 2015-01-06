@@ -2,20 +2,22 @@
 #!/usr/bin/kivy
 
 import os
-from isySUR import kmlData
+from threading import Thread
+
+from isySUR import kmlData, program
+from mapview import MapView
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty,\
-                          ListProperty
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.dropdown import DropDown
 from kivy.uix.label import Label
 from kivy.clock import Clock
-from kivy.graphics import Color, Rectangle, Line
-from mapview import MapView
+from kivy.graphics import Color, Rectangle
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty,\
+                          ListProperty
 
 class Map(FloatLayout):
   
@@ -35,8 +37,8 @@ class Map(FloatLayout):
     
     self.kmlList = KMLList()
   
-  def toast(self, text):
-    Toast().show(text, False)
+  def toast(self, text, duration=False):
+    Toast().show(text, duration)
       
   def open_menue(self):
     if self.menue.isOpen:
@@ -55,17 +57,35 @@ class Map(FloatLayout):
       self.kmlList.open(self.ids.kmlList)
     self.kmlList.is_open = not self.kmlList.is_open
     
-  
-  def addPolygon(self, polyList):
-    for poly in polyList:
-        self.maps.kmls.append(app.getPolygon(poly))
+  def addPolygonsFromKMLList(self, kmls):
+    """
+    Adds all polygons from a KMLList. Moves map to the
+    last added Polygon.
+    """
+    for kml in kmls:
+      for placemark in kml.placemarks:
+        if kml.placemarks.index(placemark) == len(kml.placemarks) -1:
+          move_to = placemark.polygon[0]
+        self.maps.kmls.append(app.getPolygonFromPlacemark(placemark))
         self.maps.drawPolygon()
-    move_to = polyList[0].polygon[0]
+      
+    move_to = move_to.split(',')
+    self.maps.center_on(float(move_to[1]), float(move_to[0]))
+      
+  
+  def addPolygon(self, placemarks):
+    """
+    Adds all polygons from one KML. Moves map to the
+    added Polygon.
+    """
+    for placemark in placemarks:
+        self.maps.kmls.append(app.getPolygonFromPlacemark(placemark))
+        self.maps.drawPolygon()
+    move_to = placemarks[0].polygon[0]
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
     
   def removePolygon(self, polygon):
-    print polygon
     self.maps.kmls.remove(polygon)
     self.maps.drawPolygon()
   
@@ -101,7 +121,7 @@ class Menue(DropDown):
     self._popup = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
     self._popup.open()
   
-  def load(self, filename):
+  def load(self, filename):    
     if filename != []:
       #path = os.path.join(path, filename[0])
       path = filename[0]
@@ -115,15 +135,16 @@ class Menue(DropDown):
           map_view.addPolygon(polyList)
         except:
           map_view.toast('The loaded KML file is incomplete!')
-          #map_view.ids.toast.text = "The loaded file is incomplete!"
-      elif ext == '.txt':        
-        map_view.toast('Ich sollte KMLS berechnen!')
-  
-    self.dismiss_popup()
+      
+      self.dismiss_popup()
+      
+      if ext == '.txt':
+        map_view.toast('Calculating ...', True)
+        kmlList = []
+        Thread(target=app.pipe._computeKMLs, args=(path, kmlList)).start()
   
   def save(self, path, filename):
     isDir = os.path.isdir(os.path.join(path, filename))
-    print isDir
     completeKML = kmlData.KMLObject()
     selection = app.getSelectedPolygons()
     for elem in selection:
@@ -138,8 +159,6 @@ class Menue(DropDown):
         if isDir:
           completeKML.saveAsXML(path + os.path.sep + 'complete.kml')
         else:
-          print isDir
-          print path, filename
           with open(os.path.join(path, filename), 'w') as stream:
             stream.write(completeKML.getXML())
       except Exception as e:
@@ -153,7 +172,6 @@ class KMLList(DropDown):
   def __init__(self):
     super(KMLList, self).__init__()
     
-    self.app = app
     self.is_open = False
     self.createList()
     self.auto_dismiss = False
@@ -168,14 +186,13 @@ class KMLList(DropDown):
   def selectBut(self, obj):
     selected = app.loaded_kmls[obj.text]['selected']
     placemarks = app.loaded_kmls[obj.text]['data'].placemarks
-    print placemarks
     if not selected:
       obj.background_color = (0,0,2,1)
       map_view.addPolygon(placemarks)
     else:
       obj.background_color = (1,1,1,1)
-      for poly in placemarks:
-        map_view.removePolygon(app.getPolygon(poly))
+      for placemark in placemarks:
+        map_view.removePolygon(app.getPolygonFromPlacemark(placemark))
     app.loaded_kmls[obj.text]['selected'] = not selected
 
   def addItem(self, name):
@@ -233,6 +250,7 @@ class MapApp(App):
   def __init__(self):
     super(MapApp, self).__init__()
     
+    self.pipe = program.Pipeline()
     self.loaded_kmls = {}
     global app
     app = self
@@ -251,10 +269,10 @@ class MapApp(App):
     
     return name, placemark.placemarks
   
-  def getPolygon(self, poly):
+  def getPolygonFromPlacemark(self, placemark):
     polygon = []
-    for i in range(len(poly.polygon)):
-      coords = poly.polygon[i].split(',')
+    for i in range(len(placemark.polygon)):
+      coords = placemark.polygon[i].split(',')
       if i == 0:
         first = coords
       polygon.append((float(coords[0]),float(coords[1])))

@@ -69,7 +69,8 @@ class TestProgrammPipeline(unittest.TestCase):
   
   def test_computeKMLs(self):
     surFilePath = "testData/dataOnlyForTests/TestData.txt"
-    kmlList = self.pipeObj._computeKMLs(surFilePath, '')
+    kmlList = []
+    self.pipeObj._computeKMLs(surFilePath, kmlList)
     self.assertIsNotNone(kmlList)
     self.assertEqual(len(kmlList), 2)
   
