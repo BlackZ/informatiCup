@@ -34,10 +34,13 @@ def parseArguments():
   return parser.parse_args()
   
 def gui(args):
+  print args.config
   try:
     sys.argv = ['']
     import isySUR.gui.MapGUI as gui
-    gui.MapApp(args.config).run()
+    mapApp = gui.MapApp(args.config)
+    mapApp.run()
+    
   except Exception, e:
     print "GUI could not be loaded. Is kivy installed correctly?"
     import traceback
