@@ -2,7 +2,7 @@
 #!/usr/bin/kivy
 
 import os
-from threading import Thread
+from threading import Thread,Lock
 from Queue import Queue
 
 from isySUR import kmlData, program
@@ -29,6 +29,8 @@ class Map(FloatLayout):
   
   def __init__(self):
     super(Map, self).__init__()
+    
+    self.lock = Lock()
     
     global map_view
     map_view = self
@@ -91,7 +93,7 @@ class Map(FloatLayout):
     self.maps.kmls.remove(polygon)
     self.maps.drawPolygon()
   
-  def computeAndShowKmls(self, path):
+  def computeAndShowKmls(self, path, queue):
     map_view.toast('Calculating ...', True)
     kmlList = Queue()
     thread = Thread(target=app.pipe._computeKMLs, args=(path, kmlList))
@@ -100,9 +102,12 @@ class Map(FloatLayout):
     while not kmlList.empty() or thread.isAlive():
       map_view.toast('Calculating ...', True)
       item = kmlList.get()
-      print item
-      app.addKML(item[0], item[1])
-      map_view.kmlList.addItem(str(item[0]))
+      queue.put(item)
+      name = app.addKML(str(item[0]), item[1])
+      self.lock.acquire()
+      map_view.kmlList.addItem(name)
+      map_view.toast('Calculating ...', True)
+      self.lock.release()
       move_to = self.addPolygonsFromKML(item[1])
     
     move_to = move_to.split(',')
@@ -119,6 +124,8 @@ class Menue(DropDown):
     self.text_input = TextInput()
     self.isOpen = False
     self.auto_dismiss = False
+    
+    self.queue = Queue()
     
     #list of tupel e.g. (access:age="21+","inner")
     self.SURConfigList=[]
@@ -188,8 +195,7 @@ class Menue(DropDown):
       self.dismiss_popup()
       
       if ext == '.txt':
-        Thread(target=map_view.computeAndShowKmls, args=(path,)).start()
-        
+        Thread(target=map_view.computeAndShowKmls, args=(path, self.queue, )).start()
   
   def save(self, path, filename):
     isDir = os.path.isdir(os.path.join(path, filename))
@@ -312,7 +318,14 @@ class MapApp(App):
     return Map()
   
   def addKML(self, name, kmlObj):
-    self.loaded_kmls.update({name:{'data':kmlObj, 'selected':True}})
+    newName = name
+    i = 1
+    while self.loaded_kmls.has_key(newName):
+      newName = name + '(' + str(i) + ')'
+      i += 1
+    self.loaded_kmls.update({newName:{'data':kmlObj, 'selected':True}})
+    
+    return newName
   
   def addKMLFromPath(self, path, filename):
     kmlObj = kmlData.KMLObject.parseKML(path)
