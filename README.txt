@@ -1,7 +1,7 @@
 ===============================================================================
 isySUR
 ===============================================================================
-03/01/2015
+06/01/2015
 
 -------------------------------------------------------------------------------
 General usage
@@ -12,8 +12,13 @@ rules which coordinates are given. It comes with a Python package with several
 tools.
 
 For the command line version type:
- $
-TODO describe parameters
+ $ python run_isySUR.py cli {inPath} {outPath}
+ 
+For the gui version type:
+ $ python run_isySUR.py gui
+
+For more information about the required parameters (cli/gui, inPath, outPath) 
+check the help parameter (-h) or the documentation.
 
 -------------------------------------------------------------------------------
 Installation on Linux
@@ -30,8 +35,6 @@ Further requirements for the gui verson:
 
 Because isySUR is in Python you do not need to make an installation. Just
 browse into the directory and call the script run_isySUR.py with Python.
-For information about the required parameters check python run_isySUR.py -h or 
-the documentation.
 
 For installation you also use Python:
  $ python setup.py install
