@@ -9,6 +9,9 @@ from mapview import MapView
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
@@ -36,6 +39,9 @@ class Map(FloatLayout):
     self.menue = Menue()
     
     self.kmlList = KMLList()
+    
+    #list of tupel e.g. (access:age="21+","inner")
+    self.SURConfigList=[]
   
   def toast(self, text, duration=False):
     Toast().show(text, duration)
@@ -120,6 +126,32 @@ class Menue(DropDown):
     content = SaveDialog(save=self.save, cancel=self.dismiss_popup)
     self._popup = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
     self._popup.open()
+    
+      
+  def show_config(self):
+    self.isOpen = not self.isOpen
+    self.dismiss()
+    content=BoxLayout(orientation='horizontal')
+    
+    for item in SURConfigList:
+        self.addConfigEntry(content,item[0],optionSelected=item[1])
+
+    self._popup = Popup(title="Configurate SUR-Rules", content=content, size_hint=(0.9, 0.9))
+    self._popup.open()
+    
+  def addConfigEntry(self,content,text,optionSelected=""):
+    selected={"inner":"normal","outer":"normal","both":"normal"}
+    if not optionSelected=="":
+        selected[optionSelected]="down"
+      
+    label=Label(text=text,size_hint=(.4,.1))
+    tglBtn1=ToggleButton(text='inner',group='g1', state=selected["inner"], size_hint=(.2,.1))
+    tglBtn2=ToggleButton(text='outer',group='g1', state=selected["outer"],size_hint=(.2,.1))
+    tglBtn3=ToggleButton(text='both',group='g1', state=selected["both"],size_hint=(.2,.1))
+    content.add_widget(label)
+    content.add_widget(tglBtn1)
+    content.add_widget(tglBtn2)
+    content.add_widget(tglBtn3)
   
   def load(self, filename):    
     if filename != []:
@@ -244,6 +276,9 @@ class SaveDialog(FloatLayout):
   save = ObjectProperty(None)
   text_input = ObjectProperty(None)
   cancel = ObjectProperty(None)
+  
+class ConfigDialog(FloatLayout):
+  pass
   
 class MapApp(App):
   
