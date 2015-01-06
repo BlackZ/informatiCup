@@ -97,6 +97,18 @@ class TestKMLObject(unittest.TestCase):
     with self.assertRaises(IOError):
       testKML = kmlData.KMLObject.parseKML(filename);
       
+  def test_parseKMLWithStartCoordsMultiples(self):
+    filename="testData/dataOnlyForTests/TestOfKmlUnformattedMultiple.kml"
+    kmlObj = kmlData.KMLObject.parseKML(filename)
+    output = "testData/dataOnlyForTests/OutputMultipleKML.kml"
+    kmlObj.saveAsXML(output)
+    truthFile = open(filename)
+    truthString = truthFile.read().replace("\r","").rstrip("\n")
+    outputFile = open(output)
+    outputString = outputFile.read().replace("\r","").rstrip("\n")
+    self.assertEqual(outputString, truthString)
+    
+      
   def test_saveAsXML(self):
     #Not too nice since this works only if the the input file is unformatted.
     filename="testData/dataOnlyForTests/TestOfKmlUnformatted.kml"

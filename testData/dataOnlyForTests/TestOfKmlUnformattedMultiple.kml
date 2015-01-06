@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://earth.google.com/kml/2.1"><Document><Style id="defaultStyle"><LineStyle><color>7f0000ff</color><width>2</width></LineStyle><PolyStyle><color>7fff0000</color></PolyStyle></Style><Placemark><name>0001</name><description><img src='0001.jpg' width = '400' /></description><styleUrl>#defaultStyle</styleUrl><Polygon><altitudeMode>clampToGround</altitudeMode><extrude>1</extrude><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>5.33897540,50.93030430
+5.33890610,50.93033890
+5.33897540,50.93030430
+5.33892360,50.93035480
+5.33897540,50.93030430
+5.33897540,50.93030430</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Document></kml>
