@@ -61,20 +61,17 @@ class Map(FloatLayout):
       self.kmlList.open(self.ids.kmlList)
     self.kmlList.is_open = not self.kmlList.is_open
     
-  def addPolygonsFromKMLList(self, kmls):
+  def addPolygonsFromKML(self, kml):
     """
     Adds all polygons from a KMLList. Moves map to the
     last added Polygon.
     """
-    for kml in kmls:
-      for placemark in kml.placemarks:
-        if kml.placemarks.index(placemark) == len(kml.placemarks) -1:
-          move_to = placemark.polygon[0]
-        self.maps.kmls.append(app.getPolygonFromPlacemark(placemark))
-        self.maps.drawPolygon()
-      
-    move_to = move_to.split(',')
-    self.maps.center_on(float(move_to[1]), float(move_to[0]))
+    for placemark in kml.placemarks:
+      if kml.placemarks.index(placemark) == len(kml.placemarks) -1:
+        move_to = placemark.polygon[0]
+      self.maps.kmls.append(app.getPolygonFromPlacemark(placemark))
+      self.maps.drawPolygon()
+    return move_to  
       
   
   def addPolygon(self, placemarks):
@@ -88,11 +85,28 @@ class Map(FloatLayout):
     move_to = placemarks[0].polygon[0]
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
+    self.maps.drawPolygon()
     
   def removePolygon(self, polygon):
     self.maps.kmls.remove(polygon)
     self.maps.drawPolygon()
-  
+  def computeAndShowKmls(self, path):
+    map_view.toast('Calculating ...', True)
+    kmlList = Queue()
+    thread = Thread(target=app.pipe._computeKMLs, args=(path, kmlList))
+    thread.start()
+    
+    while not kmlList.empty() or thread.isAlive():
+      map_view.toast('Calculating ...', True)
+      item = kmlList.get()
+      app.addKML(item[0], item[1])
+      map_view.kmlList.addItem(str(item[0]))
+      move_to = self.addPolygonsFromKML(item[1])
+    
+    move_to = move_to.split(',')
+    self.maps.center_on(float(move_to[1]), float(move_to[0]))
+    
+    
 class Menue(DropDown):
   loadfile = ObjectProperty(None)
   savefile = ObjectProperty(None)
@@ -172,14 +186,7 @@ class Menue(DropDown):
       self.dismiss_popup()
       
       if ext == '.txt':
-        map_view.toast('Calculating ...', True)
-        kmlList = Queue()
-        thread = Thread(target=app.pipe._computeKMLs, args=(path, kmlList))
-        thread.start()
-        
-        while not kmlList.empty() or thread.isAlive():
-          print kmlList.get()
-        
+        Thread(target=map_view.computeAndShowKmls, args=(path,)).start()
         
   
   def save(self, path, filename):
@@ -289,8 +296,10 @@ class ConfigDialog(FloatLayout):
   
 class MapApp(App):
   
-  def __init__(self):
+  def __init__(self, config):
     super(MapApp, self).__init__()
+    
+    self.configPath = config
     
     self.pipe = program.Pipeline()
     self.loaded_kmls = {}
@@ -300,16 +309,19 @@ class MapApp(App):
   def build(self):
     return Map()
   
-  def addKML(self, kml, filename):
-    placemark = kmlData.KMLObject.parseKML(kml)
+  def addKML(self, name, kmlObj):
+    self.loaded_kmls.update({name:{'data':kmlObj, 'selected':True}})
+  
+  def addKMLFromPath(self, path, filename):
+    kmlObj = kmlData.KMLObject.parseKML(path)
     name = filename
     i = 1
     while self.loaded_kmls.has_key(name):
       name = filename + '(' + str(i) + ')'
       i += 1
-    self.loaded_kmls.update({name:{'data':placemark, 'selected':True}})
+    self.loaded_kmls.update({name:{'data':kmlObj, 'selected':True}})
     
-    return name, placemark.placemarks
+    return name, kmlObj.placemarks
   
   def getPolygonFromPlacemark(self, placemark):
     polygon = []

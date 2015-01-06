@@ -19,6 +19,8 @@ def parseArguments():
                                        start with or without GUI.')
   parser_gui = subparsers.add_parser('gui', help='Start with GUI.')
   parser_gui.set_defaults(func=gui)
+  parser_gui.add_argument('-c','--config', type=str, default='',
+                        help='Path to config file for SUR classification (indoor, outdoor, both).')
   parser_cli = subparsers.add_parser('cli', help='Start with command-line interface.')
   parser_cli.set_defaults(func=cli)
   parser_cli.add_argument('input', type=str,
@@ -35,7 +37,7 @@ def gui(args):
   try:
     sys.argv = ['']
     import isySUR.gui.MapGUI as gui
-    gui.MapApp().run()
+    gui.MapApp(args.config).run()
   except Exception, e:
     print "GUI could not be loaded. Is kivy installed correctly?"
     import traceback
