@@ -7,6 +7,7 @@ from Queue import Queue
 
 from isySUR import kmlData, program
 from mapview import MapView
+from mapview import MapMarker
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
@@ -36,6 +37,7 @@ class Map(FloatLayout):
     map_view = self
     self.maps = MapView(zoom=11, lat=50.6394, lon=3.057)
     self.maps.center_on(52.023368, 8.538291)
+    self.addMarker(52.023368, 8.538291)
     #self.maps = MapView(app=app, zoom=11, lat=52.023368, lon=8.538291)
     self.add_widget(self.maps, 20)
     
@@ -63,6 +65,13 @@ class Map(FloatLayout):
       self.kmlList.open(self.ids.kmlList)
     self.kmlList.is_open = not self.kmlList.is_open
     
+  def addMarker(self, lat, lon):
+    marker = MapMarker()
+    marker.lat = lat
+    marker.lon = lon
+    
+    self.maps.add_marker(marker)
+    
   def addPolygonsFromKML(self, kml):
     """
     Adds all polygons from a KMLList. Moves map to the
@@ -71,7 +80,7 @@ class Map(FloatLayout):
     for placemark in kml.placemarks:
       if kml.placemarks.index(placemark) == len(kml.placemarks) -1:
         move_to = placemark.polygon[0]
-      self.maps.kmls.append(app.getPolygonFromPlacemark(placemark))
+      self.maps.addPolygon(app.getPolygonFromPlacemark(placemark))
       self.maps.drawPolygon()
     return move_to  
       
@@ -94,19 +103,19 @@ class Map(FloatLayout):
     self.maps.drawPolygon()
   
   def computeAndShowKmls(self, path, queue):
-    map_view.toast('Calculating ...', True)
+    self.toast('Calculating ...', True)
     kmlList = Queue()
     thread = Thread(target=app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
     
     while not kmlList.empty() or thread.isAlive():
-      map_view.toast('Calculating ...', True)
+      self.toast('Calculating ...', True)
       item = kmlList.get()
       queue.put(item)
       name = app.addKML(str(item[0]), item[1])
       self.lock.acquire()
-      map_view.kmlList.addItem(name)
-      map_view.toast('Calculating ...', True)
+      self.kmlList.addItem(name)
+      self.toast('Calculating ...', True)
       self.lock.release()
       move_to = self.addPolygonsFromKML(item[1])
     

@@ -172,7 +172,7 @@ class MapLayer(Widget):
         pass
       
 class PolyMapLayer(MapLayer):
-    """A map layer for :class:`MapMarker`
+    """A map layer to draw polygons on
     """
 
     def __init__(self, **kwargs):
@@ -323,8 +323,8 @@ class MapView(Widget):
         zoom = self._zoom
 
         if len(args) == 1 and isinstance(args[0], Coordinate):
-            lat = coord.lat
-            lon = coord.lon
+            lat = args[0].lat
+            lon = args[0].lon
         elif len(args) == 2:
             lat, lon = args
         else:
@@ -425,11 +425,11 @@ class MapView(Widget):
                 Color(1,0,0,0.8, mode='rgba')
                 Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
 
-    def addPolygone(self, polygone):
-        self.kmls.update(polygone)
+    def addPolygon(self, polygon):
+        self.kmls.append(polygon)
         self.drawPolygon()
     
-    def removePolygone(self, polyName):
+    def removePolygon(self, polyName):
         del self.kmls[polyName]
         self.drawPolygon()
 
@@ -465,6 +465,7 @@ class MapView(Widget):
         """Remove the layer
         """
         self._layers.remove(layer)
+        c = self.canvas
         self.canvas = layer.canvas_parent
         super(MapView, self).remove_widget(layer)
         self.canvas = c
