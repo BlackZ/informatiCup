@@ -66,6 +66,13 @@ class TestProgrammPipeline(unittest.TestCase):
     self.assertIsNotNone(resultKML1)
     self.assertIsNotNone(resultKML2)
     self.assertIsNotNone(resultKML3)
+  
+  def test_computeKMLs(self):
+    surFilePath = "testData/dataOnlyForTests/TestData.txt"
+    kmlList = self.pipeObj._computeKMLs(surFilePath, '')
+    self.assertIsNotNone(kmlList)
+    self.assertEqual(len(kmlList), 2)
+  
 
 if __name__ == '__main__':
   os.chdir("../..")

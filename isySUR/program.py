@@ -89,6 +89,8 @@ class Pipeline:
     for s in surs:
       
       kmlList.append(self.calcKML(s))
+    
+    return kmlList
   
   def calcKML(self, surObj):
     """
