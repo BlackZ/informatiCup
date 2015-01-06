@@ -68,7 +68,7 @@ class Pipeline:
     else:
       print "Error: Could not compute placemarks."
   
-  def _computeKMLs(self, inpath, configPath=''):
+  def _computeKMLs(self, inPath, configPath=''):
     """
     Function to compute kmls from a given file of SURs. Only needed for GUI.
     
