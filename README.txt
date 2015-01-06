@@ -24,8 +24,14 @@ Requirements for command line version:
 - requests (HTTP library)
 - internet connection
 
+Further requirements for the gui verson:
+- futures
+- kivy (http://kivy.org)
+
 Because isySUR is in Python you do not need to make an installation. Just
 browse into the directory and call the script run_isySUR.py with Python.
+For information about the required parameters check python run_isySUR.py -h or 
+the documentation.
 
 For installation you also use Python:
  $ python setup.py install
