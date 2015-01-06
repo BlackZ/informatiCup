@@ -3,6 +3,7 @@
 
 import os
 from threading import Thread
+from Queue import Queue
 
 from isySUR import kmlData, program
 from mapview import MapView
@@ -140,8 +141,14 @@ class Menue(DropDown):
       
       if ext == '.txt':
         map_view.toast('Calculating ...', True)
-        kmlList = []
-        Thread(target=app.pipe._computeKMLs, args=(path, kmlList)).start()
+        kmlList = Queue()
+        thread = Thread(target=app.pipe._computeKMLs, args=(path, kmlList))
+        thread.start()
+        
+        while not kmlList.empty() or thread.isAlive():
+          print kmlList.get()
+        
+        
   
   def save(self, path, filename):
     isDir = os.path.isdir(os.path.join(path, filename))

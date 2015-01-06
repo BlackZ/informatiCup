@@ -87,7 +87,7 @@ class Pipeline:
     #kmlList = []
     
     for s in surs:
-      kmlList.append(self.calcKML(s))
+      kmlList.put(self.calcKML(s))
     
     #return kmlList
   
