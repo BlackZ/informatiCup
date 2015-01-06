@@ -181,7 +181,7 @@ class Menue(DropDown):
           print e
           map_view.toast('The loaded KML file is incomplete!')
       
-      self.dismiss_popup()
+      self.dismiss_load()
       
       if ext == '.txt':
         Thread(target=map_view.computeAndShowKmls, args=(path, self.queue, )).start()
@@ -209,7 +209,7 @@ class Menue(DropDown):
         map_view.toast('An error occured while saving!')
         #map_view.ids.toast.text = "An error occured while saving!"
 
-    self.dismiss_popup()
+    self.dismiss_save()
 
 class KMLList(DropDown):
   def __init__(self):
