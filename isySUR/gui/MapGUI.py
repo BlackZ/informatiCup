@@ -304,7 +304,7 @@ class ConfigDialog(FloatLayout):
   
 class MapApp(App):
   
-  def __init__(self, config):
+  def __init__(self, config=""):
     super(MapApp, self).__init__()
     
     self.configPath = config
