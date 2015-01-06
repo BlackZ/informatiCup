@@ -370,7 +370,7 @@ class ConfigDialog(FloatLayout):
   
 class MapApp(App):
   
-  def __init__(self, configPath):
+  def __init__(self, configPath=""):
     super(MapApp, self).__init__()
     
     self.configContent = {}
@@ -427,6 +427,7 @@ class MapApp(App):
       polygon.append((float(coords[0]),float(coords[1])))
     
     polygon.append((float(first[0]),float(first[1])))
+    print len(polygon)
     return polygon
   
   def getSelectedPolygons(self):
