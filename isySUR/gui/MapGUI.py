@@ -319,18 +319,18 @@ class CustomFileChooser(FileChooserListView):
   """
   
   def open_entry(self, entry):
-        print "custom open"
+        #print "custom open"
         #try:
         #    # Just check if we can list the directory. This is also what
         #    # _add_file does, so if it fails here, it would also fail later
         #    # on. Do the check here to prevent setting path to an invalid
         #    # directory that we cannot list.
-        #    print entry.path
-        #    self.file_system.listdir(os.path.join(self.path, entry.path))
-        #    print os.path.join(self.path, entry.path)
+        #    self.file_system.listdir(entry.path)
         #except OSError:
         #    entry.locked = True
         #else:
+        #    self.path = entry.path
+        #    self.selection = []
         newPath = ''
         entry_path = entry.path.replace('\\', '/')
         if entry_path == '../':
