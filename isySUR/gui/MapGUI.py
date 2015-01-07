@@ -39,7 +39,6 @@ class Map(FloatLayout):
     self.app = app
     self.maps = MapView(zoom=11, lat=50.6394, lon=3.057)
     self.maps.center_on(52.023368, 8.538291)
-    self.addMarker(52.023368, 8.538291)
     #self.maps = MapView(app=app, zoom=11, lat=52.023368, lon=8.538291)
     self.add_widget(self.maps, 20)
     
@@ -78,6 +77,9 @@ class Map(FloatLayout):
     marker.lon = lon
     
     self.maps.add_marker(marker)
+  
+  def removeMarker(self, marker):
+    self.maps.removeMarker(marker)
     
   def addPolygonsFromKML(self, kml):
     """
@@ -89,6 +91,7 @@ class Map(FloatLayout):
         move_to = placemark.polygon[0]
       self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark))
       self.maps.drawPolygon()
+      #self.maps.addMarker()
     return move_to  
       
   
@@ -529,6 +532,10 @@ class MapApp(App):
 
   def on_stop(self):
     self.map.cleanUpCache()
+  
+  def on_start(self):
+    self.icon = 'logo.png'
+    self.title = 'isySUR'
   
   def build(self):
     self.map = Map(self)

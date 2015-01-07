@@ -269,6 +269,7 @@ class MapView(Widget):
     """
 
     kmls = ListProperty()
+    kml_colors = ListProperty()
 
     delta_x = NumericProperty(0)
     delta_y = NumericProperty(0)
@@ -437,7 +438,7 @@ class MapView(Widget):
                 indices.append(i)
                 i+=1
             with self.polyLayer.canvas:
-                Color(1,0,0,0.8, mode='rgba')
+                Color(1,0,0,0.6, mode='rgba')
                 Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
 
     def addPolygon(self, polygon):
