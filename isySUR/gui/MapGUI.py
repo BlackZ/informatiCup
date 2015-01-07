@@ -160,9 +160,9 @@ class Menue(DropDown):
   
   
   def show_load(self, obj, config=None):
-    self.isOpen = not self.isOpen
+    self.isOpen = False
     self.dismiss()
-    content = LoadDialog(load=self.load, cancel=self.dismiss_load, test=self.test)
+    content = LoadDialog(load=self.load, cancel=self.dismiss_load)
     if 'KML' in obj.text:
       content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
@@ -173,7 +173,7 @@ class Menue(DropDown):
     self._popup_load.open()
   
   def show_save(self, isConfig=False):
-    self.isOpen = not self.isOpen
+    self.isOpen = False
     self.dismiss()
     if isConfig:
       content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
@@ -184,7 +184,7 @@ class Menue(DropDown):
     
       
   def show_config(self):
-    self.isOpen = not self.isOpen
+    self.isOpen = False
     self.dismiss()
     
     self.config = ConfigDialog(self.app, save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
@@ -192,9 +192,9 @@ class Menue(DropDown):
 
     self._popup_config.open()
 #    
-  def test(self, a,b):
-    print "test a:",a.path
-    print "test b:", b
+  #def test(self, a,b):
+  #  print "test a:",a.path
+  #  print "test b:", b
     
 #  def test(self, entry, touch):
 #    '''(internal) This method must be called by the template when an entry
@@ -222,8 +222,6 @@ class Menue(DropDown):
 #      self.selection = [entry.path, ]
   
   def load(self, path, filename, config=None):    
-    print "loadpath", path
-    print "load", filename
     if filename != []:
       #path = os.path.join(path, filename[0])
       path = filename[0]
@@ -256,7 +254,7 @@ class Menue(DropDown):
   def saveConfig(self, path, filename):
     if filename != "":
     
-      config = {'[Inside]':[], '[Outside]':[], '[Both]':[]}
+      config = {'[Indoor]':[], '[Outdoor]':[], '[Both]':[]}
     
       for layout in self.config.ids.view.children:
         if isinstance(layout, GridLayout):
@@ -447,23 +445,24 @@ class ConfigDialog(FloatLayout):
     else:
       self.layout.add_widget(self.info)
     self.ids.view.add_widget(self.layout)
-  
+    
+    print self.ids.view.children
 
   def addConfigContent(self):
+    print 'add Content'
     if self.info.parent != None:
       self.layout.remove_widget(self.info)
+    if len(self.layout.children) > 1:
+      self.layout.clear_widgets()
     self.addContentHeader()
     for ruleArea in self.app.configContent:
       for rule in self.app.configContent[ruleArea]:
         self.addConfigEntry(ruleArea, rule)
-    
-    #self.ids.view.add_widget(self.layout)
-    #    self.addConfigEntry(content,item[0],optionSelected=item[1])
   
   def addContentHeader(self):
-    label1 = Label(text='', size_hint=(.4,.1))
-    label2 = Label(text='Inside', size_hint=(.1,.1))
-    label3 = Label(text='Outside', size_hint=(.1,.1))
+    label1 = Label(text='', size_hint=(.4,.1))      
+    label2 = Label(text='Indoor', size_hint=(.1,.1))
+    label3 = Label(text='Outdoor', size_hint=(.1,.1))
     label4 = Label(text='Both', size_hint=(.1,.1))
     
     self.layout.add_widget(label1)
@@ -476,9 +475,9 @@ class ConfigDialog(FloatLayout):
     active[ruleArea] = True
     
     group = ('g' + str(self.counter))
-    label = Label(text=rule, size_hint=(.4,.1,), id=group)
-    btn1 = CheckBox(group=group, active=active['[Indoor]'], size_hint=(.1,.1), id='[Inside]')
-    btn2 = CheckBox(group=group, active=active['[Outdoor]'], size_hint=(.1,.1), id='[Outside]')
+    label = Label(text=rule, size_hint=(.4,.1), id=group)
+    btn1 = CheckBox(group=group, active=active['[Indoor]'], size_hint=(.1,.1), id='[Indoor]')
+    btn2 = CheckBox(group=group, active=active['[Outdoor]'], size_hint=(.1,.1), id='[Outdoor]')
     btn3 = CheckBox(group=group, active=active['[Both]'], size_hint=(.1,.1), id='[Both]')
     
     self.layout.add_widget(label)
@@ -488,6 +487,7 @@ class ConfigDialog(FloatLayout):
     
     self.counter += 1
   
+    
   def addRule(self, obj):
     if "New" in obj.text:
       obj.text = "Add Rule"
@@ -499,9 +499,11 @@ class ConfigDialog(FloatLayout):
       self.layout.remove_widget(self.ruleInput)
       if self.ruleInput.text != "":
         group = 'g' + str(self.counter)
+        self.app.configContent['[Both]'].append(self.ruleInput.text)
+        print self.app.configContent
         self.layout.add_widget(Label(text=self.ruleInput.text, size_hint=(.4,.1), id=group))
-        self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Inside]'))
-        self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Outside]'))
+        self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Indoor]'))
+        self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Outdoor]'))
         self.layout.add_widget(CheckBox(group=group, active=True, size_hint=(.1,.1), id='[Both]'))
         self.ids.view.scroll_y = 0 
       
@@ -525,6 +527,7 @@ class MapApp(App):
   
   def loadConfig(self, configPath):
     if configPath != '':
+      self.configContent = {}
       with open(configPath, 'r') as stream:
         for line in stream:
           line = line.replace('\n','')

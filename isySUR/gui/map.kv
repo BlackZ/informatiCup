@@ -55,6 +55,7 @@
         orientation: "vertical"
         
         ScrollView:
+            view: view
             size_hint_y: 0.7
             pos: root.pos
             id: view
@@ -102,10 +103,10 @@
         size: root.size
         pos: root.pos
         orientation: "vertical"
-        FileChooserListView:
-            id: filechooser
-            on_selection: text_input.text = self.selection and self.selection[0] or ''
+        CustomFileChooser:
+            id: filechooser  
             path: '.'
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
 
         TextInput:
             id: text_input
