@@ -320,17 +320,28 @@ class CustomFileChooser(FileChooserListView):
   
   def open_entry(self, entry):
         print "custom open"
-        try:
-            # Just check if we can list the directory. This is also what
-            # _add_file does, so if it fails here, it would also fail later
-            # on. Do the check here to prevent setting path to an invalid
-            # directory that we cannot list.
-            self.file_system.listdir(entry.path)
-        except OSError:
-            entry.locked = True
+        #try:
+        #    # Just check if we can list the directory. This is also what
+        #    # _add_file does, so if it fails here, it would also fail later
+        #    # on. Do the check here to prevent setting path to an invalid
+        #    # directory that we cannot list.
+        #    print entry.path
+        #    self.file_system.listdir(os.path.join(self.path, entry.path))
+        #    print os.path.join(self.path, entry.path)
+        #except OSError:
+        #    entry.locked = True
+        #else:
+        newPath = ''
+        entry_path = entry.path.replace('\\', '/')
+        if entry_path == '../':
+          newPath = os.path.join(self.path, entry_path[:-1])
         else:
-            self.path = entry.path
-            self.selection = []
+          tmp = entry_path.split('/')
+          newPath = os.path.join(self.path, tmp[-1])
+        
+        if os.path.isdir(newPath):
+          self.path = newPath 
+          self.selection = []
 
 
 class KMLList(DropDown):
@@ -408,7 +419,6 @@ class LoadDialog(FloatLayout):
   load = ObjectProperty(None)
   cancel = ObjectProperty(None)
   test = ObjectProperty(None)
-  filters = ["*.kml"]
 
 class SaveDialog(FloatLayout):
   save = ObjectProperty(None)
