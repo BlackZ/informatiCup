@@ -140,6 +140,7 @@ class Menue(DropDown):
     self.text_input = TextInput()
     self.isOpen = False
     self.auto_dismiss = False
+    self.config = None
     
     self.queue = Queue()
   
@@ -151,9 +152,10 @@ class Menue(DropDown):
   
   def dismiss_config(self):
    self._popup_config.dismiss()
+   self.config = None
   
   
-  def show_load(self, obj):
+  def show_load(self, obj, config=None):
     self.isOpen = not self.isOpen
     self.dismiss()
     content = LoadDialog(load=self.load, cancel=self.dismiss_load)
@@ -161,13 +163,18 @@ class Menue(DropDown):
       content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
       content.ids.filechooser.filters = ['*.txt']
+    else:
+      content.ids.filechooser.filters = ['*.cfg']
     self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
     self._popup_load.open()
   
-  def show_save(self):
+  def show_save(self, isConfig=False):
     self.isOpen = not self.isOpen
     self.dismiss()
-    content = SaveDialog(save=self.save, cancel=self.dismiss_save)
+    if isConfig:
+      content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
+    else:
+      content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
     self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
     self._popup_save.open()
     
@@ -176,11 +183,11 @@ class Menue(DropDown):
     self.isOpen = not self.isOpen
     self.dismiss()
     
-    content = ConfigDialog(save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
-    self._popup_config = Popup(title="Configurate SUR-Rules", content=content, size_hint=(0.9, 0.9))
+    self.config = ConfigDialog(save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
+    self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.9))
     self._popup_config.open()
   
-  def load(self, filename):    
+  def load(self, filename, config=None):    
     if filename != []:
       #path = os.path.join(path, filename[0])
       path = filename[0]
@@ -199,33 +206,74 @@ class Menue(DropDown):
           map_view.toast('The loaded KML file is incomplete!')
           #add new kml to dropdown menue
       
+      if ext == '.cfg':
+        app.loadConfig(path)
+        
+        if len(app.configContent) > 0:
+          self.config.addConfigContent()
+          
       self.dismiss_load()
       
       if ext == '.txt':
         Thread(target=map_view.computeAndShowKmls, args=(path, self.queue, )).start()
   
-  def save(self, path, filename):
+  def saveConfig(self, path, filename):
+    if filename != "":
+    
+      config = {'[Inside]':[], '[Outside]':[], '[Both]':[]}
+    
+      for layout in self.config.ids.view.children:
+        if isinstance(layout, GridLayout):
+          i = 0
+          while i < (len(layout.children) - 4)/4:
+    
+            child = layout.children[(4*i):(4*(i+1))]
+            rule = ""
+            key = ""
+            for elem in child:
+              print elem
+              if isinstance(elem, Label):
+                rule = elem.text
+              if isinstance(elem, CheckBox):
+                if elem.active:
+                  key = elem.id
+                  
+            config[key].append(rule)
+            i += 1
+      
+      with open(os.path.join(path, filename), 'w') as stream:
+        for ruleArea in config:
+          stream.write(ruleArea + '\n')
+          for rule in config[ruleArea]:
+            stream.write(rule + '\n')
+      
+      self.dismiss_save()
+  
+  def saveKML(self, path, filename):
     isDir = os.path.isdir(os.path.join(path, filename))
     completeKML = kmlData.KMLObject()
     selection = app.getSelectedPolygons()
-    for elem in selection:
-      if isDir:  
+    if len(selection) > 0:
+      for elem in selection:
+        if isDir:  
+          try:
+            selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
+          except:
+            map_view.toast(elem + " could not be saved!")
+        completeKML.placemarks.extend(selection[elem].placemarks)
+      if len(completeKML.placemarks) > 0:
         try:
-          selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
-        except:
-          map_view.toast(elem + " could not be saved!")
-      completeKML.placemarks.extend(selection[elem].placemarks)
-    if len(completeKML.placemarks) > 0:
-      try:
-        if isDir:
-          completeKML.saveAsXML(path + os.path.sep + 'complete.kml')
-        else:
-          with open(os.path.join(path, filename), 'w') as stream:
-            stream.write(completeKML.getXML())
-      except Exception as e:
-        print e
-        map_view.toast('An error occured while saving!')
-        #map_view.ids.toast.text = "An error occured while saving!"
+          if isDir:
+            completeKML.saveAsXML(path + os.path.sep + 'complete.kml')
+          else:
+            with open(os.path.join(path, filename), 'w') as stream:
+              stream.write(completeKML.getXML())
+        except Exception as e:
+          print e
+          map_view.toast('An error occured while saving!')
+          #map_view.ids.toast.text = "An error occured while saving!"
+    else:
+      map_view.toast("No KML files selected or loaded!")
 
     self.dismiss_save()
 
@@ -270,12 +318,12 @@ class Toast(Label):
     self.pos = (map_view.center_x - self.width/2, 0.075)
   
   def show(self, text, length_long):
-    duration = 5000 if length_long else 1000
+    duration = 7000 if length_long else 2000
     rampdown = duration * 0.1
     if rampdown > 500:
       rampdown = 500
-    if rampdown < 100:
-      rampdown = 100
+    if rampdown < 150:
+      rampdown = 150
     
     self._rampdown = rampdown
     self._duration = duration - rampdown
@@ -315,65 +363,74 @@ class ConfigDialog(FloatLayout):
     self.save = save
     self.cancel = cancel
     
+    self.info = Label(text="No configuration file loaded!")
     self.counter = 0
+    self.layout = GridLayout(cols=4, size_hint_y=1.1)
+    
+    self.ruleInput = TextInput(focus=True, size_hint=(.4,.15))
     
     if len(app.configContent) > 0:
       self.addConfigContent()
+    else:
+      self.layout.add_widget(self.info)
+    self.ids.view.add_widget(self.layout)
   
-  def addConfigContent(self):  
-    layout = GridLayout(cols=4)
-    
-    self.addContentHeader(layout)
+  def addConfigContent(self):
+    if self.info.parent != None:
+      self.layout.remove_widget(self.info)
+    self.addContentHeader()
     for ruleArea in app.configContent:
       for rule in app.configContent[ruleArea]:
-        self.addConfigEntry(layout, ruleArea, rule)
+        self.addConfigEntry(ruleArea, rule)
     
-    self.ids.view.add_widget(layout)
+    #self.ids.view.add_widget(self.layout)
     #    self.addConfigEntry(content,item[0],optionSelected=item[1])
   
-  def addContentHeader(self, layout):
+  def addContentHeader(self):
     label1 = Label(text='', size_hint=(.4,.1))
     label2 = Label(text='Inside', size_hint=(.1,.1))
     label3 = Label(text='Outside', size_hint=(.1,.1))
     label4 = Label(text='Both', size_hint=(.1,.1))
     
-    layout.add_widget(label1)
-    layout.add_widget(label2)
-    layout.add_widget(label3)
-    layout.add_widget(label4)
+    self.layout.add_widget(label1)
+    self.layout.add_widget(label2)
+    self.layout.add_widget(label3)
+    self.layout.add_widget(label4)
   
-  def addConfigEntry(self, layout, ruleArea, rule):
+  def addConfigEntry(self, ruleArea, rule):
     active={"[Indoor]":False,"[Outdoor]":False,"[Both]":False}
     active[ruleArea] = True
     
-
-    label = Label(text=rule, size_hint=(.4,.1))
-    btn1 = CheckBox(group=('g' + str(self.counter)), active=active['[Indoor]'], size_hint=(.1,.1))
-    btn2 = CheckBox(group=('g' + str(self.counter)), active=active['[Outdoor]'], size_hint=(.1,.1))
-    btn3 = CheckBox(group=('g' + str(self.counter)), active=active['[Both]'], size_hint=(.1,.1))
+    group = ('g' + str(self.counter))
+    label = Label(text=rule, size_hint=(.4,.1,), id=group)
+    btn1 = CheckBox(group=group, active=active['[Indoor]'], size_hint=(.1,.1), id='[Inside]')
+    btn2 = CheckBox(group=group, active=active['[Outdoor]'], size_hint=(.1,.1), id='[Outside]')
+    btn3 = CheckBox(group=group, active=active['[Both]'], size_hint=(.1,.1), id='[Both]')
     
-    layout.add_widget(label)
-    layout.add_widget(btn1)
-    layout.add_widget(btn2)
-    layout.add_widget(btn3)
+    self.layout.add_widget(label)
+    self.layout.add_widget(btn1)
+    self.layout.add_widget(btn2)
+    self.layout.add_widget(btn3)
     
     self.counter += 1
-    
-    
-  def addConfigEntry_old(self,content,text,optionSelected=""):
-    selected={"inner":"normal","outer":"normal","both":"normal"}
-    if not optionSelected=="":
-        selected[optionSelected]="down"
-      
-    label=Label(text=text,size_hint=(.4,.1))
-    tglBtn1=ToggleButton(text='inner',group='g1', state=selected["inner"], size_hint=(.2,.1))
-    tglBtn2=ToggleButton(text='outer',group='g1', state=selected["outer"],size_hint=(.2,.1))
-    tglBtn3=ToggleButton(text='both',group='g1', state=selected["both"],size_hint=(.2,.1))
-    content.add_widget(label)
-    content.add_widget(tglBtn1)
-    content.add_widget(tglBtn2)
-    content.add_widget(tglBtn3)
   
+  def addRule(self, obj):
+    if "New" in obj.text:
+      obj.text = "Add Rule"
+      self.ruleInput.text = ""
+      self.layout.add_widget(self.ruleInput)
+      self.ids.view.scroll_y = 0 
+    elif "Add" in obj.text:
+      obj.text = "New Rule"
+      self.layout.remove_widget(self.ruleInput)
+      if self.ruleInput.text != "":
+        group = 'g' + str(self.counter)
+        self.layout.add_widget(Label(text=self.ruleInput.text, size_hint=(.4,.1), id=group))
+        self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Inside]'))
+        self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Outside]'))
+        self.layout.add_widget(CheckBox(group=group, active=True, size_hint=(.1,.1), id='[Both]'))
+        self.ids.view.scroll_y = 0 
+      
   
 class MapApp(App):
   
