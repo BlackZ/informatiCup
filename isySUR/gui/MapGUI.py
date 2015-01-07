@@ -30,25 +30,23 @@ class Map(FloatLayout):
   
   text = StringProperty()
   
-  def __init__(self):
+  def __init__(self, app):
     super(Map, self).__init__()
     
     self.lock = Lock()
-    
-    global map_view
-    map_view = self
+    self.app = app
     self.maps = MapView(zoom=11, lat=50.6394, lon=3.057)
     self.maps.center_on(52.023368, 8.538291)
     self.addMarker(52.023368, 8.538291)
     #self.maps = MapView(app=app, zoom=11, lat=52.023368, lon=8.538291)
     self.add_widget(self.maps, 20)
     
-    self.menue = Menue()
+    self.menue = Menue(self, app)
     
-    self.kmlList = KMLList()
+    self.kmlList = KMLList(self, app)
   
   def toast(self, text, duration=False):
-    Toast().show(text, duration)
+    Toast(self).show(text, duration)
       
   def open_menue(self):
     if self.menue.isOpen:
@@ -58,7 +56,7 @@ class Map(FloatLayout):
     self.menue.isOpen = not self.menue.isOpen
     
   def open_kmlList(self):
-    if len(app.loaded_kmls) == 0:
+    if len(self.app.loaded_kmls) == 0:
       self.toast("No KML files loaded!")
       #self.ids.toast.text = "No KML files loaded!"
     elif self.kmlList.is_open:
@@ -82,7 +80,7 @@ class Map(FloatLayout):
     for placemark in kml.placemarks:
       if kml.placemarks.index(placemark) == len(kml.placemarks) -1:
         move_to = placemark.polygon[0]
-      self.maps.addPolygon(app.getPolygonFromPlacemark(placemark))
+      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark))
       self.maps.drawPolygon()
     return move_to  
       
@@ -95,13 +93,14 @@ class Map(FloatLayout):
     print placemarks
     for placemark in placemarks:
       try:  
-        self.maps.kmls.append(app.getPolygonFromPlacemark(placemark))
+        self.maps.kmls.append(self.app.getPolygonFromPlacemark(placemark))
       except:
         print 'getPolygonFromPlacemark'
       self.maps.drawPolygon()
     move_to = placemarks[0].polygon[0]
     move_to = move_to.split(',')
-    self.maps.center_on(float(move_to[1]), float(move_to[0]))
+#    self.maps.center_on(float(move_to[1]), float(move_to[0]))
+    self.maps.zoom_to(move_to[1], move_to[0], 15)
     self.maps.drawPolygon()
     
   def removePolygon(self, polygon):
@@ -111,7 +110,7 @@ class Map(FloatLayout):
   def computeAndShowKmls(self, path, queue):
     self.toast('Calculating ...', True)
     kmlList = Queue()
-    thread = Thread(target=app.pipe._computeKMLs, args=(path, kmlList))
+    thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
     
     while not kmlList.empty() or thread.isAlive():
@@ -120,7 +119,7 @@ class Map(FloatLayout):
       queue.put(item)
       if not item[1].placemarks == []:
         self.lock.acquire()
-        name = app.addKML(str(item[0]), item[1])
+        name = self.app.addKML(str(item[0]), item[1])
         self.kmlList.addItem(name)
         self.toast('Calculating ...', True)
         self.lock.release()
@@ -135,11 +134,13 @@ class Menue(DropDown):
   savefile = ObjectProperty(None)
   text_input = ObjectProperty(None)
   
-  def __init__(self):
+  def __init__(self, mapview, app):
     super(Menue, self).__init__()
     self.text_input = TextInput()
     self.isOpen = False
     self.auto_dismiss = False
+    self.map_view =mapview
+    self.app = app
     
     self.queue = Queue()
   
@@ -176,7 +177,7 @@ class Menue(DropDown):
     self.isOpen = not self.isOpen
     self.dismiss()
     
-    content = ConfigDialog(save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
+    content = ConfigDialog(self.app, save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
     self._popup_config = Popup(title="Configurate SUR-Rules", content=content, size_hint=(0.9, 0.9))
     self._popup_config.open()
   
@@ -188,32 +189,32 @@ class Menue(DropDown):
       name = (name.replace('\\','/').split('/'))[-1]
       if ext == '.kml':
         try:
-          item_name, placemarks = app.addKMLFromPath(path, name)
+          item_name, placemarks = self.app.addKMLFromPath(path, name)
           if not placemarks==[]:
-            map_view.kmlList.addItem(item_name)
-            map_view.addPolygon(placemarks)
+            self.map_view.kmlList.addItem(item_name)
+            self.map_view.addPolygon(placemarks)
           else:
-            map_view.toast('The loaded KML has no polygon!')
+            self.map_view.toast('The loaded KML has no polygon!')
         except Exception as e:
           print e
-          map_view.toast('The loaded KML file is incomplete!')
+          self.map_view.toast('The loaded KML file is incomplete!')
           #add new kml to dropdown menue
       
       self.dismiss_load()
       
       if ext == '.txt':
-        Thread(target=map_view.computeAndShowKmls, args=(path, self.queue, )).start()
+        Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, )).start()
   
   def save(self, path, filename):
     isDir = os.path.isdir(os.path.join(path, filename))
     completeKML = kmlData.KMLObject()
-    selection = app.getSelectedPolygons()
+    selection = self.app.getSelectedPolygons()
     for elem in selection:
       if isDir:  
         try:
           selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
         except:
-          map_view.toast(elem + " could not be saved!")
+          self.map_view.toast(elem + " could not be saved!")
       completeKML.placemarks.extend(selection[elem].placemarks)
     if len(completeKML.placemarks) > 0:
       try:
@@ -224,37 +225,38 @@ class Menue(DropDown):
             stream.write(completeKML.getXML())
       except Exception as e:
         print e
-        map_view.toast('An error occured while saving!')
+        self.map_view.toast('An error occured while saving!')
         #map_view.ids.toast.text = "An error occured while saving!"
 
     self.dismiss_save()
 
 class KMLList(DropDown):
-  def __init__(self):
+  def __init__(self, mapview, app):
     super(KMLList, self).__init__()
-    
+    self.map_view = mapview
+    self.app = app
     self.is_open = False
     self.createList()
     self.auto_dismiss = False
   
   def createList(self):
-    if len(app.loaded_kmls) != 0:
+    if len(self.app.loaded_kmls) != 0:
       for kml in self.app.loaded_kmls:
         btn = Button(text=self.app.loaded_kmls['name'], size_hint_y=None, height=44, background_color=(0,0,2,1))
         btn.bind(on_release=self.selectBut)
         self.add_widget(btn)
     
   def selectBut(self, obj):
-    selected = app.loaded_kmls[obj.text]['selected']
-    placemarks = app.loaded_kmls[obj.text]['data'].placemarks
+    selected = self.app.loaded_kmls[obj.text]['selected']
+    placemarks = self.app.loaded_kmls[obj.text]['data'].placemarks
     if not selected:
       obj.background_color = (0,0,2,1)
-      map_view.addPolygon(placemarks)
+      self.map_view.addPolygon(placemarks)
     else:
       obj.background_color = (1,1,1,1)
       for placemark in placemarks:
-        map_view.removePolygon(app.getPolygonFromPlacemark(placemark))
-    app.loaded_kmls[obj.text]['selected'] = not selected
+        self.map_view.removePolygon(self.app.getPolygonFromPlacemark(placemark))
+    self.app.loaded_kmls[obj.text]['selected'] = not selected
 
   def addItem(self, name):
     btn = Button(text=name, size_hint_y=None, height=44,background_color=(0,0,2,1))
@@ -265,9 +267,11 @@ class Toast(Label):
   _transparency = NumericProperty(1.0)
   _background = ListProperty((0, 0, 0, 1))
   
-  def __init__(self):
+  def __init__(self, mapview):
     super(Toast, self).__init__()
-    self.pos = (map_view.center_x - self.width/2, 0.075)
+    self.map_view =mapview
+    self.pos = (self.map_view.center_x - self.width/2, 0.075)
+    
   
   def show(self, text, length_long):
     duration = 5000 if length_long else 1000
@@ -281,10 +285,11 @@ class Toast(Label):
     self._duration = duration - rampdown
     self.text = text
     self.texture_update()
-    map_view.add_widget(self)
+    self.map_view.add_widget(self)
     with self.canvas.before:
       Color(0,0,0,1)
-      Rectangle(pos=(map_view.center_x - self.texture_size[0]/2 - 2.5, 10), size=(self.texture_size[0] + 5, self.texture_size[1]+ 2))
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 - 2.5, 10), 
+                size=(self.texture_size[0] + 5, self.texture_size[1]+ 2))
     
     Clock.schedule_interval(self._in_out, 1/60.0)
   
@@ -293,7 +298,7 @@ class Toast(Label):
     if self._duration <= 0:
       self._transparency = 1.0 + (self._duration / self._rampdown)
     if -(self._duration) > self._rampdown:
-      map_view.remove_widget(self)
+      self.map_view.remove_widget(self)
       return False
   
 class LoadDialog(FloatLayout):
@@ -308,8 +313,10 @@ class SaveDialog(FloatLayout):
   
 class ConfigDialog(FloatLayout):
   
-  def __init__(self, save, load, cancel):
+  def __init__(self, app, save, load, cancel):
     super(ConfigDialog, self).__init__()
+
+    self.app = app    
     
     self.load = load
     self.save = save
@@ -317,15 +324,15 @@ class ConfigDialog(FloatLayout):
     
     self.counter = 0
     
-    if len(app.configContent) > 0:
+    if len(self.app.configContent) > 0:
       self.addConfigContent()
   
   def addConfigContent(self):  
     layout = GridLayout(cols=4)
     
     self.addContentHeader(layout)
-    for ruleArea in app.configContent:
-      for rule in app.configContent[ruleArea]:
+    for ruleArea in self.app.configContent:
+      for rule in self.app.configContent[ruleArea]:
         self.addConfigEntry(layout, ruleArea, rule)
     
     self.ids.view.add_widget(layout)
@@ -387,11 +394,10 @@ class MapApp(App):
     
     self.pipe = program.Pipeline()
     self.loaded_kmls = {}
-    global app
-    app = self
+
   
   def build(self):
-    return Map()
+    return Map(self)
   
   def loadConfig(self, configPath):
     if configPath != '':

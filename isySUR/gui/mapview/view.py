@@ -373,6 +373,20 @@ class MapView(Widget):
         # avoid triggering zoom changes.
         self._zoom = zoom
         self.zoom = self._zoom
+        
+        
+    def zoom_to(self, lat, lon, zoom):
+        """
+          Zooms to the given zoom level at the given position
+        """
+        lat = float(lat)
+        lon = float(lon)
+        
+        x = self.map_source.get_x(zoom, self.lon) - self.delta_x
+        y = self.map_source.get_y(zoom, self.lat) - self.delta_y
+        self.set_zoom_at(zoom, x, y)
+        self.center_on(lat, lon)
+        self.drawPolygon()
 
     def on_zoom(self, instance, zoom):
         if zoom == self._zoom:
