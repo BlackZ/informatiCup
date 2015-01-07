@@ -30,8 +30,8 @@ try:
         
     del os
     del sys
-except Exception as e:
-    print e
+except:
+    pass
 
 try:
     # fix if used within our programm

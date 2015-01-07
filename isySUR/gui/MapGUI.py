@@ -528,7 +528,6 @@ class MapApp(App):
     self.loaded_kmls = {}
 
   def on_stop(self):
-    print "Clean UP Cache"
     self.map.cleanUpCache()
   
   def build(self):
