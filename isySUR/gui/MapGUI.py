@@ -44,8 +44,9 @@ class Map(FloatLayout):
     self.add_widget(self.maps, 20)
     
     self.menue = Menue(self, app)
-    
-    self.kmlList = KMLList(self, app)
+  
+  def cleanUpCache(self):
+    self.maps.cleanUpCache()
   
   def toast(self, text, duration=False):
     Toast(self).show(text, duration)
@@ -513,6 +514,7 @@ class MapApp(App):
   def __init__(self, configPath=""):
     super(MapApp, self).__init__()
     
+    self.map = None
     self.configContent = {}
     self.loadConfig(configPath)
     
@@ -521,9 +523,13 @@ class MapApp(App):
     self.pipe = program.Pipeline()
     self.loaded_kmls = {}
 
+  def on_stop(self):
+    print "Clean UP Cache"
+    self.map.cleanUpCache()
   
   def build(self):
-    return Map(self)
+    self.map = Map(self)
+    return self.map
   
   def loadConfig(self, configPath):
     if configPath != '':
@@ -577,7 +583,6 @@ class MapApp(App):
         selection.update({kml:self.loaded_kmls[kml]['data']})
     
     return selection
-    
 
 if __name__ == '__main__':
   MapApp().run()  

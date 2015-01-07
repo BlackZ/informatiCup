@@ -16,7 +16,22 @@ MIN_LATITUDE = -90.
 MAX_LATITUDE = 90.
 MIN_LONGITUDE = -180.
 MAX_LONGITUDE = 180.
-CACHE_DIR = "cache"
+
+try:
+    import os
+    import sys
+    
+    if "win32" == sys.platform:
+        CACHE_DIR = os.path.expanduser('~') + "\AppData\Local\Temp\isySUR"
+    elif "linux" in sys.platform or "darwin" == sys.platform or "os" in sys.platform:
+        CACHE_DIR = '/tmp/isySUR'
+    else:
+        CACHE_DIR = 'cache'
+        
+    del os
+    del sys
+except Exception as e:
+    print e
 
 try:
     # fix if used within our programm

@@ -2,6 +2,7 @@
 
 __all__ = ["MapView", "MapMarker", "MapMarkerPopup", "MapLayer", "MarkerMapLayer"]
 
+import os
 from os.path import join, dirname
 from kivy.clock import Clock
 from kivy.metrics import dp
@@ -856,3 +857,10 @@ class MapView(Widget):
                           self.map_source.min_zoom, self.map_source.max_zoom)
         self.remove_all_tiles()
         self.trigger_update(True)
+    
+    def cleanUpCache(self):
+        for root, dirs, files in os.walk(CACHE_DIR, topdown=False):
+          for name in files:
+            os.remove(os.path.join(root, name))
+          for name in dirs:
+            os.rmdir(os.path.join(root, name))
