@@ -55,7 +55,7 @@
         orientation: "vertical"
         
         ScrollView:
-            size_hint: 1, 0.8
+            size_hint_y: 0.7
             pos: root.pos
             id: view
         
@@ -63,11 +63,14 @@
             size_hint_y: None
             height: 30
             Button:
+                text: "New Rule"
+                on_release: root.addRule(self)
+            Button:
                 text: "Load"
-                on_release: root.load(self)
+                on_release: root.load(self, root)
             Button:
                 text: "Save"
-                on_release: root.save()
+                on_release: root.save(isConfig=True)
             Button:
                 text: "Cancel"
                 on_release: root.cancel()
