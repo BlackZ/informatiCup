@@ -95,10 +95,9 @@ class Map(FloatLayout):
     print placemarks
     for placemark in placemarks:
       try:  
-        self.maps.kmls.append(app.getPolygonFromPlacemark(placemark))
+        self.maps.addPolygon(app.getPolygonFromPlacemark(placemark))
       except:
         print 'getPolygonFromPlacemark'
-      self.maps.drawPolygon()
     move_to = placemarks[0].polygon[0]
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
@@ -492,7 +491,6 @@ class MapApp(App):
       polygon.append((float(coords[0]),float(coords[1])))
     
     polygon.append((float(first[0]),float(first[1])))
-    print len(polygon)
     return polygon
   
   def getSelectedPolygons(self):
