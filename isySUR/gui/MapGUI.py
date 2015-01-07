@@ -11,6 +11,7 @@ from mapview import MapMarker
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.togglebutton import ToggleButton
@@ -25,6 +26,7 @@ from kivy.clock import Clock
 from kivy.graphics import Color, Rectangle
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty,\
                           ListProperty, DictProperty
+                          
 
 class Map(FloatLayout):
   
@@ -160,7 +162,7 @@ class Menue(DropDown):
   def show_load(self, obj, config=None):
     self.isOpen = not self.isOpen
     self.dismiss()
-    content = LoadDialog(load=self.load, cancel=self.dismiss_load)
+    content = LoadDialog(load=self.load, cancel=self.dismiss_load, test=self.test)
     if 'KML' in obj.text:
       content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
@@ -189,8 +191,39 @@ class Menue(DropDown):
     self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.9))
 
     self._popup_config.open()
+#    
+  def test(self, a,b):
+    print "test a:",a.path
+    print "test b:", b
+    
+#  def test(self, entry, touch):
+#    '''(internal) This method must be called by the template when an entry
+#    is touched by the user.
+#    '''
+#    if ('button' in touch.profile and touch.button in ('scrollup', 'scrolldown', 'scrollleft', 'scrollright')):
+#      return False
+#    _dir = self.file_system.is_dir(entry.path)
+#    dirselect = self.dirselect
+#    if _dir and dirselect and touch.is_double_tap:
+#      self.open_entry(entry)
+#      return
+#    if self.multiselect:
+#      if entry.path in self.selection:
+#        self.selection.remove(entry.path)
+#      else:
+#        if _dir and not self.dirselect:
+#          self.open_entry(entry)
+#          return
+#        self.selection.append(entry.path)
+#    else:
+#      if _dir and not self.dirselect:
+#        self.open_entry
+#        return
+#      self.selection = [entry.path, ]
   
-  def load(self, filename, config=None):    
+  def load(self, path, filename, config=None):    
+    print "loadpath", path
+    print "load", filename
     if filename != []:
       #path = os.path.join(path, filename[0])
       path = filename[0]
@@ -280,6 +313,26 @@ class Menue(DropDown):
 
     self.dismiss_save()
 
+class CustomFileChooser(FileChooserListView):
+  """
+    Implemented this and override the following method to fix path bug.
+  """
+  
+  def open_entry(self, entry):
+        print "custom open"
+        try:
+            # Just check if we can list the directory. This is also what
+            # _add_file does, so if it fails here, it would also fail later
+            # on. Do the check here to prevent setting path to an invalid
+            # directory that we cannot list.
+            self.file_system.listdir(entry.path)
+        except OSError:
+            entry.locked = True
+        else:
+            self.path = entry.path
+            self.selection = []
+
+
 class KMLList(DropDown):
   def __init__(self, mapview, app):
     super(KMLList, self).__init__()
@@ -354,6 +407,7 @@ class Toast(Label):
 class LoadDialog(FloatLayout):
   load = ObjectProperty(None)
   cancel = ObjectProperty(None)
+  test = ObjectProperty(None)
   filters = ["*.kml"]
 
 class SaveDialog(FloatLayout):
