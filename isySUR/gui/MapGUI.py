@@ -42,6 +42,7 @@ class Map(FloatLayout):
     #self.maps = MapView(app=app, zoom=11, lat=52.023368, lon=8.538291)
     self.add_widget(self.maps, 20)
     
+    self.kmlList = KMLList(self, app)
     self.menue = Menue(self, app)
   
   def cleanUpCache(self):
@@ -583,7 +584,7 @@ class MapApp(App):
         first = coords
       polygon.append((float(coords[0]),float(coords[1])))
     
-    polygon.append((float(first[0]),float(first[1])))
+    #polygon.append((float(first[0]),float(first[1])))
     return polygon
   
   def getSelectedPolygons(self):
