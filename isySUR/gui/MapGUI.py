@@ -59,14 +59,18 @@ class Map(FloatLayout):
     self.menue.isOpen = not self.menue.isOpen
     
   def open_kmlList(self):
+    print self.app.loaded_kmls
     if len(self.app.loaded_kmls) == 0:
       self.toast("No KML files loaded!")
       #self.ids.toast.text = "No KML files loaded!"
     elif self.kmlList.is_open:
       self.kmlList.dismiss(self.ids.kmlList)
+      self.kmlList.is_open = not self.kmlList.is_open
+      
     else:
       self.kmlList.open(self.ids.kmlList)
-    self.kmlList.is_open = not self.kmlList.is_open
+      self.kmlList.is_open = not self.kmlList.is_open
+    
     
   def addMarker(self, lat, lon):
     marker = MapMarker()
