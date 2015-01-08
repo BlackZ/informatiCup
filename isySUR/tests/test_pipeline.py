@@ -73,7 +73,7 @@ class TestProgrammPipeline(unittest.TestCase):
     kmlList = Queue()
     self.pipeObj._computeKMLs(surFilePath, kmlList)
     self.assertIsNotNone(kmlList)
-    self.assertEqual(kmlList.qsize(), 2)
+    self.assertEqual(kmlList.qsize(), 4) #Jacqui should have changed this when changing the function...
   
 
 if __name__ == '__main__':

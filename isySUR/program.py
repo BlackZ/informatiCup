@@ -190,7 +190,7 @@ class Pipeline:
       
       kmlObj.addPlacemark(kml.Placemark(placemarkName, surObj.id + ".jpg",
                           rule,
-                          pointList=points))
+                          pointList=points, style="#"+usedStyle.keys()[0]))
     else:
       print "Error: No polygon found for SUR %s." % surObj.id
       return None
