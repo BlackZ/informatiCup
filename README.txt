@@ -1,7 +1,7 @@
 ===============================================================================
 isySUR
 ===============================================================================
-06/01/2015
+08/01/2015
 
 -------------------------------------------------------------------------------
 General usage
@@ -17,8 +17,8 @@ For the command line version type:
 For the gui version type:
  $ python run_isySUR.py gui
 
-For more information about the required parameters (cli/gui, inPath, outPath) 
-check the help parameter (-h) or the documentation.
+For more information about optional and required parameters (cli/gui, inPath,
+outPath) check the help parameter (-h) or the manual.
 
 -------------------------------------------------------------------------------
 Installation on Linux
