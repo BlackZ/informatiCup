@@ -270,6 +270,7 @@ class MapView(Widget):
 
     kmls = ListProperty()
     kml_colors = ListProperty()
+    marker = ListProperty()
 
     delta_x = NumericProperty(0)
     delta_y = NumericProperty(0)
@@ -443,25 +444,31 @@ class MapView(Widget):
                 Color(r,g,b,a, mode='rgba')
                 Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
 
-    def addPolygon(self, polygon, color):
+    def addPolygon(self, polygon, color, markerCoords):
+        marker = None
+        if markerCoords != None:
+            marker = MapMarker()
+            marker.lat, marker.lon = markerCoords
+            self.add_marker(marker)
+            
         lineColor = self.convertKMLColor((color.values())[0]['lineColour'])
         lineWidth = (color.values())[0]['lineWidth']
         polyColor = self.convertKMLColor((color.values())[0]['polyColour'])
-        #print polyColor
+        
         self.kmls.append(polygon)
         self.kml_colors.append(polyColor)
+        self.marker.append(marker)
         self.drawPolygon()
     
     def removePolygon(self, polygon):
-        colorIndex = self.kmls.index(polygon)
+        index = self.kmls.index(polygon)
         self.kmls.remove(polygon)
-        del self.kml_colors[colorIndex]
+        del self.kml_colors[index]
+        #marker = self.marker[index]
+        #if marker != None:
+        #    self.remove_marker(self.marker[index])
+        #del self.marker[index]
         self.drawPolygon()
-
-    def remove_marker(self, marker):
-        """Remove a marker from its layer
-        """
-        marker.detach()
     
     def convertKMLColor(self, kmlColor):
         """
@@ -475,6 +482,11 @@ class MapView(Widget):
 
         return [round(float(x/255),2) for x in rgba]
 
+    def remove_marker(self, marker):
+        """Remove a marker from its layer
+        """
+        marker.detach()
+        
     def add_layer(self, layer, mode="window"):
         """Add a new layer to update at the same time the base tile layer.
         mode can be either "scatter" or "window". If "scatter", it means the

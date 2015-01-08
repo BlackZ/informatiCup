@@ -7,7 +7,6 @@ from Queue import Queue
 
 from isySUR import kmlData, program
 from mapview import MapView
-from mapview import MapMarker
 
 from kivy import platform
 from kivy.app import App
@@ -71,24 +70,30 @@ class Map(FloatLayout):
       self.kmlList.is_open = not self.kmlList.is_open
     
     
-  def addMarker(self, lat, lon):
-    marker = MapMarker()
-    marker.lat = lat
-    marker.lon = lon
+  def addMarker(self, coords):
+    """
+    Adds a marker onto the map.
+    
+    @param coords: Coordinate point - lat, lon - at which the marker will be added.
+    @type coords: Tuple(float, float)
+    """
+    #marker = MapMarker()
+    #marker.lat = lat
+    #marker.lon = lon
     
     self.maps.add_marker(marker)
   
   def removeMarker(self, marker):
     self.maps.removeMarker(marker)
     
-  def addPolygonsFromKML(self, kml):
+  def addPolygonsFromKML(self, kmlObj):
     """
     Adds all polygons from a KMLList. Moves map to the
     last added Polygon.
     """
-    for placemark in kml.placemarks:
-      color = kml.styles
-      if kml.placemarks.index(placemark) == len(kml.placemarks) -1:
+    for placemark in kmlObj.placemarks:
+      color = kmlObj.styles
+      if kmlObj.placemarks.index(placemark) == len(kmlObj.placemarks) -1:
         move_to = placemark.polygon[0]
       self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), color)
       self.maps.drawPolygon()
@@ -96,18 +101,32 @@ class Map(FloatLayout):
     return move_to  
       
   
-  def addPolygon(self, placemarks, color):
+  def addPolygon(self, kmlObj, first=True):
     """
-    Adds all polygons from one KML. Moves map to the
-    added Polygon.
+    Adds all polygons from one KML.
+    
+    @param kmlObj: KML obect which will be added to map
+    @type kmlObj: kmlData.KMLObject
+    
+    @param first: Decides whether the map zooms to the
+                  first or last added polygon.
+    @type first: Bool
+    
+    @return: Returns the coordinates to which will be moved.
+             Only relevant for move to the last added. 
     """
+    placemarks = kmlObj.placemarks
     for placemark in placemarks:
-      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), color)
-    move_to = placemarks[0].polygon[0]
-    move_to = move_to.split(',')
-#    self.maps.center_on(float(move_to[1]), float(move_to[0]))
-    self.maps.zoom_to(move_to[1], move_to[0], 15)
-    self.maps.drawPolygon()
+      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), kmlObj.styles, placemark.ruleCoords)
+    
+      move_to = placemarks[0].polygon[0]
+      move_to = move_to.split(',')
+      #moves to added Polygon
+      if first:
+        self.maps.zoom_to(move_to[1], move_to[0], 15)
+         
+    return move_to
+    
     
   def removePolygon(self, polygon):
     self.maps.removePolygon(polygon)
@@ -127,8 +146,6 @@ class Map(FloatLayout):
       Rectangle(pos=(self.center_x - toast.texture_size[0] -8, 8), 
                 size=(toast.texture_size[0]*2+10, toast.texture_size[1]+ 6))
     
-    
-    print toast.size
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
     
@@ -141,7 +158,7 @@ class Map(FloatLayout):
           name = self.app.addKML(surID, item)
           self.kmlList.addItem(name)
           self.lock.release()
-          move_to = self.addPolygonsFromKML(item)
+          move_to = self.addPolygon(item, first=False)
       else:
         surID = item
         toast.text = "Calculating " + item + " ..."
@@ -152,8 +169,7 @@ class Map(FloatLayout):
     self.remove_widget(toast)
     
     print self.children
-    
-    move_to = move_to.split(',')
+  
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
     
     
@@ -243,7 +259,7 @@ class Menue(DropDown):
           item_name, kmlObj = self.app.addKMLFromPath(path, name)
           if not kmlObj.placemarks==[]:
             self.map_view.kmlList.addItem(item_name)
-            self.map_view.addPolygon(kmlObj.placemarks, kmlObj.styles)
+            self.map_view.addPolygon(kmlObj)
           else:
             self.map_view.toast('The loaded KML has no polygon!')
         except Exception as e:
@@ -370,7 +386,7 @@ class KMLList(DropDown):
     placemarks = kmlObj.placemarks
     if not selected:
       obj.background_color = (0,0,2,1)
-      self.map_view.addPolygon(placemarks, kmlObj.styles)
+      self.map_view.addPolygon(kmlObj)
     else:
       obj.background_color = (1,1,1,1)
       for placemark in placemarks:
@@ -575,12 +591,8 @@ class MapApp(App):
     polygon = []
     for i in range(len(placemark.polygon)):
       coords = placemark.polygon[i].split(',')
-      if i == 0:
-        first = coords
       polygon.append((float(coords[0]),float(coords[1])))
     
-    print polygon
-    #polygon.append((float(first[0]),float(first[1])))
     return polygon
   
   def getSelectedPolygons(self):
