@@ -156,6 +156,8 @@ class Menue(DropDown):
     self.config = None
     
     self.queue = Queue()
+    
+    self._SURThread=None
   
   def dismiss_load(self):
     self._popup_load.dismiss()
@@ -258,8 +260,12 @@ class Menue(DropDown):
       self.dismiss_load()
       
       if ext == '.txt':
-        Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, )).start()
-  
+        if self._SURThread==None or not self._SURThread.isAlive():
+          self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, )).start()
+        else:
+          #TODO:toast-> only one SUR at a time
+          pass
+          
   def saveConfig(self, path, filename):
     if filename != "":
     
@@ -391,8 +397,10 @@ class Toast(Label):
   def __init__(self, mapview):
     super(Toast, self).__init__()
     self.map_view =mapview
-    self.pos = (self.map_view.center_x - self.width/2, 0.075)
-    
+    self.text_size=(205, 20)
+    self.texture_size=(205,20)
+    self.texture_update()
+    self.pos = (0, -self.map_view.center_y + self.text_size[1]/2 + 10)
   
   def show(self, text, length_long):
     duration = 7000 if length_long else 2000
@@ -409,9 +417,8 @@ class Toast(Label):
     self.map_view.add_widget(self)
     with self.canvas.before:
       Color(0,0,0,1)
-      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 - 2.5, 10), 
-                size=(self.texture_size[0] + 5, self.texture_size[1]+ 2))
-    
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -5, 10), 
+                size=(self.texture_size[0]+10, self.texture_size[1]+ 2))
     Clock.schedule_interval(self._in_out, 1/60.0)
   
   def _in_out(self, dt):
