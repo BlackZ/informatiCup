@@ -43,6 +43,8 @@ def gui(args):
   except BaseException as e:
     if not mapApp == None:
       mapApp.on_stop()
+    import traceback
+    traceback.print_exc()
     sys.exit('Program stopped unexpected!')
   except Exception as e:
     print "GUI could not be loaded. Is kivy installed correctly?"

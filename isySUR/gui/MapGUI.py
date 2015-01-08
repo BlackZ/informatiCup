@@ -87,21 +87,22 @@ class Map(FloatLayout):
     last added Polygon.
     """
     for placemark in kml.placemarks:
+      color = kml.styles
       if kml.placemarks.index(placemark) == len(kml.placemarks) -1:
         move_to = placemark.polygon[0]
-      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark))
+      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), color)
       self.maps.drawPolygon()
       #self.maps.addMarker()
     return move_to  
       
   
-  def addPolygon(self, placemarks):
+  def addPolygon(self, placemarks, color):
     """
     Adds all polygons from one KML. Moves map to the
     added Polygon.
     """
-    for placemark in placemarks: 
-      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark))
+    for placemark in placemarks:
+      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), color)
     move_to = placemarks[0].polygon[0]
     move_to = move_to.split(',')
 #    self.maps.center_on(float(move_to[1]), float(move_to[0]))
@@ -109,8 +110,7 @@ class Map(FloatLayout):
     self.maps.drawPolygon()
     
   def removePolygon(self, polygon):
-    self.maps.kmls.remove(polygon)
-    self.maps.drawPolygon()
+    self.maps.removePolygon(polygon)
   
   def computeAndShowKmls(self, path, queue):
     toast = Label(text="Calculating ...", #text_size=(205,20), texture_size=(205,20),
@@ -145,10 +145,7 @@ class Map(FloatLayout):
       else:
         surID = item
         toast.text = "Calculating " + item + " ..."
-        print toast.texture_size, toast.size
         toast.texture_update()
-        print toast.texture_size
-        toast.canvas.ask_update()
     
     print self.children
     
@@ -243,14 +240,16 @@ class Menue(DropDown):
       name = (name.replace('\\','/').split('/'))[-1]
       if ext == '.kml':
         try:
-          item_name, placemarks = self.app.addKMLFromPath(path, name)
-          if not placemarks==[]:
+          item_name, kmlObj = self.app.addKMLFromPath(path, name)
+          if not kmlObj.placemarks==[]:
             self.map_view.kmlList.addItem(item_name)
-            self.map_view.addPolygon(placemarks)
+            self.map_view.addPolygon(kmlObj.placemarks, kmlObj.styles)
           else:
             self.map_view.toast('The loaded KML has no polygon!')
         except Exception as e:
           print e
+          import traceback
+          traceback.print_exc()
           self.map_view.toast('The loaded KML file is incomplete!')
           #add new kml to dropdown menue
       
@@ -308,6 +307,8 @@ class Menue(DropDown):
           try:
             selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
           except:
+            import traceback
+            traceback.print_exc()
             self.map_view.toast(elem + " could not be saved!")
         completeKML.placemarks.extend(selection[elem].placemarks)
       if len(completeKML.placemarks) > 0:
@@ -319,6 +320,8 @@ class Menue(DropDown):
               stream.write(completeKML.getXML())
         except Exception as e:
           print e
+          import traceback
+          traceback.print_exc()
           self.map_view.toast('An error occured while saving!')
           #map_view.ids.toast.text = "An error occured while saving!"
     else:
@@ -363,10 +366,11 @@ class KMLList(DropDown):
     
   def selectBut(self, obj):
     selected = self.app.loaded_kmls[obj.text]['selected']
-    placemarks = self.app.loaded_kmls[obj.text]['data'].placemarks
+    kmlObj = self.app.loaded_kmls[obj.text]['data']
+    placemarks = kmlObj.placemarks
     if not selected:
       obj.background_color = (0,0,2,1)
-      self.map_view.addPolygon(placemarks)
+      self.map_view.addPolygon(placemarks, kmlObj.styles)
     else:
       obj.background_color = (1,1,1,1)
       for placemark in placemarks:
@@ -565,7 +569,7 @@ class MapApp(App):
       i += 1
     self.loaded_kmls.update({name:{'data':kmlObj, 'selected':True}})
     
-    return name, kmlObj.placemarks
+    return name, kmlObj
   
   def getPolygonFromPlacemark(self, placemark):
     polygon = []
@@ -575,6 +579,7 @@ class MapApp(App):
         first = coords
       polygon.append((float(coords[0]),float(coords[1])))
     
+    print polygon
     #polygon.append((float(first[0]),float(first[1])))
     return polygon
   
