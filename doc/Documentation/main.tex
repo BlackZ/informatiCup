@@ -105,6 +105,8 @@ Published \today
 
 \tableofcontents % Print the table of contents itself
 
+\todol{Check TableOfContents - at this moment only one point is on the second side UGLY!}
+
 \cleardoublepage % Forces the first chapter to start on an odd page so it's on the right
 
 \pagestyle{fancy} % Print headers again
@@ -121,10 +123,26 @@ Welcome to isySUR (pronounce isy as ['i:zi]), a tool helping you to find the sph
 First decide if you like to use the command line version of \pt\ or if you prefer a graphical user interface. Please proceed with section \ref{sec:QuickstartTerminal} or section \ref{sec:QuickstartWindow} depending on your choice.
 
 \subsection{\ProjectTitle\ in command line version}\label{sec:QuickstartTerminal}
-\todol{Explain how to quick start}
+For the command line version type
+\begin{verbatim}
+	$ python run_isySUR.py cli {input} {output}
+\end{verbatim}
+where \texttt{input} is the path to the input file containing the SURs which area of influence is to be computed and \texttt{output} is the path for the resulting area(s) of influence. If the path points to a file, only one kml file will be created, containing all calculated areas. If path points to a directory a kml file for each SUR will be created as well as one containing all areas.
+
+You can leave out \texttt{python} if you have installed the program before. For installation instructions see section \ref{sec:installation}. For additional parameters see section \ref{sec:cli}.
+
+For information about input and output file types see section \ref{sec:io}.
 
 \subsection{\ProjectTitle\ in window version}\label{sec:QuickstartWindow}
-\todol{Explain how to quick start}
+For the window version type
+\begin{verbatim}
+	$ python run_isySUR.py gui
+\end{verbatim}
+In Menu you find the possibility to load an SUR input file. After calculating you can save the area(s) of influence.
+
+You can leave out \texttt{python} if you have installed the program before. For installation instructions see section \ref{sec:installation}. For additional parameters and more features see section \ref{sec:gui}.
+
+For information about input and output file types see section \ref{sec:io}.
 
 \section{What is \ProjectTitle?}\label{sec:whatFor}
 \pt is a program that calculates the sphere of influence of a space usage rule by its coordinates and data from OpenStreetMap. It was developed within the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called isy and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `intelligent systems' at Bielefeld University.
@@ -134,24 +152,25 @@ Using is very easy. You give an input file with the coordinates of the SURs and 
 \section{Content of \ProjectTitle}
 In the archive you can find the following data (bold printed files will be installed with the install command):
 \todol{noch up-to-date?}
-\todol{add GUI when finished}
-\todol{MAKE UP TO DATE!}
 \begin{itemize}
+	\item data (directory) - examples for space usage rules\footnote{see section \ref{sec:surs}}
 	\item \textbf{isySUR} (directory) - the source files for the isySUR Python package
 	\begin{itemize}
+		\item gui (directory) - source files for gui version
 		\item tests (directory) - \pt\ was developed using test driven development. In this directory you will find the test files.
 	\end{itemize}
-	\item testData (directory) - in here one possible input file named Data.txt is found
+	\item testData (directory) - data for tests and test data set
 	\begin{itemize}
 		\item dataOnlyForTests (directory) - Some of the test files need data that is stored in this directory
+		\item Data.txt - a possible input file
 	\end{itemize}
 	\item kmlComperator.py - comparison tool for comparing our computed .kml-files with the given .truth.kml-files (the areas of the placemarks), used for development
 	\item manual.pdf - this manual
 	\item README.txt
 	\item \textbf{run\_isySUR.py} - the Python script to run the command line version of \pt
-	\item run\_tests.py - script that runs all tests in isySUR/tests/, used for development\todo{funktionieren die patterns eigentlich noch?}
+	\item run\_tests.py - script that runs all or some tests in isySUR/tests/, used for development
 	\item setup.py - the setup script to install \pt
-	\item surConfig.cfg - a configuration file that can optionally be used for computation (see section \ref{sec:usage})
+	\item surConfig.cfg - a configuration file that can optionally be used for computation\footnote{see section \ref{sec:usage}}
 \end{itemize}
 
 
@@ -251,27 +270,37 @@ For using the graphical user interface type:
 
 Notice that the gui version has more requirements than the command line version. See \ref{sec:requirements} for more details.
 
-\subsection{Command line version}
+\subsection{Command line version}\label{sec:cli}
 Usage of the command line version:
-\todol{MAKE UP TO DATE!}
 \begin{verbatim}
-	$ run_isySUR.py [-h] [-c CONFIG] input output
+	$ run_isySUR.py cli [-h] [-c CONFIG] input output
 \end{verbatim}
 
 \subsubsection{Parameters}
 \todol{up to date?}
-\todol{MAKE UP TO DATE!}
-The parameters of run\_isySUR.py (bold arguments are required):
+The parameters of \texttt{run\_isySUR.py cli} (bold arguments are required):
 \begin{itemize}
 	\item \textbf{input} - Path to the input file containing the SURs. See \ref{sec:io} for the required format.
 	\item \textbf{output} - Path where to put the output file(s). If this path points to a file, a single output .kml-file containing all computed areas is created. If it points to a directory, one .kml-file for each SUR is created in this directory as well as one .kml-file containing all computed areas.
-	\item -h - If this parameter is given, a short help message containing all parameters is shown.
 	\item -c CONFIG (--config CONFIG) - With this parameter an optional config file with SUR classifications (indoor, outdoor, both) is used for computation. For the format of the file see \ref{sec:io}.
+	\item -h - If this parameter is given, a short help message containing all parameters is shown.
 \end{itemize}
 
 \subsection{GUI version}\label{sec:gui}
-\todol{add -c parameter}
-\todol{fill me!}
+\todol{up to date?}
+Usage of the gui version:
+\begin{verbatim}
+	$ run_isySUR.py gui [-h] [-c CONFIG]
+\end{verbatim}
+
+\todol{Put menu description here}
+
+\subsubsection{Parameters}
+The parameters of \texttt{run\_isySUR.py gui}:
+\begin{itemize}
+	\item -c CONFIG (--config CONFIG) - With this parameter an optional config file with SUR classifications (indoor, outdoor, both) is used for computation. For the format of the file see \ref{sec:io}.
+	\item -h - If this parameter is given, a short help message containing all parameters is shown.
+\end{itemize}
 
 \subsection{Using android}\label{sec:android}
 Of course calculating SURs at home is nice but in general you would like to know a sphere of influence of a space usage rule standing in front of it. This is possible on your android device (with internet connection). In the archive you can find the isySUR\todo{name of file correct?}.apk that you can install on your device. Just copy it on the device e.g. via USB and enable the device option to install from unknown sources. Browsing to the .apk and clicking on it starts the installation. After that you will find isySUR in your apps and can use it exactly like the GUI version described in section \ref{sec:gui}.
@@ -329,7 +358,7 @@ Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie da
 %	Own SURs
 %----------------------------------------------------------------------------------------
 
-\chapter{Added SURs}
+\chapter{Added SURs}\label{sec:surs}
 For the competition ten new space usage rules should be found.
 \todol{Add our SURs (maybe with screenshot of intuitive area?)}
 
