@@ -180,7 +180,7 @@ class Pipeline:
         bestWay = way
             
     points = []  
-    for ref in bestWay.refs:
+    for ref in bestWay.refs[:-1]:
       points.append(self.osm.nodes[ref].getCoordinateString())
       
     if len(points) > 0:
