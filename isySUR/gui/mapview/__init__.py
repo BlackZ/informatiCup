@@ -19,11 +19,11 @@ MAX_LONGITUDE = 180.
 
 try:
     import os
-    import sys
+    from kivy import platform
     
-    if "win32" == sys.platform:
+    if "win" == platform:
         CACHE_DIR = os.path.expanduser('~') + "\AppData\Local\Temp\isySUR"
-    elif "linux" in sys.platform or "darwin" == sys.platform or "os" in sys.platform:
+    elif "linux" == platform or "macosx" == platform:
         CACHE_DIR = '/tmp/isySUR'
     else:
         CACHE_DIR = 'cache'
