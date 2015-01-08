@@ -2,6 +2,7 @@
 #!/usr/bin/kivy
 
 import os
+import time
 from threading import Thread,Lock
 from Queue import Queue
 
@@ -62,7 +63,6 @@ class Map(FloatLayout):
     print self.app.loaded_kmls
     if len(self.app.loaded_kmls) == 0:
       self.toast("No KML files loaded!")
-      #self.ids.toast.text = "No KML files loaded!"
     elif self.kmlList.is_open:
       self.kmlList.dismiss(self.ids.kmlList)
       self.kmlList.is_open = not self.kmlList.is_open
@@ -118,23 +118,32 @@ class Map(FloatLayout):
     self.maps.drawPolygon()
   
   def computeAndShowKmls(self, path, queue):
-    self.toast('Calculating ...', True)
+    toast = Label(text="Calculating ...!", text_size=(205,20), texture_size=(205,20),
+                  bold=True, font_size=20, color=(1,1,1,1))
+    toast.pos=(0, -self.center_y + toast.text_size[1]/2 + 10)
     kmlList = Queue()
+    self.add_widget(toast)
+    with toast.canvas.before:
+      Color(0,0,0,1)
+      Rectangle(pos=(self.center_x - toast.texture_size[0] / 2 -5, 10), 
+                size=(toast.texture_size[0] + 10, toast.texture_size[1] + 2))
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
     
     while not kmlList.empty() or thread.isAlive():
-      self.toast('Calculating ...', True)
       item = kmlList.get()
-      queue.put(item)
+      toast.text = "Calculating " + item[0] + " ...!"
+      toast.texture_update()
       if not item[1].placemarks == []:
         self.lock.acquire()
         name = self.app.addKML(str(item[0]), item[1])
         self.kmlList.addItem(name)
-        self.toast('Calculating ...', True)
         self.lock.release()
         move_to = self.addPolygonsFromKML(item[1])
     
+    time.sleep(2)
+    self.remove_widget(toast)
+    toast = None
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
     
@@ -202,35 +211,6 @@ class Menue(DropDown):
     self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.9))
 
     self._popup_config.open()
-#    
-  #def test(self, a,b):
-  #  print "test a:",a.path
-  #  print "test b:", b
-    
-#  def test(self, entry, touch):
-#    '''(internal) This method must be called by the template when an entry
-#    is touched by the user.
-#    '''
-#    if ('button' in touch.profile and touch.button in ('scrollup', 'scrolldown', 'scrollleft', 'scrollright')):
-#      return False
-#    _dir = self.file_system.is_dir(entry.path)
-#    dirselect = self.dirselect
-#    if _dir and dirselect and touch.is_double_tap:
-#      self.open_entry(entry)
-#      return
-#    if self.multiselect:
-#      if entry.path in self.selection:
-#        self.selection.remove(entry.path)
-#      else:
-#        if _dir and not self.dirselect:
-#          self.open_entry(entry)
-#          return
-#        self.selection.append(entry.path)
-#    else:
-#      if _dir and not self.dirselect:
-#        self.open_entry
-#        return
-#      self.selection = [entry.path, ]
   
   def load(self, path, filename, config=None):    
     if filename != []:
@@ -260,11 +240,12 @@ class Menue(DropDown):
       self.dismiss_load()
       
       if ext == '.txt':
+        print self._SURThread
         if self._SURThread==None or not self._SURThread.isAlive():
-          self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, )).start()
+          self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, ))
+          self._SURThread.start()
         else:
-          #TODO:toast-> only one SUR at a time
-          pass
+          self.map_view.toast('Already calculating!')
           
   def saveConfig(self, path, filename):
     if filename != "":
@@ -396,10 +377,7 @@ class Toast(Label):
   
   def __init__(self, mapview):
     super(Toast, self).__init__()
-    self.map_view =mapview
-    self.text_size=(205, 20)
-    self.texture_size=(205,20)
-    self.texture_update()
+    self.map_view = mapview
     self.pos = (0, -self.map_view.center_y + self.text_size[1]/2 + 10)
   
   def show(self, text, length_long):
@@ -416,9 +394,12 @@ class Toast(Label):
     self.texture_update()
     self.map_view.add_widget(self)
     with self.canvas.before:
-      Color(0,0,0,1)
-      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -5, 10), 
-                size=(self.texture_size[0]+10, self.texture_size[1]+ 2))
+      Color(0.6,0.6,0.6,self._transparency)
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -10, 6), 
+                size=(self.texture_size[0]+14, self.texture_size[1]+ 10))
+      Color(0.2,0.2,0.2,self._transparency)
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -8, 8), 
+                size=(self.texture_size[0]+10, self.texture_size[1]+ 6))
     Clock.schedule_interval(self._in_out, 1/60.0)
   
   def _in_out(self, dt):
