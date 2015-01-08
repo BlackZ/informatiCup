@@ -125,26 +125,32 @@ class Map(FloatLayout):
     kmlList = Queue()
     self.add_widget(toast)
     with toast.canvas.before:
-      Color(0,0,0,1)
-      Rectangle(pos=(self.center_x - toast.texture_size[0] / 2 -5, 10), 
-                size=(toast.texture_size[0] + 10, toast.texture_size[1] + 2))
+      Color(0.6,0.6,0.6,1)#self._transparency)
+      Rectangle(pos=(self.center_x - toast.texture_size[0]/2 -10, 6), 
+                size=(toast.texture_size[0]+14, toast.texture_size[1]+ 10))
+      Color(0.2,0.2,0.2,1)#self._transparency)
+      Rectangle(pos=(self.center_x - toast.texture_size[0]/2 -8, 8), 
+                size=(toast.texture_size[0]+10, toast.texture_size[1]+ 6))
+    
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
     
+    surID = "" # UEberfluessig, wenn Name in KML!!!
     while not kmlList.empty() or thread.isAlive():
       item = kmlList.get()
-      toast.text = "Calculating " + item[0] + " ...!"
-      toast.texture_update()
-      if not item[1].placemarks == []:
-        self.lock.acquire()
-        name = self.app.addKML(str(item[0]), item[1])
-        self.kmlList.addItem(name)
-        self.lock.release()
-        move_to = self.addPolygonsFromKML(item[1])
+      if isinstance(item, kmlData.KMLObject):
+        if not item.placemarks == []:
+          self.lock.acquire()
+          name = self.app.addKML(surID, item)
+          self.kmlList.addItem(name)
+          self.lock.release()
+          move_to = self.addPolygonsFromKML(item)
+      else:
+        surID = item
+        toast.text = "Calculating " + item + " ...!"
+        toast.texture_update()
     
-    time.sleep(2)
     self.remove_widget(toast)
-    toast = None
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
     
@@ -193,7 +199,12 @@ class Menue(DropDown):
     if 'KML' in obj.text:
       content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
-      content.ids.filechooser.filters = ['*.txt']
+      print self._SURThread
+      if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
+        content.ids.filechooser.filters = ['*.txt']
+      elif self._SURThread != None or self._SURThread.isAlive():
+          self.map_view.toast('Already calculating!')
+          return      
     else:
       content.ids.filechooser.filters = ['*.cfg']
     self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
@@ -248,12 +259,9 @@ class Menue(DropDown):
       self.dismiss_load()
       
       if ext == '.txt':
-        print self._SURThread
         if self._SURThread==None or not self._SURThread.isAlive():
           self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, ))
           self._SURThread.start()
-        else:
-          self.map_view.toast('Already calculating!')
           
   def saveConfig(self, path, filename):
     if filename != "":
@@ -321,18 +329,6 @@ class CustomFileChooser(FileChooserListView):
   """
  
   def open_entry(self, entry):
-        #print "custom open"
-        #try:
-        #    # Just check if we can list the directory. This is also what
-        #    # _add_file does, so if it fails here, it would also fail later
-        #    # on. Do the check here to prevent setting path to an invalid
-        #    # directory that we cannot list.
-        #    self.file_system.listdir(entry.path)
-        #except OSError:
-        #    entry.locked = True
-        #else:
-        #    self.path = entry.path
-        #    self.selection = []
         newPath = ''
         entry_path = entry.path.replace('\\', '/')
         if entry_path == '../':
@@ -389,12 +385,12 @@ class Toast(Label):
     self.pos = (0, -self.map_view.center_y + self.text_size[1]/2 + 10)
   
   def show(self, text, length_long):
-    duration = 7000 if length_long else 2000
+    duration = 5000 if length_long else 1000
     rampdown = duration * 0.1
     if rampdown > 500:
       rampdown = 500
-    if rampdown < 150:
-      rampdown = 150
+    if rampdown < 100:
+      rampdown = 100
     
     self._rampdown = rampdown
     self._duration = duration - rampdown

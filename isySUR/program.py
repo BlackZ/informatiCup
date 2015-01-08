@@ -87,9 +87,10 @@ class Pipeline:
     #kmlList = []
     
     for s in surs:
+      kmlList.put(s.id)
       kmlObj = self.calcKML(s)
       if kmlObj != None:
-        kmlList.put([s.id, kmlObj])
+        kmlList.put(kmlObj)
     
     #return kmlList
   
