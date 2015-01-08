@@ -21,8 +21,8 @@ class Pipeline:
     """
     self.osmAPI = api.osmAPI()
     self.osm = None
-    self.heightBBox = 100
-    self.widthBBox = 100
+    self.heightBBox = 20
+    self.widthBBox = 20
     self.allObjects = {}
     
   def computeKMLsAndStore(self, inPath, outPath, configPath=''):
@@ -87,7 +87,9 @@ class Pipeline:
     #kmlList = []
     
     for s in surs:
-      kmlList.put([s.id, self.calcKML(s)])
+      kmlObj = self.calcKML(s)
+      if kmlObj != None:
+        kmlList.put([s.id, kmlObj])
     
     #return kmlList
   
@@ -98,18 +100,24 @@ class Pipeline:
       @param surObj: The sur object whose kml is to be calculated.
       @type surObj: sur.SUR
       
-      @return: KML object containing the calculated area for the given sur.
+      @return: KML object containing the calculated area for the given sur. 
+               Returns None if no polygon could be computed.
       @rtype: kmlData.KMLObject
     """
+
     print "working on sur: ", surObj.id
     coords = (surObj.latitude, surObj.longitude)
-    bBox = self._createBBox(coords)
+    
+#    print bBox
+    
     kmlObj = kml.KMLObject()
-    if surObj.classification == "I":
-      self.osm = self.osmAPI.performRequest(bBox, [(["node","way","relation"],"building","")])
-    else:
-      self.osm = self.osmAPI.performRequest(bBox)
-      
+    
+    self.osm = self._getOSMData(surObj, coords)  
+
+#    print "nodes:", len(self.osm.nodes)
+#    print "ways:", len(self.osm.ways)
+#    print "relations:", len(self.osm.relations)
+#      
     if surObj.classification in ["I","IO"]:
       nearObjs = self._getNearestObj(coords, {"building":"*"})
     else:
@@ -128,8 +136,31 @@ class Pipeline:
             tmpWay = self.osm.ways[mem[1]]
       if tmpObj[1] == osmData.Way:
         tmpWay = self.osm.ways[tmpObj[0]]
+        
+      if tmpWay.tags.has_key("landuse"):
+        print "is landuse"
+        if tmpWay.tags["landuse"] == "residential":
+          otherWayIds = self.osm.ways.keys()
+          otherWayIds.remove(tmpWay.id)
+          buildings = self.osm.getNearestWay(coords, True, {"building":"*"}, otherWayIds)
+
+          if len(buildings) > 1:
+            print "more than one potential building."
+          
+          for build in buildings:
+            tmpBuild = build.nearestObj
+            tmpWay = self.osm.ways[tmpBuild[0]]
+#            possibleWays.append(tmpWay)
+#            #Set to None to prevent adding it multiple times
+#            tmpWay = None              
+            
+      
       if tmpWay != None:
         possibleWays.append(tmpWay)
+        
+    if len(possibleWays) == 0:
+      print "No ways found :-(."
+      return None
           
     bestWay = None
     closestDist = sys.float_info.max
@@ -159,6 +190,43 @@ class Pipeline:
       return None
     
     return kmlObj
+    
+  def _getOSMData(self, surObj, coords):
+    """
+      Private function to start with a small bounding box and increase it's size
+      until data is found.
+      
+      @param surObj: The surObj for which we want to get the data
+      @type surObj: sur.SUR
+      
+      @param coords: Coordinates of the sur (lat,lon)
+      @type coords: Tupel (lat, lon)
+      
+      @return: The filled osmObject
+      @rtype: osmData.OSM
+    """
+    bBox = self._createBBox(coords)
+    storeWidth = self.widthBBox
+    storeHeight = self.heightBBox
+    osm = None
+    if surObj.classification == "I":
+      osm = self.osmAPI.performRequest(bBox, [(["node","way","relation"],"building","")])
+    else:
+      osm = self.osmAPI.performRequest(bBox)
+      
+    #Increase boundingBox until we actually find SOMETHING
+    while len(osm.nodes) < 3:
+      self.widthBBox *= 2
+      self.heightBBox *= 2
+      bBox = self._createBBox(coords)
+      if surObj.classification == "I":
+        osm = self.osmAPI.performRequest(bBox, [(["node","way","relation"],"building","")])
+      else:
+        osm = self.osmAPI.performRequest(bBox)
+        
+    self.widthBBox = storeWidth
+    self.heightBBox = storeHeight
+    return osm
   
   def _getNearestObj(self, coords, tags={}):
     """
@@ -195,7 +263,7 @@ class Pipeline:
   def _createBBox(self, coords):
     """
     The given coords mark the center of a bounding box
-    with around 100m height and width.
+    with the given height and width.
     
     @param coords:  Central point coordinates - (lat, long) - of the
                     calculated bounding box
@@ -210,8 +278,8 @@ class Pipeline:
     midLat = float(coords[0])
     midLon = float(coords[1])
     
-    widthOffset = round(0.00001 * self.widthBBox / 2 / 1.11, 6)
-    heightOffset = round(0.00001 * self.heightBBox / 2 / 0.66, 6)
+    widthOffset = round(0.00001 * self.widthBBox / 2 / 1.11, 8)
+    heightOffset = round(0.00001 * self.heightBBox / 2 / 0.66, 8)
     
     llX = round(midLat - widthOffset, 6)
     llY = round(midLon - heightOffset, 6)

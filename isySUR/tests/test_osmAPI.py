@@ -92,6 +92,44 @@ class TestOsmAPI(unittest.TestCase):
   #def test_performRequest(self):
     #self.requestData = self.osmAPIobj.performRequest(self.boundingBox)
     #self.assertIsNotNone(self.requestData)
+   
+  def test_parseDataET(self):
+    
+    testFile = open(self.osmDataFilename, "r").read()
+    
+    testDataObj = self.osmAPIobj._parseData(testFile)
+    
+    self.assertIsNotNone(testDataObj)
+    self.assertIsNotNone(testDataObj.nodes)
+    self.assertIsNotNone(testDataObj.ways)
+    self.assertIsNotNone(testDataObj.relations)    
+
+    #self.assertTrue(self.testOsmObj == testDataObj)
+    self.assertEqual(self.testOsmObj, testDataObj)
+   
+  def test_getTagsET(self):
+    tags = {"leisure":"pitch", "type":"multipolygon"}
+    
+    testTags = self.osmAPIobj._getTags(self.testNode)
+    
+    self.assertIsNotNone(testTags)
+    self.assertEqual(tags, testTags)
+  
+  def test_getRefsET(self):
+    refs = ["43682400","260441217"]
+    
+    testRefs = self.osmAPIobj._getRefs(self.testNode)
+    
+    self.assertIsNotNone(testRefs)
+    self.assertEqual(refs, testRefs)
+  
+  def test_getMembersET(self):
+    members = [("way", "17958713","inner"),("way","17958715", "outer")]
+    
+    testMembers = self.osmAPIobj._getMembers(self.testNode)
+    
+    self.assertIsNotNone(testMembers)
+    self.assertEqual(members, testMembers)
   
   def test_parseData(self):
     

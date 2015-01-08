@@ -5,6 +5,7 @@ import osmData
 import types
 
 import xml.dom.minidom as dom
+import xml.etree.cElementTree as ET
 
 class osmAPI():
   
@@ -44,7 +45,7 @@ class osmAPI():
     """
     if not isinstance(filterList,types.ListType):
       raise TypeError('performRequest only accepts a list of filterrules e.g.[(["way","node"],"amenity","univerity"),..]')
-    return self._parseData(
+    return self._parseDataET(
       requests.get(self.osmurl,
                     params=self._getOsmRequestData(boundingBox[0],
                                                    boundingBox[1],
@@ -52,15 +53,81 @@ class osmAPI():
                                                    boundingBox[3],
                                                    filterList)).content)
 
+
+  def _getTagsET(self, elem):
+    res = {}
+    for tag in elem.iter("tag"):
+      res[tag.attrib["k"]] = tag.attrib["v"]
+    return res
+
+  def _getRefsET(self, elem):
+    res = []
+    for ref in elem.iter("nd"):
+      res.append(ref.attrib["ref"])
+      
+    return res
+    
+  def _getMembersET(self, elem):
+    res = []
+    for mem in elem.iter("member"):
+      res.append((mem.attrib["type"], mem.attrib["ref"], mem.attrib["role"]))
+    return res
+
+  def _parseDataET(self, obj):
+    
+    osmObj = osmData.OSM()
+    
+    root=ET.fromstring(obj)
+
+    
+    for node in root.iter("node"):
+      nodeObj = osmData.Node(node.attrib["id"].encode('utf-8'), 
+                             float(node.attrib["lat"]), 
+                             float(node.attrib["lon"]), 
+                             self._getTagsET(node))
+      if osmObj.nodes.has_key(nodeObj.id):
+        osmObj.nodes[nodeObj.id].tags = nodeObj.tags
+      else:
+        osmObj.addNode(nodeObj)
+        
+    for way in root.iter("way"):
+      wayObj = osmData.Way(way.attrib["id"].encode('utf-8'), self._getRefsET(way), self._getTagsET(way), osmObj)
+      if osmObj.ways.has_key(wayObj.id):
+        if len(osmObj.ways[wayObj.id].refs) == 0:
+          osmObj.ways[wayObj.id].refs = wayObj.refs
+        if len(osmObj.ways[wayObj.id].tags) == 0:
+          osmObj.ways[wayObj.id].tags = wayObj.tags
+      else:
+        osmObj.addWay(wayObj)
+
+    for relation in root.iter("relation"):
+      relationObj = osmData.Relation(relation.attrib["id"].encode('utf-8'), 
+                                     self._getMembersET(relation),
+                                     self._getTagsET(relation),
+                                     osmObj)
+      if osmObj.relations.has_key(relationObj.id):
+        if len(osmObj.relations[relationObj.id].members) == 0:
+          osmObj.relations[relationObj.id].members = relationObj.members
+        if len(osmObj.relations[relationObj.id].tags) == 0:
+          osmObj.relations[relationObj.id].tags = relationObj.tags
+      else:
+        osmObj.addRelation(relationObj)
+      
+
+    return osmObj    
+  
+
   def _parseData(self, obj):
     """
     Splits the incoming OSM Date into Nodes, Ways and Relations
     and stores it into an OSMObject for further calculations.
     """
+
     osmObj=osmData.OSM()
     
     data = dom.parseString(obj)
     
+    pass
     for node in data.getElementsByTagName('node'):      
       node_id = node.getAttribute('id').encode('utf-8')
       
@@ -75,6 +142,7 @@ class osmAPI():
                              float(node.getAttribute('lon')),
                              node_tags)
         osmObj.addNode(nodeObj)
+      node.unlink()
       
     for way in data.getElementsByTagName('way'):
       way_id = way.getAttribute('id').encode('utf-8')
@@ -92,6 +160,7 @@ class osmAPI():
         
           wayObj = osmData.Way(way_id, way_refs, way_tags, osmObj)  
           osmObj.addWay(wayObj)
+      way.unlink()
       
     for relation in data.getElementsByTagName('relation'):
       rel_id = relation.getAttribute('id').encode('utf-8')
@@ -109,7 +178,9 @@ class osmAPI():
 
           relObj = osmData.Relation(rel_id, rel_members, rel_tags, osmObj)
           osmObj.addRelation(relObj)
+      relation.unlink()
 
+    del data
     return osmObj
 
   def _getTags(self, elem):

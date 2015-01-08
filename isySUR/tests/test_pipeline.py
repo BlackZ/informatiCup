@@ -39,8 +39,8 @@ class TestProgrammPipeline(unittest.TestCase):
   
   def test_createBBox(self):
     centralPoint = (53.86351, 8.65816)
-    upperRight = (53.86396, 8.658918)
-    lowerLeft = (53.86306, 8.657402)
+    upperRight = (53.8636, 8.658312)
+    lowerLeft =  (53.86342, 8.658008)
     
     bBox = self.pipeObj._createBBox(centralPoint)
     

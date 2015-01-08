@@ -202,7 +202,7 @@ class OSM():
                 e.g. dict("type":"xyz") or dict("type":"*")       
     @type tags: dict(str:str)
     
-    @param otherWays: Use only this ways, given by a list of
+    @param otherWays: Use only these ways, given by a list of
                            its IDs, to find the nearest way.                       
     @type otherWays: [str,]
     
