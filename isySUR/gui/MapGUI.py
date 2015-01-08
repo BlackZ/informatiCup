@@ -61,7 +61,6 @@ class Map(FloatLayout):
     self.menue.isOpen = not self.menue.isOpen
     
   def open_kmlList(self):
-    print self.app.loaded_kmls
     if len(self.app.loaded_kmls) == 0:
       self.toast("No KML files loaded!")
     elif self.kmlList.is_open:
@@ -102,12 +101,8 @@ class Map(FloatLayout):
     Adds all polygons from one KML. Moves map to the
     added Polygon.
     """
-    print placemarks
-    for placemark in placemarks:
-      try:  
-        self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark))
-      except:
-        print 'getPolygonFromPlacemark'
+    for placemark in placemarks: 
+      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark))
     move_to = placemarks[0].polygon[0]
     move_to = move_to.split(',')
 #    self.maps.center_on(float(move_to[1]), float(move_to[0]))
@@ -119,23 +114,24 @@ class Map(FloatLayout):
     self.maps.drawPolygon()
   
   def computeAndShowKmls(self, path, queue):
-    toast = Label(text="Calculating ...!", text_size=(205,20), texture_size=(205,20),
+    toast = Label(text="Calculating ...!", #text_size=(205,20), texture_size=(205,20),
                   bold=True, font_size=20, color=(1,1,1,1))
-    toast.pos=(0, -self.center_y + toast.text_size[1]/2 + 10)
+    toast.texture_update()
+    toast.pos=(0, -self.center_y + toast.texture_size[1]/2 + 10)
     kmlList = Queue()
     self.add_widget(toast)
     with toast.canvas.before:
       Color(0.6,0.6,0.6,1)#self._transparency)
-      Rectangle(pos=(self.center_x - toast.texture_size[0]/2 -10, 6), 
+      Rectangle(pos=(self.center_x - toast.texture_size[0] -10, 6), 
                 size=(toast.texture_size[0]+14, toast.texture_size[1]+ 10))
       Color(0.2,0.2,0.2,1)#self._transparency)
-      Rectangle(pos=(self.center_x - toast.texture_size[0]/2 -8, 8), 
+      Rectangle(pos=(self.center_x - toast.texture_size[0] -8, 8), 
                 size=(toast.texture_size[0]+10, toast.texture_size[1]+ 6))
     
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
     
-    surID = "" # UEberfluessig, wenn Name in KML!!!
+    surID = "" # Ueberfluessig, wenn Name in KML!!!
     while not kmlList.empty() or thread.isAlive():
       item = kmlList.get()
       if isinstance(item, kmlData.KMLObject):
@@ -148,9 +144,17 @@ class Map(FloatLayout):
       else:
         surID = item
         toast.text = "Calculating " + item + " ...!"
+        print toast.texture_size
         toast.texture_update()
+        print toast.texture_size
+        toast.canvas.ask_update()
+    
+    print self.children
     
     self.remove_widget(toast)
+    
+    print self.children
+    
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
     
@@ -199,7 +203,6 @@ class Menue(DropDown):
     if 'KML' in obj.text:
       content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
-      print self._SURThread
       if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
         content.ids.filechooser.filters = ['*.txt']
       elif self._SURThread != None or self._SURThread.isAlive():
@@ -277,7 +280,6 @@ class Menue(DropDown):
             rule = ""
             key = ""
             for elem in child:
-              print elem
               if isinstance(elem, Label):
                 rule = elem.text
               if isinstance(elem, CheckBox):
@@ -382,6 +384,7 @@ class Toast(Label):
   def __init__(self, mapview):
     super(Toast, self).__init__()
     self.map_view = mapview
+    print self.texture_size, self.text_size
     self.pos = (0, -self.map_view.center_y + self.text_size[1]/2 + 10)
   
   def show(self, text, length_long):
@@ -447,10 +450,8 @@ class ConfigDialog(FloatLayout):
       self.layout.add_widget(self.info)
     self.ids.view.add_widget(self.layout)
     
-    print self.ids.view.children
 
   def addConfigContent(self):
-    print 'add Content'
     if self.info.parent != None:
       self.layout.remove_widget(self.info)
     if len(self.layout.children) > 1:
@@ -501,7 +502,6 @@ class ConfigDialog(FloatLayout):
       if self.ruleInput.text != "":
         group = 'g' + str(self.counter)
         self.app.configContent['[Both]'].append(self.ruleInput.text)
-        print self.app.configContent
         self.layout.add_widget(Label(text=self.ruleInput.text, size_hint=(.4,.1), id=group))
         self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Indoor]'))
         self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Outdoor]'))
@@ -517,8 +517,6 @@ class MapApp(App):
     self.map = None
     self.configContent = {}
     self.loadConfig(configPath)
-    
-    print self.config
     
     self.pipe = program.Pipeline()
     self.loaded_kmls = {}
@@ -569,7 +567,6 @@ class MapApp(App):
   
   def getPolygonFromPlacemark(self, placemark):
     polygon = []
-    print len(placemark.polygon)
     for i in range(len(placemark.polygon)):
       coords = placemark.polygon[i].split(',')
       if i == 0:
