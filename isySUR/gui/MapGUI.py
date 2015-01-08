@@ -2,6 +2,7 @@
 #!/usr/bin/kivy
 
 import os
+import time
 from threading import Thread,Lock
 from Queue import Queue
 
@@ -9,6 +10,7 @@ from isySUR import kmlData, program
 from mapview import MapView
 from mapview import MapMarker
 
+from kivy import platform
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.filechooser import FileChooserListView
@@ -59,10 +61,8 @@ class Map(FloatLayout):
     self.menue.isOpen = not self.menue.isOpen
     
   def open_kmlList(self):
-    print self.app.loaded_kmls
     if len(self.app.loaded_kmls) == 0:
       self.toast("No KML files loaded!")
-      #self.ids.toast.text = "No KML files loaded!"
     elif self.kmlList.is_open:
       self.kmlList.dismiss(self.ids.kmlList)
       self.kmlList.is_open = not self.kmlList.is_open
@@ -101,12 +101,8 @@ class Map(FloatLayout):
     Adds all polygons from one KML. Moves map to the
     added Polygon.
     """
-    print placemarks
-    for placemark in placemarks:
-      try:  
-        self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark))
-      except:
-        print 'getPolygonFromPlacemark'
+    for placemark in placemarks: 
+      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark))
     move_to = placemarks[0].polygon[0]
     move_to = move_to.split(',')
 #    self.maps.center_on(float(move_to[1]), float(move_to[0]))
@@ -118,22 +114,46 @@ class Map(FloatLayout):
     self.maps.drawPolygon()
   
   def computeAndShowKmls(self, path, queue):
-    self.toast('Calculating ...', True)
+    toast = Label(text="Calculating ...!", #text_size=(205,20), texture_size=(205,20),
+                  bold=True, font_size=20, color=(1,1,1,1))
+    toast.texture_update()
+    toast.pos=(0, -self.center_y + toast.texture_size[1]/2 + 10)
     kmlList = Queue()
+    self.add_widget(toast)
+    with toast.canvas.before:
+      Color(0.6,0.6,0.6,1)#self._transparency)
+      Rectangle(pos=(self.center_x - toast.texture_size[0] -10, 6), 
+                size=(toast.texture_size[0]+14, toast.texture_size[1]+ 10))
+      Color(0.2,0.2,0.2,1)#self._transparency)
+      Rectangle(pos=(self.center_x - toast.texture_size[0] -8, 8), 
+                size=(toast.texture_size[0]+10, toast.texture_size[1]+ 6))
+    
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
     
+    surID = "" # Ueberfluessig, wenn Name in KML!!!
     while not kmlList.empty() or thread.isAlive():
-      self.toast('Calculating ...', True)
       item = kmlList.get()
-      queue.put(item)
-      if not item[1].placemarks == []:
-        self.lock.acquire()
-        name = self.app.addKML(str(item[0]), item[1])
-        self.kmlList.addItem(name)
-        self.toast('Calculating ...', True)
-        self.lock.release()
-        move_to = self.addPolygonsFromKML(item[1])
+      if isinstance(item, kmlData.KMLObject):
+        if not item.placemarks == []:
+          self.lock.acquire()
+          name = self.app.addKML(surID, item)
+          self.kmlList.addItem(name)
+          self.lock.release()
+          move_to = self.addPolygonsFromKML(item)
+      else:
+        surID = item
+        toast.text = "Calculating " + item + " ...!"
+        print toast.texture_size
+        toast.texture_update()
+        print toast.texture_size
+        toast.canvas.ask_update()
+    
+    print self.children
+    
+    self.remove_widget(toast)
+    
+    print self.children
     
     move_to = move_to.split(',')
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
@@ -149,6 +169,11 @@ class Menue(DropDown):
     self.text_input = TextInput()
     self.isOpen = False
     self.auto_dismiss = False
+
+    if "win" == platform or "linux" == platform or "macosx" == platform:
+      self.path = '.'
+    else:
+      self.path = '/'
 
     self.map_view =mapview
     self.app = app
@@ -174,10 +199,15 @@ class Menue(DropDown):
     self.isOpen = False
     self.dismiss()
     content = LoadDialog(load=self.load, cancel=self.dismiss_load)
+    content.ids.filechooser.path = self.path
     if 'KML' in obj.text:
       content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
-      content.ids.filechooser.filters = ['*.txt']
+      if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
+        content.ids.filechooser.filters = ['*.txt']
+      elif self._SURThread != None or self._SURThread.isAlive():
+          self.map_view.toast('Already calculating!')
+          return      
     else:
       content.ids.filechooser.filters = ['*.cfg']
     self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
@@ -190,6 +220,7 @@ class Menue(DropDown):
       content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
     else:
       content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
+    content.ids.filechooser.path = self.path
     self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
     self._popup_save.open()
     
@@ -202,35 +233,6 @@ class Menue(DropDown):
     self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.9))
 
     self._popup_config.open()
-#    
-  #def test(self, a,b):
-  #  print "test a:",a.path
-  #  print "test b:", b
-    
-#  def test(self, entry, touch):
-#    '''(internal) This method must be called by the template when an entry
-#    is touched by the user.
-#    '''
-#    if ('button' in touch.profile and touch.button in ('scrollup', 'scrolldown', 'scrollleft', 'scrollright')):
-#      return False
-#    _dir = self.file_system.is_dir(entry.path)
-#    dirselect = self.dirselect
-#    if _dir and dirselect and touch.is_double_tap:
-#      self.open_entry(entry)
-#      return
-#    if self.multiselect:
-#      if entry.path in self.selection:
-#        self.selection.remove(entry.path)
-#      else:
-#        if _dir and not self.dirselect:
-#          self.open_entry(entry)
-#          return
-#        self.selection.append(entry.path)
-#    else:
-#      if _dir and not self.dirselect:
-#        self.open_entry
-#        return
-#      self.selection = [entry.path, ]
   
   def load(self, path, filename, config=None):    
     if filename != []:
@@ -261,10 +263,8 @@ class Menue(DropDown):
       
       if ext == '.txt':
         if self._SURThread==None or not self._SURThread.isAlive():
-          self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, )).start()
-        else:
-          #TODO:toast-> only one SUR at a time
-          pass
+          self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, ))
+          self._SURThread.start()
           
   def saveConfig(self, path, filename):
     if filename != "":
@@ -280,7 +280,6 @@ class Menue(DropDown):
             rule = ""
             key = ""
             for elem in child:
-              print elem
               if isinstance(elem, Label):
                 rule = elem.text
               if isinstance(elem, CheckBox):
@@ -330,20 +329,8 @@ class CustomFileChooser(FileChooserListView):
   """
     Implemented this and override the following method to fix path bug.
   """
-  
+ 
   def open_entry(self, entry):
-        #print "custom open"
-        #try:
-        #    # Just check if we can list the directory. This is also what
-        #    # _add_file does, so if it fails here, it would also fail later
-        #    # on. Do the check here to prevent setting path to an invalid
-        #    # directory that we cannot list.
-        #    self.file_system.listdir(entry.path)
-        #except OSError:
-        #    entry.locked = True
-        #else:
-        #    self.path = entry.path
-        #    self.selection = []
         newPath = ''
         entry_path = entry.path.replace('\\', '/')
         if entry_path == '../':
@@ -396,19 +383,17 @@ class Toast(Label):
   
   def __init__(self, mapview):
     super(Toast, self).__init__()
-    self.map_view =mapview
-    self.text_size=(205, 20)
-    self.texture_size=(205,20)
-    self.texture_update()
+    self.map_view = mapview
+    print self.texture_size, self.text_size
     self.pos = (0, -self.map_view.center_y + self.text_size[1]/2 + 10)
   
   def show(self, text, length_long):
-    duration = 7000 if length_long else 2000
+    duration = 5000 if length_long else 1000
     rampdown = duration * 0.1
     if rampdown > 500:
       rampdown = 500
-    if rampdown < 150:
-      rampdown = 150
+    if rampdown < 100:
+      rampdown = 100
     
     self._rampdown = rampdown
     self._duration = duration - rampdown
@@ -416,9 +401,12 @@ class Toast(Label):
     self.texture_update()
     self.map_view.add_widget(self)
     with self.canvas.before:
-      Color(0,0,0,1)
-      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -5, 10), 
-                size=(self.texture_size[0]+10, self.texture_size[1]+ 2))
+      Color(0.6,0.6,0.6,self._transparency)
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -10, 6), 
+                size=(self.texture_size[0]+14, self.texture_size[1]+ 10))
+      Color(0.2,0.2,0.2,self._transparency)
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -8, 8), 
+                size=(self.texture_size[0]+10, self.texture_size[1]+ 6))
     Clock.schedule_interval(self._in_out, 1/60.0)
   
   def _in_out(self, dt):
@@ -462,10 +450,8 @@ class ConfigDialog(FloatLayout):
       self.layout.add_widget(self.info)
     self.ids.view.add_widget(self.layout)
     
-    print self.ids.view.children
 
   def addConfigContent(self):
-    print 'add Content'
     if self.info.parent != None:
       self.layout.remove_widget(self.info)
     if len(self.layout.children) > 1:
@@ -516,7 +502,6 @@ class ConfigDialog(FloatLayout):
       if self.ruleInput.text != "":
         group = 'g' + str(self.counter)
         self.app.configContent['[Both]'].append(self.ruleInput.text)
-        print self.app.configContent
         self.layout.add_widget(Label(text=self.ruleInput.text, size_hint=(.4,.1), id=group))
         self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Indoor]'))
         self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Outdoor]'))
@@ -532,8 +517,6 @@ class MapApp(App):
     self.map = None
     self.configContent = {}
     self.loadConfig(configPath)
-    
-    print self.config
     
     self.pipe = program.Pipeline()
     self.loaded_kmls = {}
@@ -584,7 +567,6 @@ class MapApp(App):
   
   def getPolygonFromPlacemark(self, placemark):
     polygon = []
-    print len(placemark.polygon)
     for i in range(len(placemark.polygon)):
       coords = placemark.polygon[i].split(',')
       if i == 0:

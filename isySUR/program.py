@@ -91,9 +91,10 @@ class Pipeline:
     #kmlList = []
     
     for s in surs:
+      kmlList.put(s.id)
       kmlObj = self.calcKML(s)
       if kmlObj != None:
-        kmlList.put([s.id, kmlObj])
+        kmlList.put(kmlObj)
     
     #return kmlList
   
@@ -109,7 +110,7 @@ class Pipeline:
       @rtype: kmlData.KMLObject
     """
 
-    print "working on sur: ", surObj.id
+    #print "working on sur: ", surObj.id
     coords = (surObj.latitude, surObj.longitude)
     
 #    print bBox
