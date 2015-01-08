@@ -315,7 +315,7 @@ class Menue(DropDown):
   
   def saveKML(self, path, filename):
     isDir = os.path.isdir(os.path.join(path, filename))
-    completeKML = kmlData.KMLObject()
+    completeKML = kmlData.KMLObject("complete")
     selection = self.app.getSelectedPolygons()
     if len(selection) > 0:
       for elem in selection:

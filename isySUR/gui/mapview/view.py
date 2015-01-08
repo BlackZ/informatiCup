@@ -453,6 +453,8 @@ class MapView(Widget):
             print marker.source
             print marker.parent
             
+        print color        
+
         lineColor = self.convertKMLColor((color.values())[0]['lineColour'])
         lineWidth = (color.values())[0]['lineWidth']
         polyColor = self.convertKMLColor((color.values())[0]['polyColour'])
@@ -467,7 +469,6 @@ class MapView(Widget):
         self.kmls.remove(polygon)
         del self.kml_colors[index]
         marker = self.marker[index]
-        print marker.parent
         if marker != None:
             self._default_marker_layer.clear_widgets([marker])
         del self.marker[index]
