@@ -20,6 +20,7 @@ class TestPlacemarkObject(unittest.TestCase):
     self.ruleType = ("key", "value")
     self.pointList = ["4.12,52.12","4.12,52.13","4.13,52.12"]
     self.testStyle = "#defaultStyle"
+    self.testCoords = (1.2345,9,876)
 
   def test_createPlacemark(self):  
     placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType)
@@ -29,6 +30,17 @@ class TestPlacemarkObject(unittest.TestCase):
     self.assertEqual(placemarkObj.style, self.testStyle)
     self.assertIsNotNone(placemarkObj.polygon)
     self.assertEqual(len(placemarkObj.polygon),0)
+    self.assertIsNone(placemarkObj.ruleCoords)
+    
+  def test_createPlacemarkWithCoordinates(self):  
+    placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, ruleCoords = self.testCoords)
+    self.assertIsNotNone(placemarkObj)
+    self.assertEqual(placemarkObj.name, self.testName)
+    self.assertEqual(placemarkObj.ruleType, self.ruleType)
+    self.assertEqual(placemarkObj.style, self.testStyle)
+    self.assertIsNotNone(placemarkObj.polygon)
+    self.assertEqual(len(placemarkObj.polygon),0)
+    self.assertEqual(placemarkObj.ruleCoords, self.testCoords)
     
   def test_createPlacemarkWithPolygon(self):
     placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, self.pointList)
@@ -42,6 +54,10 @@ class TestPlacemarkObject(unittest.TestCase):
   def test_createPlacemarkFailNotList(self):
     with self.assertRaises(TypeError):
       placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, 42)
+      
+  def test_createPlacemarkFailNotTuple(self):
+    with self.assertRaises(TypeError):
+      placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType, ruleCoords = "abs")
         
   def test_addPoint(self):
     placemarkObj = kmlData.Placemark(self.testName, self.imageName, self.ruleType)

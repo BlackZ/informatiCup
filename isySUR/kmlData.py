@@ -314,7 +314,7 @@ class KMLObject():
   
 class Placemark():
   
-  def __init__(self, name, imageName, ruleType=None, pointList=None, style="#defaultStyle"):
+  def __init__(self, name, imageName, ruleType=None, pointList=None, style="#defaultStyle", ruleCoords = None):
     """
       Constructor for the Placemark class.
       
@@ -335,6 +335,9 @@ class Placemark():
       @param style: Optional style for the placemark. Relevant for displaying the placemark in googleEarth. 
                 (Currently not used)
       @type style: String.
+      
+      @param ruleCoords: Optional rule coordinates (lat,lon).
+      @type ruleCoords: (Float,Float)
     """
     self.name = name
     self.ruleType = ruleType
@@ -345,7 +348,10 @@ class Placemark():
       if not isinstance(pointList, list):
         raise TypeError("nodeList must be a list of nodes")
       self.addPointList(pointList)
-    
+    if ruleCoords != None:
+      if not isinstance(ruleCoords, tuple):
+        raise TypeError("ruleCoords must be a tuple of lat, lon coordinates.")
+    self.ruleCoords = ruleCoords
     
   def addPoint(self, point):
     """
