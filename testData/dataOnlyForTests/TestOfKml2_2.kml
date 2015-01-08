@@ -21,7 +21,7 @@
 			<key>highlight</key>
 			<styleUrl>#Poly1</styleUrl>
 		</Pair>
-	</StyleMap>cd ..
+	</StyleMap>
 	<Style id="Poly11">
 		<LineStyle>
 			<color>7f00ff00</color>
