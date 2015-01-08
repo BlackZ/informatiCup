@@ -7,23 +7,45 @@ Created on Sun Nov  9 15:09:52 2014
 
 import xml.etree.cElementTree as ET
 import xml.sax.saxutils as xmlUtils
+import os
 
 class KMLObject():
   """ Class representing a kml file. Holds a list of contained placemarks.
   """
   
-  def __init__(self, placemarks=None):
+  def __init__(self, name, placemarks=None):
     """
       Constructor for the KMLObject.
       
+      @param name: Name of the kml.
+      @type name: String
+      
       @param placemarks: Optional paramter to initialise this KMLObject with a list of placemarks.
+      @type placemarks: [kmlData.Placemark,]
     """
+    self.name = name
     self.placemarks = []
+    self.styles = {}
     if placemarks != None:
       if not isinstance(placemarks, list):
         raise TypeError("placemarks must be a list of placemarks.")
       for p in placemarks:
         self.addPlacemark(p)
+        
+  def addStyles(self, styles):
+    """
+      Function that allows to add styles to the kml. If styles does not include lineColour, or
+      lineWidth, standard values are used.
+      
+      @param styles: The styles that are to be added.
+      @type styles: {styleID: {"polyColour":value, "lineColour":value, "lineWidth":value},}
+    """
+    for key, value in styles.items():
+      self.styles[key] = value
+      if not value.has_key("lineColour"):
+        self.styles[key]["lineColour"] = "7f00ff00"
+      if not value.has_key("lineWidth"):
+        self.styles[key]["lineWidth"] = "2"
       
   def addPlacemark(self, placemark):
     """
@@ -60,12 +82,20 @@ class KMLObject():
       
       @return: The parsed KMLObject.
     """
-    tree=ET.parse(filename)
+    stylesToParse = []
+    
+    fileNameIndex = filename.rfind(os.sep)
+    #Mabe remove file ending
+    if fileNameIndex > 0:
+      kmlName = filename[fileNameIndex+1:]
+    else:
+      kmlName = filename
+    tree=ET.parse(filename)  
     root=tree.getroot()
-    res=cls()
+    res=cls(kmlName)
     namespace = root.tag[:root.tag.find("}")+1]
     for pm in root.iter(namespace + "Placemark"):
-      pmName = pm[0].text
+      pmName = pm.find(namespace+"name").text
       imageName = pmName + ".jpg"
       if "2.2" in namespace:
         for desc in pm.iter(namespace + "description"):
@@ -74,7 +104,9 @@ class KMLObject():
       elif "2.1" in namespace:
         for img in pm.iter(namespace + "img"):
           imageName = img.attrib["src"]
-      newPlacemark=Placemark(pmName, imageName ,None,None,pm[2].text)
+      pmStyle = pm.find(namespace+"styleUrl")
+      stylesToParse.append(pmStyle.text[1:])
+      newPlacemark=Placemark(pmName, imageName, None, None, pmStyle.text)
       for coord in pm.iter(namespace + "coordinates"):
         points = []
         if "2.1" in namespace:
@@ -87,6 +119,87 @@ class KMLObject():
         if len(points) > 0:
           newPlacemark.addPointList(points)
       res.addPlacemark(newPlacemark)
+
+      styles = {}
+      if "2.2" in namespace:
+        styles = cls._parse22Styles(root, namespace, stylesToParse)
+      elif "2.1" in namespace:
+        styles = cls._parseStyles(root, namespace, stylesToParse)
+      
+      res.addStyles(styles)
+    return res
+    
+  @classmethod
+  def _parse22Styles(cls, root, ns, stylesToParse = []):
+    """
+      Helper function to parse the styles in kml2.2.
+      Only "normal" styleMaps will be parsed.
+      
+      @param root: Root element from where to start parsing
+      @type root: ET.Element
+      
+      @param ns: Namespace of the tags
+      @type ns: String
+      
+      @param stylesToParse: Optional list of styleIds that are to be parsed. All are parsed if list is empty
+      @type stylesToParse: [String,]
+      
+      @return: The parsed styles.
+      @rtype: {styleID: {"polyColour":value, "lineColour":value, "lineWidth":value},}
+    """
+    res = {}
+
+    tmpStyles = cls._parseStyles(root, ns)    
+    for styleId in tmpStyles.keys():
+      if len(stylesToParse) == 0 or styleId in stylesToParse:
+        res[styleId] = tmpStyles[styleId]
+    
+    for styleMap in root.iter(ns +"StyleMap"):
+      styleMapId = styleMap.attrib["id"]
+      if len(stylesToParse) == 0 or styleMapId in stylesToParse:
+        for pair in styleMap.iter(ns +"Pair"):
+          if pair.find(ns+"key").text == "normal":
+            styleId = ""
+            style = pair.find(ns+"Style")
+            if style != None:
+              styleId = style.attrib["id"]
+            styleUrl = pair.find(ns+"styleUrl")
+            if styleUrl != None:
+              styleId = styleUrl.text[1:]
+            if tmpStyles.has_key(styleId):
+              res[styleMapId] = tmpStyles[styleId]
+              
+    
+    return res
+    
+    
+    
+  @classmethod
+  def _parseStyles(cls, root, ns, stylesToParse=[]):
+    """
+      Helper function to parse the styles in kml files.
+      Finds the style tags and returns them in a dictionary.
+      
+      @param root: Root element from where to start parsing
+      @type root: ET.Element
+      
+      @param ns: Namespace of the tags
+      @type ns: String
+      
+      @param stylesToParse: Optional list of styleIds that are to be parsed. All are parsed if list is empty
+      @type stylesToParse: [String,]
+      
+      @return: The parsed styles.
+      @rtype: {styleID: {"polyColour":value, "lineColour":value, "lineWidth":value},}
+    """
+    res = {}
+    for style in root.iter(ns +"Style"):
+      styleId = style.attrib["id"]
+      if len(stylesToParse) == 0 or styleId in stylesToParse:
+        for lineStyle in style.iter(ns +"LineStyle"):
+          res[styleId] = {"lineColour": lineStyle[0].text, "lineWidth":lineStyle[1].text}
+        for polyStyle in style.iter(ns +"PolyStyle"):
+          res[styleId]["polyColour"] = polyStyle[0].text
     return res
     
   @classmethod
@@ -182,16 +295,17 @@ class KMLObject():
     root = ET.Element("kml")
     root.attrib = {"xmlns":"http://earth.google.com/kml/2.1"}
     documentE = ET.SubElement(root, "Document")
-    styleE = ET.SubElement(documentE, "Style")  
-    styleE.attrib = {"id":"defaultStyle"}
-    lineStyleE = ET.SubElement(styleE, "LineStyle")
-    linColourE = ET.SubElement(lineStyleE, "color")
-    linColourE.text = "7f0000ff"
-    widthE = ET.SubElement(lineStyleE, "width")
-    widthE.text = "2"
-    polyStyleE = ET.SubElement(styleE, "PolyStyle")
-    polyColourE = ET.SubElement(polyStyleE, "color")
-    polyColourE.text = "7fff0000"
+    for styleId, style in self.styles.items():        
+      styleE = ET.SubElement(documentE, "Style")  
+      styleE.attrib = {"id":styleId}
+      lineStyleE = ET.SubElement(styleE, "LineStyle")
+      linColourE = ET.SubElement(lineStyleE, "color")
+      linColourE.text = style["lineColour"]
+      widthE = ET.SubElement(lineStyleE, "width")
+      widthE.text = style["lineWidth"]
+      polyStyleE = ET.SubElement(styleE, "PolyStyle")
+      polyColourE = ET.SubElement(polyStyleE, "color")
+      polyColourE.text = style["polyColour"]
     
     for p in self.placemarks:
       documentE.append(p.getXMLTree())

@@ -24,6 +24,9 @@ class Pipeline:
     self.heightBBox = 20
     self.widthBBox = 20
     self.allObjects = {}
+    self.certainStyle = {"Style":{"polyColour":"9900ff00"}}
+    self.uncertainStyle = {"StyleUncertain":{"polyColour":"99ff0000"}}
+    
     
   def computeKMLsAndStore(self, inPath, outPath, configPath=''):
     """
@@ -48,7 +51,7 @@ class Pipeline:
     surs = sur.SUR.fromFile(surFile, configPath)
     surFile.close()
     
-    completeKML = kml.KMLObject()
+    completeKML = kml.KMLObject("complete.kml")
     
     
     for s in surs:
@@ -59,6 +62,7 @@ class Pipeline:
           resKML.saveAsXML(outPath + os.path.sep + s.id + '.kml')
       #TODO give kml the option to merge to kmls and change this -> Jan
         completeKML.placemarks.extend(resKML.placemarks)
+        completeKML.addStyles(resKML.styles)
       
     if len(completeKML.placemarks) > 0:
       if isOutputDir:
@@ -110,7 +114,7 @@ class Pipeline:
     
 #    print bBox
     
-    kmlObj = kml.KMLObject()
+    kmlObj = kml.KMLObject(surObj.id+".kml")
     
     self.osm = self._getOSMData(surObj, coords)  
 
@@ -124,7 +128,7 @@ class Pipeline:
       nearObjs = self._getNearestObj(coords)
     
 
-    
+    usedStyle = self.certainStyle
     possibleWays = []
     for obj in nearObjs:
       tmpObj = obj.nearestObj
@@ -146,10 +150,11 @@ class Pipeline:
 
           if len(buildings) > 1:
             print "more than one potential building."
-          
+          usedStyle = self.uncertainStyle
           for build in buildings:
             tmpBuild = build.nearestObj
             tmpWay = self.osm.ways[tmpBuild[0]]
+            usedStyle = self.certainStyle
 #            possibleWays.append(tmpWay)
 #            #Set to None to prevent adding it multiple times
 #            tmpWay = None              
@@ -188,6 +193,8 @@ class Pipeline:
     else:
       print "Error: No polygon found for SUR %s." % surObj.id
       return None
+      
+    kmlObj.addStyles(usedStyle)
     
     return kmlObj
     
