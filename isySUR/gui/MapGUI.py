@@ -2,7 +2,6 @@
 #!/usr/bin/kivy
 
 import os
-import time
 from threading import Thread,Lock
 from Queue import Queue
 
@@ -114,7 +113,7 @@ class Map(FloatLayout):
     self.maps.drawPolygon()
   
   def computeAndShowKmls(self, path, queue):
-    toast = Label(text="Calculating ...!", #text_size=(205,20), texture_size=(205,20),
+    toast = Label(text="Calculating ...", #text_size=(205,20), texture_size=(205,20),
                   bold=True, font_size=20, color=(1,1,1,1))
     toast.texture_update()
     toast.pos=(0, -self.center_y + toast.texture_size[1]/2 + 10)
@@ -123,11 +122,13 @@ class Map(FloatLayout):
     with toast.canvas.before:
       Color(0.6,0.6,0.6,1)#self._transparency)
       Rectangle(pos=(self.center_x - toast.texture_size[0] -10, 6), 
-                size=(toast.texture_size[0]+14, toast.texture_size[1]+ 10))
+                size=(toast.texture_size[0]*2+14, toast.texture_size[1]+ 10))
       Color(0.2,0.2,0.2,1)#self._transparency)
       Rectangle(pos=(self.center_x - toast.texture_size[0] -8, 8), 
-                size=(toast.texture_size[0]+10, toast.texture_size[1]+ 6))
+                size=(toast.texture_size[0]*2+10, toast.texture_size[1]+ 6))
     
+    
+    print toast.size
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
     
@@ -143,8 +144,8 @@ class Map(FloatLayout):
           move_to = self.addPolygonsFromKML(item)
       else:
         surID = item
-        toast.text = "Calculating " + item + " ...!"
-        print toast.texture_size
+        toast.text = "Calculating " + item + " ..."
+        print toast.texture_size, toast.size
         toast.texture_update()
         print toast.texture_size
         toast.canvas.ask_update()
@@ -385,7 +386,6 @@ class Toast(Label):
     super(Toast, self).__init__()
     self.map_view = mapview
     print self.texture_size, self.text_size
-    self.pos = (0, -self.map_view.center_y + self.text_size[1]/2 + 10)
   
   def show(self, text, length_long):
     duration = 5000 if length_long else 1000
@@ -399,14 +399,16 @@ class Toast(Label):
     self._duration = duration - rampdown
     self.text = text
     self.texture_update()
+    self.pos=(0, -self.map_view.center_y + self.texture_size[1]/2 + 10)
     self.map_view.add_widget(self)
     with self.canvas.before:
-      Color(0.6,0.6,0.6,self._transparency)
-      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -10, 6), 
-                size=(self.texture_size[0]+14, self.texture_size[1]+ 10))
-      Color(0.2,0.2,0.2,self._transparency)
-      Rectangle(pos=(self.map_view.center_x - self.texture_size[0]/2 -8, 8), 
-                size=(self.texture_size[0]+10, self.texture_size[1]+ 6))
+      Color(0.6,0.6,0.6,1)#self._transparency)
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0] -10, 6), 
+                size=(self.texture_size[0]*2+14, self.texture_size[1]+ 10))
+      Color(0.2,0.2,0.2,1)#self._transparency)
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0] -8, 8), 
+                size=(self.texture_size[0]*2+10, self.texture_size[1]+ 6))
+  
     Clock.schedule_interval(self._in_out, 1/60.0)
   
   def _in_out(self, dt):
