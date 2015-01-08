@@ -455,9 +455,9 @@ class MapView(Widget):
             
         print color        
 
-        lineColor = self.convertKMLColor((color.values())[0]['lineColour'])
-        lineWidth = (color.values())[0]['lineWidth']
-        polyColor = self.convertKMLColor((color.values())[0]['polyColour'])
+        lineColor = self.convertKMLColor(color['lineColour'])
+        lineWidth = color ['lineWidth']
+        polyColor = self.convertKMLColor(color['polyColour'])
         
         self.kmls.append(polygon)
         self.kml_colors.append(polyColor)

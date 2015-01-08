@@ -117,7 +117,9 @@ class Map(FloatLayout):
     """
     placemarks = kmlObj.placemarks
     for placemark in placemarks:
-      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), kmlObj.styles, placemark.ruleCoords)
+      style = kmlObj.styles[placemark.style.lstrip('#')]
+      print style
+      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), style, placemark.ruleCoords)
     
       move_to = placemarks[0].polygon[0]
       move_to = move_to.split(',')
@@ -327,6 +329,7 @@ class Menue(DropDown):
             traceback.print_exc()
             self.map_view.toast(elem + " could not be saved!")
         completeKML.placemarks.extend(selection[elem].placemarks)
+        completeKML.addStyles(selection[elem].styles)
       if len(completeKML.placemarks) > 0:
         try:
           if isDir:
