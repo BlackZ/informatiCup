@@ -10,6 +10,7 @@ from isySUR import kmlData, program
 from mapview import MapView
 from mapview import MapMarker
 
+from kivy import platform
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.filechooser import FileChooserListView
@@ -159,6 +160,11 @@ class Menue(DropDown):
     self.isOpen = False
     self.auto_dismiss = False
 
+    if "win" == platform or "linux" == platform or "macosx" == platform:
+      self.path = '.'
+    else:
+      self.path = '/'
+
     self.map_view =mapview
     self.app = app
 
@@ -183,6 +189,7 @@ class Menue(DropDown):
     self.isOpen = False
     self.dismiss()
     content = LoadDialog(load=self.load, cancel=self.dismiss_load)
+    content.ids.filechooser.path = self.path
     if 'KML' in obj.text:
       content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
@@ -199,6 +206,7 @@ class Menue(DropDown):
       content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
     else:
       content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
+    content.ids.filechooser.path = self.path
     self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
     self._popup_save.open()
     
@@ -311,7 +319,7 @@ class CustomFileChooser(FileChooserListView):
   """
     Implemented this and override the following method to fix path bug.
   """
-  
+ 
   def open_entry(self, entry):
         #print "custom open"
         #try:
