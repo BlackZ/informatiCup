@@ -43,12 +43,12 @@ class osmAPI():
     """
     This function requests data from openStreetMap
     @param boundingBox: a list of the points of the boundingBox [minLat,minLon,maxLat,maxLon]
-    @param filterList: (optional) List of tripel of filter-rules e.g.[(["way","node"],"amenity","univerity"),..]
-                        or (["way","node"],"building","") for some kind of wild-card
+    @param filterList: (optional) List of tupel of filter-rules e.g.[('way',['"amenity"="univerity"',..]),..]
+                        or ('way',['"building"=""']) for some kind of wild-card
     @return: an request object with the data-xml in the content property
     """
     if not isinstance(filterList,types.ListType):
-      raise TypeError('performRequest only accepts a list of filterrules e.g.[(["way","node"],"amenity","univerity"),..]')
+      raise TypeError('performRequest only accepts a list of filterrules')
     return self._parseDataET(
       requests.get(self.osmurl,
                     params=self._getOsmRequestData(boundingBox[0],
