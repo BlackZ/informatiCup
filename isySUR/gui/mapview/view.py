@@ -387,10 +387,21 @@ class MapView(Widget):
         lat = float(lat)
         lon = float(lon)
         
-        x = self.map_source.get_x(zoom, self.lon) - self.delta_x
-        y = self.map_source.get_y(zoom, self.lat) - self.delta_y
-        self.set_zoom_at(zoom, x, y)
-        self.center_on(lat, lon)
+        
+
+        print "set zoom:", zoom
+        print "self.zoom:", self.zoom
+        if zoom > self.zoom:
+          x = self.map_source.get_x(zoom, self.lon) - self.delta_x
+          y = self.map_source.get_y(zoom, self.lat) - self.delta_y
+          print "setting zoom"
+          self.set_zoom_at(zoom, x, y)
+        
+        latLonBox = self.get_bbox()
+        if lat < latLonBox[0] or lat > latLonBox[2] \
+          or lon < latLonBox[1] or lon > latLonBox[2]:
+          print "center on"
+          self.center_on(lat, lon)
         self.drawPolygon()
 
     def on_zoom(self, instance, zoom):
@@ -467,6 +478,15 @@ class MapView(Widget):
                   Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
                 else:
                   Mesh(vertices=vertices, indices=indices, mode="line_loop")
+                  
+                  
+    def isPolyVisible(self, name):
+      
+        latLonBox = self.get_bbox()
+        polyBBox = self.placemarks[name]["bBox"]
+        return (polyBBox[0] > latLonBox[0] and polyBBox[1] > latLonBox[1] 
+            and polyBBox[2] < latLonBox[2] and polyBBox[3] < latLonBox[3])
+      
 
     def addPolygon(self, name, polygon, color, markerCoords):
         
@@ -486,7 +506,8 @@ class MapView(Widget):
             marker.lat, marker.lon = markerCoords
             print marker.source
             self.add_marker(marker)
-          self.placemarks[name] = {"poly": polygon, "show":1, "color": polyColor, "triangles":None, "marker": marker}
+          self.placemarks[name] = {"poly": polygon, "show":1, "color": polyColor, 
+            "triangles":None, "marker": marker, "bBox": self.getBBoxOfPolygon(polygon)}
           
   #        self.kmls.append(polygon)
           try:
@@ -506,6 +527,23 @@ class MapView(Widget):
             self.add_marker(marker)
         
         self.drawPolygon()
+        
+    def getBBoxOfPolygon(self, polygon):
+      minLat = 99999.9
+      maxLat = 0.0
+      minLon = 99999.9
+      maxLon = 0.0
+      for coords in polygon:
+        if coords[0] < minLat:
+          minLat = coords[0]
+        if coords[0] > maxLat:
+          maxLat = coords[0]
+        if coords[1] < minLon:
+          minLon = coords[1]
+        if coords[1] > maxLon:
+          maxLon = coords[1]
+        
+      return [minLat,minLon, maxLat,maxLon]
         
     def showPolygon(self, name):
       if self.placemarks.has_key(name):
