@@ -22,12 +22,13 @@ from mapview import MIN_LONGITUDE, MAX_LONGITUDE, MIN_LATITUDE, MAX_LATITUDE, \
 from mapview.source import MapSource
 from mapview.utils import clamp
 from isySUR.gui.triangulation import Triangulator
-
+from kivy.loader import Loader
+MARKERIMAGE = Loader.image(join(dirname(__file__), "icons", "marker.png"))
 
 Builder.load_string("""
 <MapMarker>:
     size_hint: None, None
-    source: self.default_marker_fn
+    #source: self.default_marker_fn
     size: list(map(dp, self.texture_size))
     allow_stretch: True
 
@@ -118,6 +119,10 @@ class MapMarker(ButtonBehavior, Image):
     """Longitude of the marker
     """
 
+    def __init__(self, **kwargs):
+      super(MapMarker, self).__init__(**kwargs)
+      self.texture = MARKERIMAGE.texture
+
     @property
     def default_marker_fn(self):
         return join(dirname(__file__), "icons", "marker.png")
@@ -197,6 +202,7 @@ class MarkerMapLayer(MapLayer):
     def __init__(self, **kwargs):
         self.markers = []
         super(MarkerMapLayer, self).__init__(**kwargs)
+        
 
     def add_widget(self, marker):
         self.markers.append(marker)
@@ -226,6 +232,7 @@ class MarkerMapLayer(MapLayer):
         x, y = mapview.get_window_xy_from(marker.lat, marker.lon, mapview.zoom)
         marker.x = int(x - marker.width * marker.anchor_x)
         marker.y = int(y - marker.height * marker.anchor_y)
+#        marker.reload()
 
     def unload(self):
         self.clear_widgets()
@@ -451,47 +458,27 @@ class MapView(Widget):
         layer.add_widget(marker)
         layer.set_marker_position(self, marker)
         
-#        
-#    def drawPolygon(self):
-#        self.polyLayer.canvas.clear()     
-#        for kml in self.kmls:
-#            r,g,b,a = self.kml_colors[self.kmls.index(kml)]
-#            #print color
-#            vertices = []
-#            indices = []
-#            i = 0
-#            for coords in kml:
-#                x,y = self.get_window_xy_from(coords[1],coords[0], self._zoom)
-#              
-#                vertices.extend([x,y,0,0])
-#                indices.append(i)
-#                i+=1
-#            with self.polyLayer.canvas:
-#                Color(r,g,b,a, mode='rgba')
-#                Mesh(vertices=vertices, indices=self.triangles[self.kmls.index(kml)], mode="triangles")
-              
     def drawPolygon(self):
         self.polyLayer.canvas.clear()     
         for k,v in self.placemarks.items():
-          if v["show"] and self.isPolyInView(k):
-            print "drawing", k
-            r,g,b,a = v["color"]
-            #print color
-            vertices = []
-            indices = []
-            i = 0
-            for coords in v["poly"]:
-                x,y = self.get_window_xy_from(coords[1],coords[0], self._zoom)
-              
-                vertices.extend([x,y,0,0])
-                indices.append(i)
-                i+=1
-            with self.polyLayer.canvas:
-                Color(r,g,b,a, mode='rgba')
-                if v["triangles"] != None:
-                    Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
-                else:
-                    Mesh(vertices=vertices, indices=indices, mode="line_loop")
+            if v["show"] and self.isPolyInView(k):
+                r,g,b,a = v["color"]
+                #print color
+                vertices = []
+                indices = []
+                i = 0
+                for coords in v["poly"]:
+                    x,y = self.get_window_xy_from(coords[1],coords[0], self._zoom)
+                  
+                    vertices.extend([x,y,0,0])
+                    indices.append(i)
+                    i+=1
+                with self.polyLayer.canvas:
+                    Color(r,g,b,a, mode='rgba')
+                    if v["triangles"] != None:
+                        Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
+                    else:
+                        Mesh(vertices=vertices, indices=indices, mode="line_loop")
 
 
     def isPolyInView(self, name):
@@ -531,7 +518,7 @@ class MapView(Widget):
             if markerCoords != None:
                 marker = MapMarker()
                 marker.lat, marker.lon = markerCoords
-                print marker.source
+                self.trigger_update(True)
                 self.add_marker(marker)
               
             self.placemarks[name] = {"poly": polygon, 
@@ -559,7 +546,6 @@ class MapView(Widget):
                (self._default_marker_layer != None and \
                not marker in self._default_marker_layer.children)):
                     self.add_marker(marker)
-        
         self.drawPolygon()
         
     def getBBoxOfPolygon(self, polygon):
