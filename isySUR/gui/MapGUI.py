@@ -42,7 +42,6 @@ class Map(FloatLayout):
     self.app = app
     self.maps = MapView(zoom=11, lat=50.6394, lon=3.057)
     self.maps.center_on(52.023368, 8.538291)
-    #self.maps = MapView(app=app, zoom=11, lat=52.023368, lon=8.538291)
     self.add_widget(self.maps, 20)
     self.toastLabel = Label(bold=True, font_size=20, color=(1,1,1,1))
     
@@ -84,8 +83,7 @@ class Map(FloatLayout):
       self.toast("No KML files loaded!")
     elif self.kmlList.is_open:
       self.kmlList.dismiss(self.ids.kmlList)
-      self.kmlList.is_open = not self.kmlList.is_open
-      
+      self.kmlList.is_open = not self.kmlList.is_open  
     else:
       self.kmlList.open(self.ids.kmlList)
       self.kmlList.is_open = not self.kmlList.is_open      
@@ -107,7 +105,6 @@ class Map(FloatLayout):
     placemarks = kmlObj.placemarks
     for placemark in placemarks:
       style = kmlObj.styles[placemark.style.lstrip('#')]
-#      print style
       self.maps.addPolygon(name, self.app.getPolygonFromPlacemark(placemark), style, placemark.ruleCoords)
       move_to = placemarks[0].polygon[0]
       move_to = move_to.split(',')
@@ -121,22 +118,20 @@ class Map(FloatLayout):
     self.maps.removePolygon(name)
   
   def computeAndShowKmls(self, path, queue):
-    #toast = Label(text="Calculating ...", #text_size=(205,20), texture_size=(205,20),
-    #              bold=True, font_size=20, color=(1,1,1,1))
-    #toast.texture_update()
-    #toast.pos=(0, -self.center_y + toast.texture_size[1]/2 + 10)
-    self.toastLabel.text = "Calculating ..."
-    self.toastLabel.texture_update()
-    self.toastLabel.pos=(0, -self.center_y + self.toastLabel.texture_size[1]/2 + 10)
+    toast = Toast(self)
+    toast.stayVisible("Calculating ... ")
+    #self.toastLabel.text = "Calculating ..."
+    #self.toastLabel.texture_update()
+    #self.toastLabel.pos=(0, -self.center_y + self.toastLabel.texture_size[1]/2 + 10)
     kmlList = Queue()
-    self.add_widget(self.toastLabel)
-    with self.toastLabel.canvas.before:
-      Color(0.6,0.6,0.6,1)#self._transparency)
-      Rectangle(pos=(self.center_x - self.toastLabel.texture_size[0] -10, 6), 
-                size=(self.toastLabel.texture_size[0]*2+14, self.toastLabel.texture_size[1]+ 10))
-      Color(0.2,0.2,0.2,1)#self._transparency)
-      Rectangle(pos=(self.center_x - self.toastLabel.texture_size[0] -8, 8), 
-                size=(self.toastLabel.texture_size[0]*2+10, self.toastLabel.texture_size[1]+ 6))
+    #self.add_widget(self.toastLabel)
+    #with self.toastLabel.canvas.before:
+    #  Color(0.6,0.6,0.6,1)#self._transparency)
+    #  Rectangle(pos=(self.center_x - self.toastLabel.texture_size[0] -10, 6), 
+    #            size=(self.toastLabel.texture_size[0]*2+14, self.toastLabel.texture_size[1]+ 10))
+    #  Color(0.2,0.2,0.2,1)#self._transparency)
+    #  Rectangle(pos=(self.center_x - self.toastLabel.texture_size[0] -8, 8), 
+    #            size=(self.toastLabel.texture_size[0]*2+10, self.toastLabel.texture_size[1]+ 6))
     
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
@@ -153,16 +148,24 @@ class Map(FloatLayout):
           move_to = self.addPolygon(item, name, first=False)
       else:
         surID = item
-        self.toastLabel.text = "Calculating " + item + " ..."
-        self.toastLabel.texture_update()
+        toast.stayVisible("Calculating " + item + " ...")
+        #self.toastLabel.text = "Calculating " + item + " ..."
+        #self.toastLabel.texture_update()
     
-    print self.children
-    
-    self.remove_widget(self.toastLabel)
-    
-    print self.children
-  
     self.maps.center_on(float(move_to[1]), float(move_to[0]))
+    toast.remove()
+    #self.remove_widget(toast)
+    #Clock.schedule_interval(self._in_out, 1/60.0)
+  
+  #def _in_out(self, dt):
+  #  duration -= dt*1000
+  #  if self._duration <= 0:
+  #    self._transparency = 1.0 + (self._duration / self._rampdown)
+  #  if -(self._duration) > self._rampdown:
+  #    self.map_view.remove_widget(self)
+  #    return False
+  
+    
     
     
 class Menue(DropDown):
@@ -187,7 +190,6 @@ class Menue(DropDown):
     self.config = None
     
     self.queue = Queue()
-    
     self._SURThread=None
   
   def dismiss_load(self):
@@ -401,6 +403,27 @@ class Toast(Label):
     self.map_view = mapview
     print self.texture_size, self.text_size
   
+  def stayVisible(self, text):
+    self.text = text
+    self.texture_update()
+    
+    self.pos=(0, -self.map_view.center_y + self.texture_size[1]/2 + 10)
+    if self.parent != self.map_view:
+      self.map_view.add_widget(self)
+    with self.canvas.before:
+      Color(0.6,0.6,0.6,1)#self._transparency)
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0] -10, 6), 
+                size=(self.texture_size[0]*2+14, self.texture_size[1]+ 10))
+      Color(0.2,0.2,0.2,1)#self._transparency)
+      Rectangle(pos=(self.map_view.center_x - self.texture_size[0] -8, 8), 
+                size=(self.texture_size[0]*2+10, self.texture_size[1]+ 6))
+    
+  def remove(self):
+    self._duration = 100
+    self._rampdown = 100
+  
+    Clock.schedule_interval(self._in_out, 1/60.0)
+
   def show(self, text, length_long):
     duration = 5000 if length_long else 1000
     rampdown = duration * 0.1
