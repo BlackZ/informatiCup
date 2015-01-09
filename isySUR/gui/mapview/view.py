@@ -464,9 +464,9 @@ class MapView(Widget):
             with self.polyLayer.canvas:
                 Color(r,g,b,a, mode='rgba')
                 if v["triangles"] != None:
-                  Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
+                    Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
                 else:
-                  Mesh(vertices=vertices, indices=indices, mode="line_loop")
+                    Mesh(vertices=vertices, indices=indices, mode="line_loop")
 
     def addPolygon(self, name, polygon, color, markerCoords):
         
@@ -480,40 +480,45 @@ class MapView(Widget):
         polyColor = self.convertKMLColor(color['polyColour'])
         
         if not self.placemarks.has_key(name):
-          marker = None
-          if markerCoords != None:
-            marker = MapMarker()
-            marker.lat, marker.lon = markerCoords
-            print marker.source
-            self.add_marker(marker)
-          self.placemarks[name] = {"poly": polygon, "show":1, "color": polyColor, "triangles":None, "marker": marker}
-          
-  #        self.kmls.append(polygon)
-          try:
-            tri = Triangulator(polygon)
-            triangles = tri.triangles()
-            triIdx = []
-            for tri in triangles:
-              for point in tri:
-                triIdx.append(polygon.index(point))   
-            self.placemarks[name]["triangles"] = triIdx
-          except:
-            print "Triangulation failed."
+            marker = None
+            if markerCoords != None:
+                marker = MapMarker()
+                marker.lat, marker.lon = markerCoords
+                print marker.source
+                self.add_marker(marker)
+              
+            self.placemarks[name] = {"poly": polygon, "show":1, "color": polyColor, "triangles":None, "marker": marker}
+            
+    #        self.kmls.append(polygon)
+            try:
+                tri = Triangulator(polygon)
+                triangles = tri.triangles()
+                triIdx = []
+                for tri in triangles:
+                    for point in tri:
+                        triIdx.append(polygon.index(point))   
+                self.placemarks[name]["triangles"] = triIdx
+            except:
+                print "Triangulation failed."
         else:
-          self.showPolygon(name)
-          marker = self.placemarks[name]["marker"]
-          if not marker in self._default_marker_layer.children:
-            self.add_marker(marker)
+            self.showPolygon(name)
+            marker = self.placemarks[name]["marker"]
+            print marker
+            if marker != None and \
+               (self._default_marker_layer == None or \
+               (self._default_marker_layer != None and \
+               not marker in self._default_marker_layer.children)):
+                    self.add_marker(marker)
         
         self.drawPolygon()
         
     def showPolygon(self, name):
-      if self.placemarks.has_key(name):
-        self.placemarks[name]["show"] = 1
+        if self.placemarks.has_key(name):
+            self.placemarks[name]["show"] = 1
     
     def hidePolygon(self, name):
-      if self.placemarks.has_key(name):
-        self.placemarks[name]["show"] = 0
+        if self.placemarks.has_key(name):
+            self.placemarks[name]["show"] = 0
     
     def removePolygon(self, name):
         self.hidePolygon(name)
