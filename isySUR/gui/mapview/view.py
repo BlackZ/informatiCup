@@ -387,22 +387,35 @@ class MapView(Widget):
         lat = float(lat)
         lon = float(lon)
         
+        if zoom > self.zoom:
+            x = self.map_source.get_x(zoom, self.lon) - self.delta_x
+            y = self.map_source.get_y(zoom, self.lat) - self.delta_y
+            print "setting zoom"
+            self.set_zoom_at(zoom, x, y)
         
 
-        print "set zoom:", zoom
-        print "self.zoom:", self.zoom
-        if zoom > self.zoom:
-          x = self.map_source.get_x(zoom, self.lon) - self.delta_x
-          y = self.map_source.get_y(zoom, self.lat) - self.delta_y
-          print "setting zoom"
-          self.set_zoom_at(zoom, x, y)
-        
         latLonBox = self.get_bbox()
         if lat < latLonBox[0] or lat > latLonBox[2] \
           or lon < latLonBox[1] or lon > latLonBox[2]:
-          print "center on"
-          self.center_on(lat, lon)
+
+            self.center_on(lat, lon)
         self.drawPolygon()
+        
+    def zoom_to_Polygon(self, name, zoom):
+        if zoom > self.zoom:
+            x = self.map_source.get_x(zoom, self.lon) - self.delta_x
+            y = self.map_source.get_y(zoom, self.lat) - self.delta_y
+            self.set_zoom_at(zoom, x, y)
+        if not self.isPolyVisible(name):
+            bBox = self.placemarks[name]["bBox"]
+            centerLat = (bBox[0] + bBox[2]) / 2.0
+            centerLon = (bBox[1] + bBox[3]) / 2.0
+
+            self.center_on(centerLat,centerLon)
+
+        self.drawPolygon()
+          
+      
 
     def on_zoom(self, instance, zoom):
         if zoom == self._zoom:
@@ -460,7 +473,8 @@ class MapView(Widget):
     def drawPolygon(self):
         self.polyLayer.canvas.clear()     
         for k,v in self.placemarks.items():
-          if v["show"]:
+          if v["show"] and self.isPolyInView(k):
+            print "drawing", k
             r,g,b,a = v["color"]
             #print color
             vertices = []
@@ -475,18 +489,30 @@ class MapView(Widget):
             with self.polyLayer.canvas:
                 Color(r,g,b,a, mode='rgba')
                 if v["triangles"] != None:
-                  Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
+                    Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
                 else:
-                  Mesh(vertices=vertices, indices=indices, mode="line_loop")
-                  
-                  
+                    Mesh(vertices=vertices, indices=indices, mode="line_loop")
+
+
+    def isPolyInView(self, name):
+      
+        latLonBox = self.get_bbox()
+        polyBBox = self.placemarks[name]["bBox"]
+        centerLat = (polyBBox[0] + polyBBox[2]) / 2.0
+        centerLon = (polyBBox[1] + polyBBox[3]) / 2.0
+        return ((polyBBox[0] > latLonBox[0] and polyBBox[1] > latLonBox[1] and 
+            polyBBox[0] < latLonBox[2] and polyBBox[1] < latLonBox[3]) or 
+            (polyBBox[2] > latLonBox[0] and polyBBox[3] > latLonBox[1] and
+            polyBBox[2] < latLonBox[2] and polyBBox[3] < latLonBox[3]) or 
+            (centerLat > latLonBox[0] and centerLon > latLonBox[1] and 
+            centerLat < latLonBox[2] and centerLon < latLonBox[3]))
+
     def isPolyVisible(self, name):
       
         latLonBox = self.get_bbox()
         polyBBox = self.placemarks[name]["bBox"]
         return (polyBBox[0] > latLonBox[0] and polyBBox[1] > latLonBox[1] 
             and polyBBox[2] < latLonBox[2] and polyBBox[3] < latLonBox[3])
-      
 
     def addPolygon(self, name, polygon, color, markerCoords):
         
@@ -500,31 +526,39 @@ class MapView(Widget):
         polyColor = self.convertKMLColor(color['polyColour'])
         
         if not self.placemarks.has_key(name):
-          marker = None
-          if markerCoords != None:
-            marker = MapMarker()
-            marker.lat, marker.lon = markerCoords
-            print marker.source
-            self.add_marker(marker)
-          self.placemarks[name] = {"poly": polygon, "show":1, "color": polyColor, 
-            "triangles":None, "marker": marker, "bBox": self.getBBoxOfPolygon(polygon)}
-          
-  #        self.kmls.append(polygon)
-          try:
-            tri = Triangulator(polygon)
-            triangles = tri.triangles()
-            triIdx = []
-            for tri in triangles:
-              for point in tri:
-                triIdx.append(polygon.index(point))   
-            self.placemarks[name]["triangles"] = triIdx
-          except:
-            print "Triangulation failed."
+
+            marker = None
+            if markerCoords != None:
+                marker = MapMarker()
+                marker.lat, marker.lon = markerCoords
+                print marker.source
+                self.add_marker(marker)
+              
+            self.placemarks[name] = {"poly": polygon, 
+                "show":1, "color": polyColor, 
+                "triangles":None, "marker": marker,
+                "bBox": self.getBBoxOfPolygon(polygon)}
+            
+    #        self.kmls.append(polygon)
+            try:
+                tri = Triangulator(polygon)
+                triangles = tri.triangles()
+                triIdx = []
+                for tri in triangles:
+                    for point in tri:
+                        triIdx.append(polygon.index(point))   
+                self.placemarks[name]["triangles"] = triIdx
+            except:
+                print "Triangulation failed."
         else:
-          self.showPolygon(name)
-          marker = self.placemarks[name]["marker"]
-          if not marker in self._default_marker_layer.children:
-            self.add_marker(marker)
+            self.showPolygon(name)
+            marker = self.placemarks[name]["marker"]
+            print marker
+            if marker != None and \
+               (self._default_marker_layer == None or \
+               (self._default_marker_layer != None and \
+               not marker in self._default_marker_layer.children)):
+                    self.add_marker(marker)
         
         self.drawPolygon()
         
@@ -534,24 +568,24 @@ class MapView(Widget):
       minLon = 99999.9
       maxLon = 0.0
       for coords in polygon:
-        if coords[0] < minLat:
-          minLat = coords[0]
-        if coords[0] > maxLat:
-          maxLat = coords[0]
-        if coords[1] < minLon:
-          minLon = coords[1]
-        if coords[1] > maxLon:
-          maxLon = coords[1]
+        if coords[1] < minLat:
+          minLat = coords[1]
+        if coords[1] > maxLat:
+          maxLat = coords[1]
+        if coords[0] < minLon:
+          minLon = coords[0]
+        if coords[0] > maxLon:
+          maxLon = coords[0]
         
       return [minLat,minLon, maxLat,maxLon]
         
     def showPolygon(self, name):
-      if self.placemarks.has_key(name):
-        self.placemarks[name]["show"] = 1
+        if self.placemarks.has_key(name):
+            self.placemarks[name]["show"] = 1
     
     def hidePolygon(self, name):
-      if self.placemarks.has_key(name):
-        self.placemarks[name]["show"] = 0
+        if self.placemarks.has_key(name):
+            self.placemarks[name]["show"] = 0
     
     def removePolygon(self, name):
         self.hidePolygon(name)

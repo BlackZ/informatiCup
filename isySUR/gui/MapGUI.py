@@ -87,7 +87,7 @@ class Map(FloatLayout):
       self.kmlList.open(self.ids.kmlList)
       self.kmlList.is_open = not self.kmlList.is_open      
   
-  def addPolygon(self, kmlObj, first=True):
+  def addPolygon(self, kmlObj, name, first=True):
     """
     Adds all polygons from one KML.
     
@@ -105,13 +105,14 @@ class Map(FloatLayout):
     for placemark in placemarks:
       style = kmlObj.styles[placemark.style.lstrip('#')]
 #      print style
-      self.maps.addPolygon(placemark.name, self.app.getPolygonFromPlacemark(placemark), style, placemark.ruleCoords)
+      self.maps.addPolygon(name, self.app.getPolygonFromPlacemark(placemark), style, placemark.ruleCoords)
     
       move_to = placemarks[0].polygon[0]
       move_to = move_to.split(',')
       #moves to added Polygon
       if first:
-        self.maps.zoom_to(move_to[1], move_to[0], 15)
+#        self.maps.zoom_to(move_to[1], move_to[0], 15)
+        self.maps.zoom_to_Polygon(name, 15)
          
     return move_to
     
@@ -146,7 +147,7 @@ class Map(FloatLayout):
           name = self.app.addKML(surID, item)
           self.kmlList.addItem(name)
           self.lock.release()
-          move_to = self.addPolygon(item, first=False)
+          move_to = self.addPolygon(item, name, first=False)
       else:
         surID = item
         toast.text = "Calculating " + item + " ..."
@@ -247,7 +248,7 @@ class Menue(DropDown):
           item_name, kmlObj = self.app.addKMLFromPath(path, name)
           if not kmlObj.placemarks==[]:
             self.map_view.kmlList.addItem(item_name)
-            self.map_view.addPolygon(kmlObj)
+            self.map_view.addPolygon(kmlObj, item_name)
           else:
             self.map_view.toast('The loaded KML has no polygon!')
         except Exception as e:
@@ -375,13 +376,17 @@ class KMLList(DropDown):
     placemarks = kmlObj.placemarks
     if not selected:
       obj.background_color = (0,0,2,1)
-      self.map_view.addPolygon(kmlObj)
+      self.map_view.addPolygon(kmlObj, obj.text)
+      self.app.loaded_kmls[obj.text]['selected'] = not selected
     else:
-      obj.background_color = (1,1,1,1)
-      for placemark in placemarks:
-#        self.map_view.removePolygon(self.app.getPolygonFromPlacemark(placemark))
-        self.map_view.removePolygon(placemark.name)
-    self.app.loaded_kmls[obj.text]['selected'] = not selected
+      if self.map_view.maps.isPolyInView(obj.text):
+        obj.background_color = (1,1,1,1)
+        for placemark in placemarks:
+  #        self.map_view.removePolygon(self.app.getPolygonFromPlacemark(placemark))
+          self.map_view.removePolygon(obj.text)
+          self.app.loaded_kmls[obj.text]['selected'] = not selected
+      else:
+        self.map_view.addPolygon(kmlObj, obj.text)
 
   def addItem(self, name):
     btn = Button(text=name, size_hint_y=None, height=44,background_color=(0,0,2,1))
