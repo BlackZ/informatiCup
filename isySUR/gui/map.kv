@@ -67,11 +67,13 @@
             id: view
         
         BoxLayout:
+            id: footer
             size_hint_y: None
             height: 30
             Button:
+                id: action
                 text: "New Rule"
-                on_release: root.addRule(self)
+                on_release: root.action(self)
             Button:
                 text: "Load"
                 on_release: root.load(self, root)
