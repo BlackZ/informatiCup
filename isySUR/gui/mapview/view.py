@@ -551,7 +551,9 @@ class MapView(Widget):
   def showMarkers(self):
     for placemark in self.placemarks:
       self.trigger_update(True)
-      self.add_marker(self.placemarks[placemark]['marker'])
+      marker = self.placemarks[placemark]['marker']
+      if marker != None:
+        self.add_marker(marker)
 
   def getBBoxOfPolygon(self, polygon):
     minLat = 99999.9
