@@ -539,18 +539,11 @@ class MapView(Widget):
           for point in tri:
             triIdx.append(polygon.index(point))   
         self.placemarks[name]["triangles"] = triIdx
+        self.drawPolygon()
       except:
         print "Triangulation failed. Will just visualise the border."
     else:
       self.showPolygon(name)
-      marker = self.placemarks[name]["marker"]
-      print marker
-      if marker != None and \
-         (self._default_marker_layer == None or \
-         (self._default_marker_layer != None and \
-         not marker in self._default_marker_layer.children)):
-          self.add_marker(marker)
-    self.drawPolygon()
     
   def getBBoxOfPolygon(self, polygon):
     minLat = 99999.9
@@ -572,20 +565,26 @@ class MapView(Widget):
   def showPolygon(self, name):
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 1
+      marker = self.placemarks[name]["marker"]
+#      print marker
+      if marker != None and \
+         (self._default_marker_layer == None or \
+         (self._default_marker_layer != None and \
+         not marker in self._default_marker_layer.children)):
+          self.add_marker(marker)
+      self.drawPolygon()
   
   def hidePolygon(self, name):
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 0
+      marker = self.placemarks[name]["marker"]#self.marker[index]
+      if marker != None:
+        self._default_marker_layer.clear_widgets([marker])
+      self.drawPolygon()
   
   def removePolygon(self, name):
     self.hidePolygon(name)
-    
-    marker = self.placemarks[name]["marker"]#self.marker[index]
-    if marker != None:
-      self._default_marker_layer.clear_widgets([marker])
-
-#    del self.marker[index]
-    self.drawPolygon()
+    #    del self.marker[index]
   
   def convertKMLColor(self, kmlColor):
     """
