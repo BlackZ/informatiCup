@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 #!/usr/bin/kivy
+from kivy.config import Config
+Config.set('graphics','resizable',0)
+
 
 import os
 from threading import Thread,Lock
@@ -41,6 +44,7 @@ class Map(FloatLayout):
     self.maps.center_on(52.023368, 8.538291)
     #self.maps = MapView(app=app, zoom=11, lat=52.023368, lon=8.538291)
     self.add_widget(self.maps, 20)
+    self.toastLabel = Label(bold=True, font_size=20, color=(1,1,1,1))
     
     self.kmlList = KMLList(self, app)
     self.menue = Menue(self, app)
@@ -76,7 +80,6 @@ class Map(FloatLayout):
     """
     Opens and closes the KML List.
     """
-    
     if len(self.app.loaded_kmls) == 0:
       self.toast("No KML files loaded!")
     elif self.kmlList.is_open:
@@ -106,13 +109,11 @@ class Map(FloatLayout):
       style = kmlObj.styles[placemark.style.lstrip('#')]
 #      print style
       self.maps.addPolygon(name, self.app.getPolygonFromPlacemark(placemark), style, placemark.ruleCoords)
-    
       move_to = placemarks[0].polygon[0]
       move_to = move_to.split(',')
       #moves to added Polygon
       if first:
         self.maps.zoom_to(move_to[1], move_to[0], 15)
-         
     return move_to
     
     
@@ -120,19 +121,22 @@ class Map(FloatLayout):
     self.maps.removePolygon(name)
   
   def computeAndShowKmls(self, path, queue):
-    toast = Label(text="Calculating ...", #text_size=(205,20), texture_size=(205,20),
-                  bold=True, font_size=20, color=(1,1,1,1))
-    toast.texture_update()
-    toast.pos=(0, -self.center_y + toast.texture_size[1]/2 + 10)
+    #toast = Label(text="Calculating ...", #text_size=(205,20), texture_size=(205,20),
+    #              bold=True, font_size=20, color=(1,1,1,1))
+    #toast.texture_update()
+    #toast.pos=(0, -self.center_y + toast.texture_size[1]/2 + 10)
+    self.toastLabel.text = "Calculating ..."
+    self.toastLabel.texture_update()
+    self.toastLabel.pos=(0, -self.center_y + self.toastLabel.texture_size[1]/2 + 10)
     kmlList = Queue()
-    self.add_widget(toast)
-    with toast.canvas.before:
+    self.add_widget(self.toastLabel)
+    with self.toastLabel.canvas.before:
       Color(0.6,0.6,0.6,1)#self._transparency)
-      Rectangle(pos=(self.center_x - toast.texture_size[0] -10, 6), 
-                size=(toast.texture_size[0]*2+14, toast.texture_size[1]+ 10))
+      Rectangle(pos=(self.center_x - self.toastLabel.texture_size[0] -10, 6), 
+                size=(self.toastLabel.texture_size[0]*2+14, self.toastLabel.texture_size[1]+ 10))
       Color(0.2,0.2,0.2,1)#self._transparency)
-      Rectangle(pos=(self.center_x - toast.texture_size[0] -8, 8), 
-                size=(toast.texture_size[0]*2+10, toast.texture_size[1]+ 6))
+      Rectangle(pos=(self.center_x - self.toastLabel.texture_size[0] -8, 8), 
+                size=(self.toastLabel.texture_size[0]*2+10, self.toastLabel.texture_size[1]+ 6))
     
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.start()
@@ -149,12 +153,12 @@ class Map(FloatLayout):
           move_to = self.addPolygon(item, name, first=False)
       else:
         surID = item
-        toast.text = "Calculating " + item + " ..."
-        toast.texture_update()
+        self.toastLabel.text = "Calculating " + item + " ..."
+        self.toastLabel.texture_update()
     
     print self.children
     
-    self.remove_widget(toast)
+    self.remove_widget(self.toastLabel)
     
     print self.children
   
@@ -556,7 +560,6 @@ class MapApp(App):
   
   def __init__(self, configPath=""):
     super(MapApp, self).__init__()
-    
     self.map = None
     self.configContent = {}
     self.loadConfig(configPath)
@@ -570,7 +573,7 @@ class MapApp(App):
   def on_start(self):
     self.icon = 'logo.png'
     self.title = 'isySUR'
-  
+    
   def build(self):
     self.map = Map(self)
     return self.map

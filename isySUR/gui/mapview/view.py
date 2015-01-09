@@ -226,6 +226,7 @@ class MarkerMapLayer(MapLayer):
         x, y = mapview.get_window_xy_from(marker.lat, marker.lon, mapview.zoom)
         marker.x = int(x - marker.width * marker.anchor_x)
         marker.y = int(y - marker.height * marker.anchor_y)
+        marker.reload()
 
     def unload(self):
         self.clear_widgets()
@@ -509,7 +510,6 @@ class MapView(Widget):
                (self._default_marker_layer != None and \
                not marker in self._default_marker_layer.children)):
                     self.add_marker(marker)
-        
         self.drawPolygon()
         
     def showPolygon(self, name):
