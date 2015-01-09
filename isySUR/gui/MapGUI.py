@@ -46,12 +46,26 @@ class Map(FloatLayout):
     self.menue = Menue(self, app)
   
   def cleanUpCache(self):
+    """
+    Triggers function to delete cache folder.
+    """
     self.maps.cleanUpCache()
   
-  def toast(self, text, duration=False):
-    Toast(self).show(text, duration)
+  def toast(self, text, long_duration=False):
+    """
+    Shows a toast.
+    
+    @param duration: If paramter is True the toast is
+                     visible for a long time. Otherwise
+                     it has a shorter duration.
+    @type duration: Boolean
+    """
+    Toast(self).show(text, long_duration)
       
   def open_menue(self):
+    """
+    Opens and closes the Main Menu.
+    """
     if self.menue.isOpen:
       self.menue.dismiss(self.ids.menueBut)
     else:
@@ -59,6 +73,10 @@ class Map(FloatLayout):
     self.menue.isOpen = not self.menue.isOpen
     
   def open_kmlList(self):
+    """
+    Opens and closes the KML List.
+    """
+    
     if len(self.app.loaded_kmls) == 0:
       self.toast("No KML files loaded!")
     elif self.kmlList.is_open:
@@ -67,39 +85,7 @@ class Map(FloatLayout):
       
     else:
       self.kmlList.open(self.ids.kmlList)
-      self.kmlList.is_open = not self.kmlList.is_open
-    
-    
-  def addMarker(self, coords):
-    """
-    Adds a marker onto the map.
-    
-    @param coords: Coordinate point - lat, lon - at which the marker will be added.
-    @type coords: Tuple(float, float)
-    """
-    #marker = MapMarker()
-    #marker.lat = lat
-    #marker.lon = lon
-    
-    self.maps.add_marker(marker)
-  
-  def removeMarker(self, marker):
-    self.maps.removeMarker(marker)
-    
-  def addPolygonsFromKML(self, kmlObj):
-    """
-    Adds all polygons from a KMLList. Moves map to the
-    last added Polygon.
-    """
-    for placemark in kmlObj.placemarks:
-      color = kmlObj.styles
-      if kmlObj.placemarks.index(placemark) == len(kmlObj.placemarks) -1:
-        move_to = placemark.polygon[0]
-      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), color)
-      self.maps.drawPolygon()
-      #self.maps.addMarker()
-    return move_to  
-      
+      self.kmlList.is_open = not self.kmlList.is_open      
   
   def addPolygon(self, kmlObj, first=True):
     """
@@ -464,11 +450,11 @@ class ConfigDialog(FloatLayout):
     self.cancel = cancel
     
     self.info = Label(text="No configuration file loaded!")
-    self.counter = 0
+    self.counter = 1
     self.layout = GridLayout(cols=4, size_hint_y=1.1)
     
     self.ruleInput = TextInput(focus=True, size_hint=(.4,.15))
-    
+    self.labels = []
     if len(self.app.configContent) > 0:
       self.addConfigContent()
     else:
@@ -482,6 +468,7 @@ class ConfigDialog(FloatLayout):
     if len(self.layout.children) > 1:
       self.layout.clear_widgets()
     self.addContentHeader()
+    
     for ruleArea in self.app.configContent:
       for rule in self.app.configContent[ruleArea]:
         self.addConfigEntry(ruleArea, rule)
@@ -501,11 +488,16 @@ class ConfigDialog(FloatLayout):
     active={"[Indoor]":False,"[Outdoor]":False,"[Both]":False}
     active[ruleArea] = True
     
-    group = ('g' + str(self.counter))
-    label = Label(text=rule, size_hint=(.4,.1), id=group)
+    group = str(self.counter)
+    label = Label(text=rule, size_hint=(.4,.1))
+    self.labels.append(label)
     btn1 = CheckBox(group=group, active=active['[Indoor]'], size_hint=(.1,.1), id='[Indoor]')
     btn2 = CheckBox(group=group, active=active['[Outdoor]'], size_hint=(.1,.1), id='[Outdoor]')
     btn3 = CheckBox(group=group, active=active['[Both]'], size_hint=(.1,.1), id='[Both]')
+    
+    btn1.bind(active=self.changeRuleArea)
+    btn2.bind(active=self.changeRuleArea)
+    btn3.bind(active=self.changeRuleArea)
     
     self.layout.add_widget(label)
     self.layout.add_widget(btn1)
@@ -514,24 +506,49 @@ class ConfigDialog(FloatLayout):
     
     self.counter += 1
   
+  def changeRuleArea(self, *args):
+    for value in args:
+      if isinstance(value, CheckBox):
+        group = value.group
+        rule = self.labels[int(group) - 1].text
+        if value.active:    
+          self.app.configContent[value.id].append(rule)
+        else:
+          oldArea = self.app.configContent[value.id]
+          if rule in oldArea:
+            oldArea.remove(rule)    
     
   def addRule(self, obj):
-    if "New" in obj.text:
-      obj.text = "Add Rule"
-      self.ruleInput.text = ""
-      self.layout.add_widget(self.ruleInput)
-      self.ids.view.scroll_y = 0 
-    elif "Add" in obj.text:
-      obj.text = "New Rule"
-      self.layout.remove_widget(self.ruleInput)
-      if self.ruleInput.text != "":
-        group = 'g' + str(self.counter)
-        self.app.configContent['[Both]'].append(self.ruleInput.text)
-        self.layout.add_widget(Label(text=self.ruleInput.text, size_hint=(.4,.1), id=group))
-        self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Indoor]'))
-        self.layout.add_widget(CheckBox(group=group, size_hint=(.1,.1), id='[Outdoor]'))
-        self.layout.add_widget(CheckBox(group=group, active=True, size_hint=(.1,.1), id='[Both]'))
+    if len(self.app.configContent) > 0:
+      if "New" in obj.text:
+        obj.text = "Add Rule"
+        self.ruleInput.text = ""
+        self.layout.add_widget(self.ruleInput)
         self.ids.view.scroll_y = 0 
+      elif "Add" in obj.text:
+        obj.text = "New Rule"
+        self.layout.remove_widget(self.ruleInput)
+        if self.ruleInput.text != "":
+          self.app.configContent['[Both]'].append(self.ruleInput.text)
+          
+          group = str(self.counter)
+          label = Label(text=self.ruleInput.text, size_hint=(.4,.1))
+          self.labels.append(label)
+          btn1 = CheckBox(group=group, active=False, size_hint=(.1,.1), id='[Indoor]')
+          btn2 = CheckBox(group=group, active=False, size_hint=(.1,.1), id='[Outdoor]')
+          btn3 = CheckBox(group=group, active=True, size_hint=(.1,.1), id='[Both]')
+          
+          btn1.bind(active=self.changeRuleArea)
+          btn2.bind(active=self.changeRuleArea)
+          btn3.bind(active=self.changeRuleArea)
+          
+          self.layout.add_widget(label)
+          self.layout.add_widget(btn1)
+          self.layout.add_widget(btn2)
+          self.layout.add_widget(btn3)
+          
+          self.counter += 1
+          self.ids.view.scroll_y = 0 
       
   
 class MapApp(App):
