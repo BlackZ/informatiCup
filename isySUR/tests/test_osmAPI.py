@@ -82,9 +82,9 @@ class TestOsmAPI(unittest.TestCase):
                                                  self.boundingBox[2],
                                                  self.boundingBox[3],
                                                  filterList=[("node",
-                                                  ["building"]),("way",
-                                                  ["building"]),("relation",
-                                                  ["building"])])
+                                                  ['"building"']),("way",
+                                                  ['"building"']),("relation",
+                                                  ['"building"'])])
     self.assertIsNotNone(testObj3)
     self.assertEqual(testObj3.has_key('data'),True)
     self.assertEqual(testObj3['data'],'[out:xml][timeout:25];'\
