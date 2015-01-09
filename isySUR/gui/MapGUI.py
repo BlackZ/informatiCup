@@ -251,7 +251,6 @@ class Menue(DropDown):
    self._popup_config.dismiss()
    self.config = None
   
-  
   def show_load(self, obj, config=None):
     self.isOpen = False
     self.dismiss()
@@ -347,18 +346,17 @@ class Menue(DropDown):
       for layout in self.config.ids.view.children:
         if isinstance(layout, GridLayout):
           i = 0
-          while i < (len(layout.children) - 4)/4:
+          while i < (len(layout.children) - 5)/5:
     
-            child = layout.children[(4*i):(4*(i+1))]
+            children = layout.children[(5*i):(5*(i+1))]
             rule = ""
             key = ""
-            for elem in child:
+            for elem in children:
               if isinstance(elem, Label):
                 rule = elem.text
               if isinstance(elem, CheckBox):
                 if elem.active:
                   key = elem.id
-                  
             config[key].append(rule)
             i += 1
       name, ext = os.path.splitext(filename)
@@ -408,6 +406,17 @@ class Menue(DropDown):
       self.map_view.toast("No KML files selected or loaded!")
 
     self.dismiss_save()
+  
+  def switchMarkers(self, obj):
+    if "Hide" in obj.text:
+      obj.text = "Show Markers"
+      self.map_view.maps.markers = False
+      self.map_view.maps.hideMarkers()
+    elif "Show" in obj.text:
+      obj.text = "Hide Markers"
+      self.map_view.maps.markers = True
+      self.map_view.maps.showMarkers()
+
 
 class CustomFileChooser(FileChooserListView):
   """
@@ -453,15 +462,16 @@ class KMLList(DropDown):
       #self.map_view.addPolygon((obj.text, self.app.getPolygonFromPlacemark(placemark)))
       self.app.loaded_kmls[obj.text]['selected'] = not isSelected
     else:
-#      if self.map_view.maps.isPolyInView(obj.text):
+      if len(polygons) == 1 and self.map_view.maps.isPolyInView(polygons[0]) or\
+         len(polygons) > 1 and self.map_view.maps.isPolyInView(polygons[-1]):
         obj.background_color = (1,1,1,1)
         #for placemark in placemarks:
   #        self.map_view.removePolygon(self.app.getPolygonFromPlacemark(placemark))
         self.map_view.hidePolygons(polygons)
         #self.map_view.removePolygon(obj.text)
         self.app.loaded_kmls[obj.text]['selected'] = not isSelected
-#      else:
-#        self.map_view.showPolygons(polygons)
+      else:
+        self.map_view.showPolygons(polygons)
         #self.map_view.addPolygon((obj.text, self.app.getPolygonFromPlacemark(placemark)))
 
   def addItem(self, name):
@@ -555,8 +565,9 @@ class ConfigDialog(FloatLayout):
     
     self.info = Label(text="No configuration file loaded!")
     self.counter = 1
-    self.layout = GridLayout(cols=4, size_hint_y=1.1)
+    self.layout = GridLayout(cols=5, size_hint_y=1.1)
     
+    self.selected = []
     self.ruleInput = TextInput(focus=True, size_hint=(.4,.15))
     self.labels = []
     if len(self.app.configContent) > 0:
@@ -565,7 +576,6 @@ class ConfigDialog(FloatLayout):
       self.layout.add_widget(self.info)
     self.ids.view.add_widget(self.layout)
     
-
   def addConfigContent(self):
     if self.info.parent != None:
       self.layout.remove_widget(self.info)
@@ -582,11 +592,14 @@ class ConfigDialog(FloatLayout):
     label2 = Label(text='Indoor', size_hint=(.1,.1))
     label3 = Label(text='Outdoor', size_hint=(.1,.1))
     label4 = Label(text='Both', size_hint=(.1,.1))
+    label5 = Label(text='Delete', size_hint=(.1,.1))
+    
     
     self.layout.add_widget(label1)
     self.layout.add_widget(label2)
     self.layout.add_widget(label3)
     self.layout.add_widget(label4)
+    self.layout.add_widget(label5)
   
   def addConfigEntry(self, ruleArea, rule):
     active={"[Indoor]":False,"[Outdoor]":False,"[Both]":False}
@@ -598,15 +611,18 @@ class ConfigDialog(FloatLayout):
     btn1 = CheckBox(group=group, active=active['[Indoor]'], size_hint=(.1,.1), id='[Indoor]')
     btn2 = CheckBox(group=group, active=active['[Outdoor]'], size_hint=(.1,.1), id='[Outdoor]')
     btn3 = CheckBox(group=group, active=active['[Both]'], size_hint=(.1,.1), id='[Both]')
+    btn4 = CheckBox(size_hint=(.1, .1), id=group, active=False)
     
     btn1.bind(active=self.changeRuleArea)
     btn2.bind(active=self.changeRuleArea)
     btn3.bind(active=self.changeRuleArea)
+    btn4.bind(active=self.deleteEntry)
     
     self.layout.add_widget(label)
     self.layout.add_widget(btn1)
     self.layout.add_widget(btn2)
     self.layout.add_widget(btn3)
+    self.layout.add_widget(btn4)
     
     self.counter += 1
   
@@ -622,7 +638,7 @@ class ConfigDialog(FloatLayout):
           if rule in oldArea:
             oldArea.remove(rule)    
     
-  def addRule(self, obj):
+  def action(self, obj):
     if len(self.app.configContent) > 0:
       if "New" in obj.text:
         obj.text = "Add Rule"
@@ -641,19 +657,54 @@ class ConfigDialog(FloatLayout):
           btn1 = CheckBox(group=group, active=False, size_hint=(.1,.1), id='[Indoor]')
           btn2 = CheckBox(group=group, active=False, size_hint=(.1,.1), id='[Outdoor]')
           btn3 = CheckBox(group=group, active=True, size_hint=(.1,.1), id='[Both]')
+          btn4 = CheckBox(size_hint=(.1, .1), id=group, active=False)
           
           btn1.bind(active=self.changeRuleArea)
           btn2.bind(active=self.changeRuleArea)
           btn3.bind(active=self.changeRuleArea)
+          btn4.bind(active=self.deleteEntry)
           
           self.layout.add_widget(label)
           self.layout.add_widget(btn1)
           self.layout.add_widget(btn2)
           self.layout.add_widget(btn3)
+          self.layout.add_widget(btn4)
           
           self.counter += 1
-          self.ids.view.scroll_y = 0 
+          self.ids.view.scroll_y = 0
+      elif 'Delete' in obj.text:
+        remove = []
+        self.text = "New Rule"
+        for selection in self.selected:
+          label = self.labels[int(selection) -1]
+          remove.append(label)
+          rule = label.text
+          for values in self.app.configContent.values():
+            if rule in values:
+              values.remove(rule)
+          for child in self.layout.children:
+            if isinstance(child, CheckBox) and \
+             (child.id == selection or child.group == selection):
+              remove.append(child)
+        self.layout.clear_widgets(remove)
+        
+        
+  def deleteEntry(self, *args):
+    for value in args:
+      if isinstance(value, CheckBox):
+    
+        if value.active:
+          self.selected.append(value.id)
+        else:
+          if len(self.selected) > 0:
+            self.selected.remove(value.id)
       
+    if len(self.selected) > 1:
+      self.ids.action.text="Delete selected Rules!"
+    elif len(self.selected) == 1:
+      self.ids.action.text="Delete selected Rule!"
+    else:
+      self.ids.action.text="New Rule"
   
 class MapApp(App):
   

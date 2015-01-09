@@ -36,11 +36,6 @@
 \usepackage[utf8]{inputenc} % Required for including letters with accents
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
 
-% Bibliography
-%\usepackage[style=alphabetic,sorting=nyt,sortcites=true,autopunct=true,babel=hyphen,hyperref=true,abbreviate=false,backref=true,backend=biber]{biblatex}
-%\addbibresource{bibliography.bib} % BibTeX bibliography file
-%\defbibheading{bibempty}{}
-
 % Index
 %\usepackage{calc} % For simpler calculation - used for spacing the index letter headings correctly
 %\usepackage{makeidx} % Required to make an index
@@ -103,9 +98,8 @@ Published \today
 
 \pagestyle{empty} % No headers
 
+\setcounter{tocdepth}{3}
 \tableofcontents % Print the table of contents itself
-
-\todol{Check TableOfContents - at this moment only one point is on the second side UGLY!}
 
 \cleardoublepage % Forces the first chapter to start on an odd page so it's on the right
 
@@ -145,13 +139,13 @@ You can leave out \texttt{python} if you have installed the program before. For 
 For information about input and output file types see section \ref{sec:io}.
 
 \section{What is \ProjectTitle?}\label{sec:whatFor}
+\todol{add screenshot}
 \pt is a program that calculates the sphere of influence of a space usage rule by its coordinates and data from OpenStreetMap. It was developed within the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called isy and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `intelligent systems' at Bielefeld University.
 
 Using is very easy. You give an input file with the coordinates of the SURs and the sphere of influence is computed. Optionally you can add a configuration file that classifies SURs in those that are applicable only indoor, those that are only outdoor or those that are applicable indoor as well as outdoor (both) to get a better result. The calculated areas are shown on a map (GUI version) and you can choose which ones you want to be displayed. They can be saved into a file to reload them whenever you want to have a look at them.
 
 \section{Content of \ProjectTitle}
 In the archive you can find the following data (bold printed files will be installed with the install command):
-\todol{noch up-to-date?}
 \begin{itemize}
 	\item data (directory) - examples for space usage rules\footnote{see section \ref{sec:surs}}
 	\item \textbf{isySUR} (directory) - the source files for the isySUR Python package
@@ -184,6 +178,7 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 \section{Requirements and installation}\label{sec:installation}
 \pt\ is written in Python so you get a Python script, which is the main program, and a package with the tools. For running the command line version you need not much more than basic Python. If you prefer to use a graphical user interface you will have to install some more packages.
 \subsection{Requirements}\label{sec:requirements}
+\todol{add credits}
 \begin{enumerate}
 	\item \textbf{requirements for the command line version:}
 	\begin{itemize}
@@ -277,7 +272,6 @@ Usage of the command line version:
 \end{verbatim}
 
 \subsubsection{Parameters}
-\todol{up to date?}
 The parameters of \texttt{run\_isySUR.py cli} (bold arguments are required):
 \begin{itemize}
 	\item \textbf{input} - Path to the input file containing the SURs. See \ref{sec:io} for the required format.
@@ -287,13 +281,10 @@ The parameters of \texttt{run\_isySUR.py cli} (bold arguments are required):
 \end{itemize}
 
 \subsection{GUI version}\label{sec:gui}
-\todol{up to date?}
 Usage of the gui version:
 \begin{verbatim}
 	$ run_isySUR.py gui [-h] [-c CONFIG]
 \end{verbatim}
-
-\todol{Put menu description here}
 
 \subsubsection{Parameters}
 The parameters of \texttt{run\_isySUR.py gui}:
@@ -301,6 +292,25 @@ The parameters of \texttt{run\_isySUR.py gui}:
 	\item -c CONFIG (--config CONFIG) - With this parameter an optional config file with SUR classifications (indoor, outdoor, both) is used for computation. For the format of the file see \ref{sec:io}.
 	\item -h - If this parameter is given, a short help message containing all parameters is shown.
 \end{itemize}
+
+\subsubsection{The menu}
+\begin{figure}
+\centering
+\includegraphics[width=0.75\textwidth]{GUI.png}
+\caption{GUI with open menu and KML list}
+\todol{update}
+\end{figure}
+On the left side you can find the menu that holds the tools you will use. In the menu you will find the following possibilities:
+\begin{itemize}
+	\item \textbf{Load SUR} - Choose the file with the coordinates of your SURs. See section \ref{sec:io} for more information about the format. The spheres of influence of the SURs will be calculated. An information text will inform you about the ID of the current SUR. When the kml list is open you can see that spheres are added. Calculated spheres are displayed on the map as well as red markers on the position where the SUR is located. After a calculation is finished you can start another one. The new areas will be added to the ones already in kml list.
+	\item \textbf{Load KML} - Choose some kml file you have already saved during the last usage. Or maybe you made your own kml file with another program. See section \ref{sec:io} for more information about the format. The areas contained in your file are displayed on the map and added to those already in kml list.
+	\item \textbf{Save KML} - All kmls that are currently selected in kml list are saved to a kml file you can choose here.
+	\item \textbf{Hide/Show Markers} - The red SUR markers can be hidden and shown with this button.
+	\item \textbf{Config} - With this button you can open the configuration window. If you used the \texttt{--config} parameter there is already a configuration file loaded. You can load another configuration file, add or remove some rules and save your personal configuration file. With your configuration you say if you prefer to find an area for a SUR indoor or outdoor or if you think that kind of rule can be applicable indoor as well as outdoor.
+\end{itemize}
+
+\subsubsection{KML list}
+On the right side there is the kml list. This list tells you which areas you have calculated or loaded. You can scroll the list if it is too long for the window with the mouse wheel. When you click on an entry which area is not in viewport the map will jump to that area. When you click on an entry which area is already in viewport you can hide it. Hidden areas are not saved into a kml file. With another click you can make an area visible again.
 
 \subsection{Using android}\label{sec:android}
 Of course calculating SURs at home is nice but in general you would like to know a sphere of influence of a space usage rule standing in front of it. This is possible on your android device (with internet connection). In the archive you can find the isySUR\todo{name of file correct?}.apk that you can install on your device. Just copy it on the device e.g. via USB and enable the device option to install from unknown sources. Browsing to the .apk and clicking on it starts the installation. After that you will find isySUR in your apps and can use it exactly like the GUI version described in section \ref{sec:gui}.
@@ -310,43 +320,38 @@ Of course calculating SURs at home is nice but in general you would like to know
 %----------------------------------------------------------------------------------------
 
 \chapter{Technical and implementation details}
-\todol{add some words here}
+In this chapter the implemented algorithm to calculate the spheres of influence is explained.\todo{section?} You will gain an insight into the development and learn some implementation details. After that an evaluation of the achieved results follows.
+
+\todol{Code documentation -> pydoc?}
 
 \section{Development}
-\todol{Korrektur lesen + rework}
-\todol{Code documentation -> pydoc}
-This project was created using test driven development on the unittest layer. This does not only allow us to keep track of unwated side effects of new functionality, but also helps assigning work load to the different members, because it can be easier to write a failing unittest with a bit of information, that is assigned to someone, than it is to explain all the requirements for some new functionality.
+For this project we decided to use Python. First of all, we all wanted to challenge and expand upon our Python knowledge. Furthermore Python is mostly os independent and can even be ported to android for tablet usage which seems to be a good feature here.
 
-First of all, we all wanted to challenge and expand upon our Python knowledge. Furthermore python is mostly os independent and can even be ported to android for tablet usage. 
+This project was created using test driven development on the unittest layer. This does not only allow us to keep track of unwanted side effects of new functionality, but also helps assigning work load to the different members, because it can be easier to write a failing unittest with a bit of information, that is assigned to someone, than it is to explain all the requirements for some new functionality.
 
-\subsection{Data usage}
-\todol{Korrektur lesen + rework}
-We deliberatly do not use the images in our analysis. This is because they do not give us reliable information about the interesting polygons. The variety of possible signs, including totally unkown ones, (and their placement in/on/around the intended area) make it infeasible to perform robust image recognition or classification. Furthermore the only relevant information we think one could extract from images in special cases refers to an inside/outside classification of the rule. However even this classification would not be reliable and robust enough in the general use case.
+\pt was created in two steps: First the command line version was created and the first versions of the algorithm were implemented. While the algorithm was improved and reworked it was decided to add a GUI because a lightweight tool for displaying the calculated areas was missing. Furthermore not all people like to use a command line tool. At the beginning of the project the idea of an app came up and with the kivy framework for the GUI the foundations for this was laid. With buildozer\footnote{see \url{https://github.com/kivy/buildozer}} a nice tool for packaging an apk file from our project was found.
 
-One might consider using images and compute vision techniques in the future, when the google StreetView recordings cover virtually everything and these images are available to OSM as well, but until then we do not believe we can extract useful information from the images.
+\subsection{Data usage}\label{sec:config}
+We deliberately do not use the images in our analysis. This is because they do not give us reliable information about the interesting polygons. The variety of possible signs, including totally unknown ones, (and their placement in/on/around the intended area) make it infeasible to perform robust image recognition or classification. Furthermore the only relevant information we think one could extract from images in special cases refers to an inside/outside classification of the rule. However even this classification would not be reliable and robust enough in the general use case.
 
-We do use the ruleTypes/Names (e.g. access:21="no") to some minimal extend in the way that we pre classified all the rules in the training set to be applicable indoor,outdoor or both, which we use to narrow down the possible OSM elements around the target coordinates. Unknown rules will always get the "both" classification so that we do not ignore relevant information in those cases. We hope to improve our results (or at least or computational costs) by doing so, but unfortunatly most rules are applicable in indoor as well as outdoor, so this might only be a minor improvement.
+One might consider using images and compute vision techniques in the future, when the Google StreetView recordings cover virtually everything and these images are available to OSM as well, but until then we do not believe we can extract useful information from the images.
+
+We do use the rule types/names (e.g. access:21="no") to some minimal extend in the way that we pre classified all the rules in the training set to be applicable indoor, outdoor or both, which we use to narrow down the possible OSM elements around the target coordinates. Unknown rules will always get the "both" classification so that we do not ignore relevant information in those cases. We hope to improve our results (or at least our computational costs) by doing so, but unfortunately most rules are applicable in indoor as well as outdoor, so this might only be a minor improvement.
 
 \todol{Maybe an image of the pipeline?}
 
-Our main focus lies upon the coordinate of the SUR. In a bounding box [currently 100m might be reduced further] around the given coordinates, we start by searching for the closest osm relations and ways (we emit nodes for now, since they hardly provide any connectivity information, necessary to be able to construct reasonable polygons). We use a bounding box of limited size because we want to reduce the amount of data that we need to request from OSM and we work on the assumption that these coordinates should always relatively close to the intended area. Unfortunatly some coordinates (at least in the test data) are quite far away from the intended area, which can lead to finding unintented polygons that are closer to the coordinates. Furthermore the OSM data is not complete and even some elements from the test data are not present in OSM, which means, that we have no way of ever finding the intended polygon.
+Our main focus lies upon the coordinate of the SUR. In a bounding box (currently 100m\todo{this is not up to date is it?} might be reduced further) around the given coordinates, we start by searching for the closest OSM relations and ways (we emit nodes for now, since they hardly provide any connectivity information, necessary to be able to construct reasonable polygons). We use a bounding box of limited size because we want to reduce the amount of data that we need to request from OSM and we work on the assumption that these coordinates should always relatively close to the intended area. Unfortunately some coordinates (at least in the test data) are quite far away from the intended area, which can lead to finding unintended polygons that are closer to the coordinates. Furthermore the OSM data is not complete and even some elements from the test data are not present in OSM, which means, that we have no way of ever finding the intended polygon.
+\todol{add another section with more detailed algorithm information? or expand this one?}
 
 \subsection{Data structure}
-\todol{Korrektur lesen + rework}
 In order to be able to work freely with all the data that we require when computing suitable polygons for SURs we have introduced several data structures.
 \begin{itemize}
-	\item sur: A wrapper object for the SURs. We have them so that we have to handle the file only once at the beginning.
-	\item osmData: Wrapper for the OSM elements Node, Way and Relation. We convert the xml data we receive from osm to these objects, so that we do not have to work on a xml for computation.
-	\item kmlData: Wrapper objects for a KML and a Placemark. These will be created by our algorithm and can be saved as a XML to a file.
+	\item sur: A wrapper object for the SURs. We have them so that we need to handle the file only once at the beginning.
+	\item osmData: Wrapper for the OSM elements Node, Way and Relation. We convert the xml data we receive from OSM to these objects, so that we do not have to work on a xml for computation.
+	\item kmlData: Wrapper objects for a kml and placemarks. These will be created by our algorithm and can be saved as a kml-xml to a file.
 \end{itemize}
 
 Furthermore, our data structure splits our program into nice modular chunks that can be reused independently in other project if desired.
-
-\subsection*{}
-\todol{add Thorstens stuff}
-
-\subsection{The configuration file}\label{sec:config}
-\todol{said in data usage?}
 
 \section{Evaluation}
 \todol{Berechnen Sie nun die Geltungsbereiche der Space Usage Rules aus Ihrer Umgebung mit Ihrer Implementierung aus der ersten Runde.
@@ -359,7 +364,7 @@ Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie da
 %----------------------------------------------------------------------------------------
 
 \chapter{Added SURs}\label{sec:surs}
-For the competition ten new space usage rules should be found.
+For the competition at least ten new space usage rules should be found. Here our 20 found SURs are presented.
 \todol{Add our SURs (maybe with screenshot of intuitive area?)}
 
 %----------------------------------------------------------------------------------------
@@ -367,265 +372,5 @@ For the competition ten new space usage rules should be found.
 %----------------------------------------------------------------------------------------
 
 \listoftodos  %to be deleated in the end
-
-%========================================================================================
-%   EVERYTHINGS BELOW IS EXAMPLE TEXT - TO BE DELEATED IN THE END
-%   (nice examples how to use some commands)
-%========================================================================================
-
-%----------------------------------------------------------------------------------------
-%	CHAPTER 1
-%----------------------------------------------------------------------------------------
-
-%\chapterimage{chapter_head_2.pdf} % Chapter heading image
-%
-%\chapter{EXAMPLE Chapter}
-%
-%\section{Paragraphs of Text}\index{Paragraphs of Text}
-%
-%\lipsum[1-7] % Dummy text
-
-%------------------------------------------------
-
-%\section{Citation}\index{Citation}
-%
-%This statement requires citation \cite{book_key}; this one is more specific \cite[122]{article_key}.
-
-%------------------------------------------------
-
-%\section{Lists}\index{Lists}
-%
-%Lists are useful to present information in a concise and/or ordered way\footnote{Footnote example...}.
-%
-%\subsection{Numbered List}\index{Lists!Numbered List}
-%
-%\begin{enumerate}
-%\item The first item
-%\item The second item
-%\item The third item
-%\end{enumerate}
-%
-%\subsection{Bullet Points}\index{Lists!Bullet Points}
-%
-%\begin{itemize}
-%\item The first item
-%\item The second item
-%\item The third item
-%\end{itemize}
-%
-%\subsection{Descriptions and Definitions}\index{Lists!Descriptions and Definitions}
-%
-%\begin{description}
-%\item[Name] Description
-%\item[Word] Definition
-%\item[Comment] Elaboration
-%\end{description}
-
-%----------------------------------------------------------------------------------------
-%	CHAPTER 2
-%----------------------------------------------------------------------------------------
-
-%\chapter{In-text Elements}
-%
-%\section{Theorems}\index{Theorems}
-%
-%This is an example of theorems.
-%
-%\subsection{Several equations}\index{Theorems!Several Equations}
-%This is a theorem consisting of several equations.
-%
-%\begin{theorem}[Name of the theorem]
-%In $E=\mathbb{R}^n$ all norms are equivalent. It has the properties:
-%\begin{align}
-%& \big| ||\mathbf{x}|| - ||\mathbf{y}|| \big|\leq || \mathbf{x}- \mathbf{y}||\\
-%&  ||\sum_{i=1}^n\mathbf{x}_i||\leq \sum_{i=1}^n||\mathbf{x}_i||\quad\text{where $n$ is a finite integer}
-%\end{align}
-%\end{theorem}
-%
-%\subsection{Single Line}\index{Theorems!Single Line}
-%This is a theorem consisting of just one line.
-%
-%\begin{theorem}
-%A set $\mathcal{D}(G)$ in dense in $L^2(G)$, $|\cdot|_0$. 
-%\end{theorem}
-
-%------------------------------------------------
-
-%\section{Definitions}\index{Definitions}
-%
-%This is an example of a definition. A definition could be mathematical or it could define a concept.
-%
-%\begin{definition}[Definition name]
-%Given a vector space $E$, a norm on $E$ is an application, denoted $||\cdot||$, $E$ in $\mathbb{R}^+=[0,+\infty[$ such that:
-%\begin{align}
-%& ||\mathbf{x}||=0\ \Rightarrow\ \mathbf{x}=\mathbf{0}\\
-%& ||\lambda \mathbf{x}||=|\lambda|\cdot ||\mathbf{x}||\\
-%& ||\mathbf{x}+\mathbf{y}||\leq ||\mathbf{x}||+||\mathbf{y}||
-%\end{align}
-%\end{definition}
-
-%------------------------------------------------
-
-%\section{Notations}\index{Notations}
-%
-%\begin{notation}
-%Given an open subset $G$ of $\mathbb{R}^n$, the set of functions $\varphi$ are:
-%\begin{enumerate}
-%\item Bounded support $G$;
-%\item Infinitely differentiable;
-%\end{enumerate}
-%a vector space is denoted by $\mathcal{D}(G)$. 
-%\end{notation}
-
-%------------------------------------------------
-
-%\section{Remarks}\index{Remarks}
-%
-%This is an example of a remark.
-%
-%\begin{remark}
-%The concepts presented here are now in conventional employment in mathematics. Vector spaces are taken over the field $\mathbb{K}=\mathbb{R}$, however, established properties are easily extended to $\mathbb{K}=\mathbb{C}$.
-%\end{remark}
-
-%------------------------------------------------
-
-%\section{Corollaries}\index{Corollaries}
-%
-%This is an example of a corollary.
-%
-%\begin{corollary}[Corollary name]
-%The concepts presented here are now in conventional employment in mathematics. Vector spaces are taken over the field $\mathbb{K}=\mathbb{R}$, however, established properties are easily extended to $\mathbb{K}=\mathbb{C}$.
-%\end{corollary}
-
-%------------------------------------------------
-
-%\section{Propositions}\index{Propositions}
-%
-%This is an example of propositions.
-%
-%\subsection{Several equations}\index{Propositions!Several Equations}
-%
-%\begin{proposition}[Proposition name]
-%It has the properties:
-%\begin{align}
-%& \big| ||\mathbf{x}|| - ||\mathbf{y}|| \big|\leq || \mathbf{x}- \mathbf{y}||\\
-%&  ||\sum_{i=1}^n\mathbf{x}_i||\leq \sum_{i=1}^n||\mathbf{x}_i||\quad\text{where $n$ is a finite integer}
-%\end{align}
-%\end{proposition}
-%
-%\subsection{Single Line}\index{Propositions!Single Line}
-%
-%\begin{proposition} 
-%Let $f,g\in L^2(G)$; if $\forall \varphi\in\mathcal{D}(G)$, $(f,\varphi)_0=(g,\varphi)_0$ then $f = g$. 
-%\end{proposition}
-
-%------------------------------------------------
-
-%\section{Examples}\index{Examples}
-%
-%This is an example of examples.
-%
-%\subsection{Equation and Text}\index{Examples!Equation and Text}
-%
-%\begin{example}
-%Let $G=\{x\in\mathbb{R}^2:|x|<3\}$ and denoted by: $x^0=(1,1)$; consider the function:
-%\begin{equation}
-%f(x)=\left\{\begin{aligned} & \mathrm{e}^{|x|} & & \text{si $|x-x^0|\leq 1/2$}\\
-%& 0 & & \text{si $|x-x^0|> 1/2$}\end{aligned}\right.
-%\end{equation}
-%The function $f$ has bounded support, we can take $A=\{x\in\mathbb{R}^2:|x-x^0|\leq 1/2+\epsilon\}$ for all $\epsilon\in\intoo{0}{5/2-\sqrt{2}}$.
-%\end{example}
-%
-%\subsection{Paragraph of Text}\index{Examples!Paragraph of Text}
-%
-%\begin{example}[Example name]
-%\lipsum[2]
-%\end{example}
-
-%------------------------------------------------
-
-%\section{Exercises}\index{Exercises}
-%
-%This is an example of an exercise.
-%
-%\begin{exercise}
-%This is a good place to ask a question to test learning progress or further cement ideas into students' minds.
-%\end{exercise}
-
-%------------------------------------------------
-
-%\section{Problems}\index{Problems}
-%
-%\begin{problem}
-%What is the average airspeed velocity of an unladen swallow?
-%\end{problem}
-
-%------------------------------------------------
-
-%\section{Vocabulary}\index{Vocabulary}
-%
-%Define a word to improve a students' vocabulary.
-%
-%\begin{vocabulary}[Word]
-%Definition of word.
-%\end{vocabulary}
-
-%----------------------------------------------------------------------------------------
-%	CHAPTER 3
-%----------------------------------------------------------------------------------------
-
-%\chapterimage{chapter_head_1.pdf} % Chapter heading image
-%
-%\chapter{Presenting Information}
-%
-%\section{Table}\index{Table}
-%
-%\begin{table}[h]
-%\centering
-%\begin{tabular}{l l l}
-%\toprule
-%\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-%\midrule
-%Treatment 1 & 0.0003262 & 0.562 \\
-%Treatment 2 & 0.0015681 & 0.910 \\
-%Treatment 3 & 0.0009271 & 0.296 \\
-%\bottomrule
-%\end{tabular}
-%\caption{Table caption}
-%\end{table}
-
-%------------------------------------------------
-
-%\section{Figure}\index{Figure}
-%
-%\begin{figure}[h]
-%\centering\includegraphics[scale=0.5]{placeholder}
-%\caption{Figure caption}
-%\end{figure}
-
-%----------------------------------------------------------------------------------------
-%	BIBLIOGRAPHY
-%----------------------------------------------------------------------------------------
-
-%\chapter*{Bibliography}
-%\addcontentsline{toc}{chapter}{\textcolor{ocre}{Bibliography}}
-%\section*{Books}
-%\addcontentsline{toc}{section}{Books}
-%\printbibliography[heading=bibempty,type=book]
-%\section*{Articles}
-%\addcontentsline{toc}{section}{Articles}
-%\printbibliography[heading=bibempty,type=article]
-
-%----------------------------------------------------------------------------------------
-%	INDEX
-%----------------------------------------------------------------------------------------
-
-%\cleardoublepage
-%\phantomsection
-%\setlength{\columnsep}{0.75cm}
-%\addcontentsline{toc}{chapter}{\textcolor{ocre}{Index}}
-%\printindex
-
-%----------------------------------------------------------------------------------------
 
 \end{document}

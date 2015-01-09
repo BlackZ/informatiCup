@@ -1,7 +1,7 @@
 ===============================================================================
 isySUR
 ===============================================================================
-08/01/2015
+09/01/2015
 
 -------------------------------------------------------------------------------
 General usage
@@ -46,8 +46,7 @@ Further information
 -------------------------------------------------------------------------------
 
 For information about the requirements, the installation and usage of the GUI
-version and implementation details see the manual. The manual is of type .pdf
-and can be found in the doc-directory.
+version and implementation details see the manual.
 
 ===============================================================================
 Authors
