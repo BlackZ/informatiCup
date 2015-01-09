@@ -43,7 +43,7 @@ class TestOsmAPI(unittest.TestCase):
   
   def test_performRequestWithWildcard(self):
     bBox = [50.92615995855398,5.396102964878082,50.92663164856874,5.397061854600906]
-    testData = self.osmAPIobj.performRequest(bBox,[(["way","relation"],"building","")])
+    testData = self.osmAPIobj.performRequest(bBox,[("way",['"building"']),("relation",['"building"'])])
     self.assertTrue(len(testData.nodes)==12)
     self.assertTrue(len(testData.ways)==1)
     self.assertTrue(len(testData.relations)==0)
@@ -65,22 +65,26 @@ class TestOsmAPI(unittest.TestCase):
                                                  self.boundingBox[1],
                                                  self.boundingBox[2],
                                                  self.boundingBox[3],
-                                                 filterList=[(["node","way","relation"],
-                                                  "amenity","university")])
+                                                 filterList=[("node",
+                                                  ['"amenity"="university"']),("way",
+                                                  ['"amenity"="university"']),("relation",
+                                                  ['"amenity"="university"','"building"!="true"'])])
     self.assertIsNotNone(testObj2)
     self.assertEqual(testObj2.has_key('data'),True)
     self.assertEqual(testObj2['data'],'[out:xml][timeout:25];'\
                      '(node["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
                      'way["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
-                     'relation["amenity"="university"](52.032736,8.486593,52.042113,8.501194););'\
+                     'relation["amenity"="university"]["building"!="true"](52.032736,8.486593,52.042113,8.501194););'\
                      'out body;>;out skel qt;')
                      
     testObj3 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
                                                  self.boundingBox[1],
                                                  self.boundingBox[2],
                                                  self.boundingBox[3],
-                                                 filterList=[(["node","way","relation"],
-                                                  "building","")])
+                                                 filterList=[("node",
+                                                  ["building"]),("way",
+                                                  ["building"]),("relation",
+                                                  ["building"])])
     self.assertIsNotNone(testObj3)
     self.assertEqual(testObj3.has_key('data'),True)
     self.assertEqual(testObj3['data'],'[out:xml][timeout:25];'\

@@ -26,11 +26,15 @@ class osmAPI():
     else:
       compactOverpassQLstring = '[out:xml][timeout:25];('
       for fil in filterList:
-          for obj in fil[0]:
-              if not fil[2]=="":
-                  compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);'% (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
-              else:
-                  compactOverpassQLstring += '%s["%s"](%s,%s,%s,%s);'% (obj, fil[1], minLat, minLon, maxLat, maxLon)
+          if len(fil)==2:
+            tmpFil=""
+            for obj in fil[1]:
+              tmpFil+="[" + obj + "]"
+            compactOverpassQLstring += '%s%s(%s,%s,%s,%s);'% (fil[0], tmpFil, minLat, minLon, maxLat, maxLon)
+                #if not fil[1]=="":
+                #    compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);'% (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
+                #else:
+                #    compactOverpassQLstring += '%s["%s"](%s,%s,%s,%s);'% (obj, fil[1], minLat, minLon, maxLat, maxLon)
       compactOverpassQLstring += ');out body;>;out skel qt;'
       return  {'data':compactOverpassQLstring}
 
