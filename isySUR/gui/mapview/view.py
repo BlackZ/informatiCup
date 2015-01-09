@@ -476,6 +476,8 @@ class MapView(Widget):
         with self.polyLayer.canvas:
           Color(r,g,b,a, mode='rgba')
           if v["triangles"] != None:
+#            print "drawing triangles"
+#            print v["triangles"]
             Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
           else:
             Mesh(vertices=vertices, indices=indices, mode="line_loop")
@@ -530,13 +532,15 @@ class MapView(Widget):
       try:
         tri = Triangulator(polygon)
         triangles = tri.triangles()
+        if len(triangles) == 0:
+          raise Exception("No triangles computed.")
         triIdx = []
         for tri in triangles:
           for point in tri:
             triIdx.append(polygon.index(point))   
         self.placemarks[name]["triangles"] = triIdx
       except:
-        print "Triangulation failed."
+        print "Triangulation failed. Will just visualise the border."
     else:
       self.showPolygon(name)
       marker = self.placemarks[name]["marker"]
