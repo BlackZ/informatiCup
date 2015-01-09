@@ -12,7 +12,7 @@ from kivy.uix.scatter import Scatter
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.properties import NumericProperty, ObjectProperty, ListProperty, \
     AliasProperty, BooleanProperty, DictProperty
-from kivy.graphics import Canvas, Color, Rectangle, Mesh
+from kivy.graphics import Canvas, Color, Rectangle, Mesh, Triangle
 from kivy.graphics.transformation import Matrix
 from kivy.lang import Builder
 from kivy.compat import string_types
@@ -21,12 +21,13 @@ from mapview import MIN_LONGITUDE, MAX_LONGITUDE, MIN_LATITUDE, MAX_LATITUDE, \
     CACHE_DIR, Coordinate, Bbox
 from mapview.source import MapSource
 from mapview.utils import clamp
+from isySUR.gui.triangulation import Triangulator
 
 
 Builder.load_string("""
 <MapMarker>:
     size_hint: None, None
-    source: root.default_marker_fn
+    source: self.default_marker_fn
     size: list(map(dp, self.texture_size))
     allow_stretch: True
 
@@ -269,6 +270,7 @@ class MapView(Widget):
     """
 
     kmls = ListProperty()
+    triangles = ListProperty()
     kml_colors = ListProperty()
     marker = ListProperty()
 
@@ -425,16 +427,35 @@ class MapView(Widget):
         layer.add_widget(marker)
         layer.set_marker_position(self, marker)
         
-        
+#        
+#    def drawPolygon(self):
+#        self.polyLayer.canvas.clear()     
+#        for kml in self.kmls:
+#            r,g,b,a = self.kml_colors[self.kmls.index(kml)]
+#            #print color
+#            vertices = []
+#            indices = []
+#            i = 0
+#            for coords in kml:
+#                x,y = self.get_window_xy_from(coords[1],coords[0], self._zoom)
+#              
+#                vertices.extend([x,y,0,0])
+#                indices.append(i)
+#                i+=1
+#            with self.polyLayer.canvas:
+#                Color(r,g,b,a, mode='rgba')
+#                Mesh(vertices=vertices, indices=self.triangles[self.kmls.index(kml)], mode="triangles")
+              
     def drawPolygon(self):
-        self.polyLayer.canvas.clear()            
-        for kml in self.kmls:
-            r,g,b,a = self.kml_colors[self.kmls.index(kml)]
+        self.polyLayer.canvas.clear()     
+        for k,v in self.placemarks.items():
+          if v["show"]:
+            r,g,b,a = v["color"]
             #print color
             vertices = []
             indices = []
             i = 0
-            for coords in kml:
+            for coords in v["poly"]:
                 x,y = self.get_window_xy_from(coords[1],coords[0], self._zoom)
               
                 vertices.extend([x,y,0,0])
@@ -442,43 +463,73 @@ class MapView(Widget):
                 i+=1
             with self.polyLayer.canvas:
                 Color(r,g,b,a, mode='rgba')
-                Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
+                if v["triangles"] != None:
+                  Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
+                else:
+                  Mesh(vertices=vertices, indices=indices, mode="line_loop")
 
-    def addPolygon(self, polygon, color, markerCoords):
-        marker = None
-        if markerCoords != None:
-            marker = MapMarker()
-            marker.lat, marker.lon = markerCoords
-            self.add_marker(marker)
-            print marker.source
-            print marker.parent
+    def addPolygon(self, name, polygon, color, markerCoords):
+        
+#            print marker.source
+#            print marker.parent
             
-        print color        
+#        print color        
 
-        lineColor = self.convertKMLColor(color['lineColour'])
-        lineWidth = color ['lineWidth']
+#        lineColor = self.convertKMLColor(color['lineColour'])
+#        lineWidth = color ['lineWidth']
         polyColor = self.convertKMLColor(color['polyColour'])
         
-        self.kmls.append(polygon)
-        self.kml_colors.append(polyColor)
-        self.marker.append(marker)
+        if not self.placemarks.has_key(name):
+          marker = None
+          if markerCoords != None:
+            marker = MapMarker()
+            marker.lat, marker.lon = markerCoords
+            print marker.source
+            self.add_marker(marker)
+          self.placemarks[name] = {"poly": polygon, "show":1, "color": polyColor, "triangles":None, "marker": marker}
+          
+  #        self.kmls.append(polygon)
+          try:
+            tri = Triangulator(polygon)
+            triangles = tri.triangles()
+            triIdx = []
+            for tri in triangles:
+              for point in tri:
+                triIdx.append(polygon.index(point))   
+            self.placemarks[name]["triangles"] = triIdx
+          except:
+            print "Triangulation failed."
+        else:
+          self.showPolygon(name)
+          marker = self.placemarks[name]["marker"]
+          if not marker in self._default_marker_layer.children:
+            self.add_marker(marker)
+        
         self.drawPolygon()
+        
+    def showPolygon(self, name):
+      if self.placemarks.has_key(name):
+        self.placemarks[name]["show"] = 1
     
-    def removePolygon(self, polygon):
-        index = self.kmls.index(polygon)
-        self.kmls.remove(polygon)
-        del self.kml_colors[index]
-        marker = self.marker[index]
+    def hidePolygon(self, name):
+      if self.placemarks.has_key(name):
+        self.placemarks[name]["show"] = 0
+    
+    def removePolygon(self, name):
+        self.hidePolygon(name)
+        
+        marker = self.placemarks[name]["marker"]#self.marker[index]
         if marker != None:
             self._default_marker_layer.clear_widgets([marker])
-        del self.marker[index]
+
+#        del self.marker[index]
         self.drawPolygon()
     
     def convertKMLColor(self, kmlColor):
         """
         Convert a KML Color to its rgba value between 0 and 1.
         """
-        print "KML:", kmlColor
+#        print "KML:", kmlColor
         lv = len(kmlColor)
         #alpha, blue, green, red
         abgr = tuple(tuple(int(kmlColor[i:i + lv // 4], 16) for i in range(0, lv, lv // 4)))
@@ -557,7 +608,11 @@ class MapView(Widget):
         Clock.schedule_interval(self._animate_color, 1 / 60.)
         
         self.polyLayer = PolyMapLayer()
-        self.add_layer(self.polyLayer)  
+        self.add_layer(self.polyLayer)
+        
+        self.triangles = {}
+        self.placemarks = {}
+        self.marker = {}
 
         super(MapView, self).__init__(**kwargs)
 

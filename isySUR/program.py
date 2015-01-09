@@ -110,19 +110,15 @@ class Pipeline:
       @rtype: kmlData.KMLObject
     """
 
-    #print "working on sur: ", surObj.id
+    print "working on sur: ", surObj.id
     coords = (surObj.latitude, surObj.longitude)
     
-#    print bBox
+
     
     kmlObj = kml.KMLObject(surObj.id+".kml")
     
     self.osm = self._getOSMData(surObj, coords)  
 
-#    print "nodes:", len(self.osm.nodes)
-#    print "ways:", len(self.osm.ways)
-#    print "relations:", len(self.osm.relations)
-#      
     if surObj.classification in ["I","IO"]:
       nearObjs = self._getNearestObj(coords, {"building":"*"})
     else:

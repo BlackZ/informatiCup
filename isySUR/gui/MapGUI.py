@@ -104,8 +104,8 @@ class Map(FloatLayout):
     placemarks = kmlObj.placemarks
     for placemark in placemarks:
       style = kmlObj.styles[placemark.style.lstrip('#')]
-      print style
-      self.maps.addPolygon(self.app.getPolygonFromPlacemark(placemark), style, placemark.ruleCoords)
+#      print style
+      self.maps.addPolygon(placemark.name, self.app.getPolygonFromPlacemark(placemark), style, placemark.ruleCoords)
     
       move_to = placemarks[0].polygon[0]
       move_to = move_to.split(',')
@@ -116,8 +116,8 @@ class Map(FloatLayout):
     return move_to
     
     
-  def removePolygon(self, polygon):
-    self.maps.removePolygon(polygon)
+  def removePolygon(self, name):#polygon):
+    self.maps.removePolygon(name)
   
   def computeAndShowKmls(self, path, queue):
     toast = Label(text="Calculating ...", #text_size=(205,20), texture_size=(205,20),
@@ -379,7 +379,8 @@ class KMLList(DropDown):
     else:
       obj.background_color = (1,1,1,1)
       for placemark in placemarks:
-        self.map_view.removePolygon(self.app.getPolygonFromPlacemark(placemark))
+#        self.map_view.removePolygon(self.app.getPolygonFromPlacemark(placemark))
+        self.map_view.removePolygon(placemark.name)
     self.app.loaded_kmls[obj.text]['selected'] = not selected
 
   def addItem(self, name):
