@@ -276,6 +276,8 @@ class MapView(Widget):
   """If True, this will activate the double-tap to zoom.
   """
 
+  markers = BooleanProperty(True)
+
   kmls = ListProperty()
   triangles = ListProperty()
   kml_colors = ListProperty()
@@ -519,7 +521,8 @@ class MapView(Widget):
         marker = MapMarker()
         marker.lat, marker.lon = markerCoords
         self.trigger_update(True)
-        self.add_marker(marker)
+        if marker:
+          self.add_marker(marker)
         
       self.placemarks[name] = {"poly": polygon, 
         "show":1, "color": polyColor, 
@@ -540,7 +543,16 @@ class MapView(Widget):
         print "Triangulation failed."
     else:
       self.showPolygon(name)
-    
+  
+  def hideMarkers(self):
+    if self._default_marker_layer != None:
+      self._default_marker_layer.unload()
+
+  def showMarkers(self):
+    for placemark in self.placemarks:
+      self.trigger_update(True)
+      self.add_marker(self.placemarks[placemark]['marker'])
+
   def getBBoxOfPolygon(self, polygon):
     minLat = 99999.9
     maxLat = 0.0

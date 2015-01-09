@@ -251,7 +251,6 @@ class Menue(DropDown):
    self._popup_config.dismiss()
    self.config = None
   
-  
   def show_load(self, obj, config=None):
     self.isOpen = False
     self.dismiss()
@@ -408,6 +407,17 @@ class Menue(DropDown):
       self.map_view.toast("No KML files selected or loaded!")
 
     self.dismiss_save()
+  
+  def switchMarkers(self, obj):
+    if "Hide" in obj.text:
+      obj.text = "Show Markers"
+      self.map_view.maps.markers = False
+      self.map_view.maps.hideMarkers()
+    elif "Show" in obj.text:
+      obj.text = "Hide Markers"
+      self.map_view.maps.markers = True
+      self.map_view.maps.showMarkers()
+
 
 class CustomFileChooser(FileChooserListView):
   """

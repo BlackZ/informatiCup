@@ -42,6 +42,12 @@
         background_color: (0,0,2,1)
         on_release: root.show_save()
     Button:
+        text: 'Hide Markers'
+        size_hint_y: None
+        height: 44
+        background_color: (0,0,2,1)
+        on_release: root.switchMarkers(self)
+    Button:
         text: 'Config'
         size_hint_y: None
         height: 44
