@@ -568,10 +568,12 @@ class MapView(Widget):
   def showPolygon(self, name):
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 1
+      self.drawPolygon()
   
   def hidePolygon(self, name):
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 0
+      self.drawPolygon()
   
   def removePolygon(self, name):
     self.hidePolygon(name)
