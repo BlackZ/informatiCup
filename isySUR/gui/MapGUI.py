@@ -462,15 +462,16 @@ class KMLList(DropDown):
       #self.map_view.addPolygon((obj.text, self.app.getPolygonFromPlacemark(placemark)))
       self.app.loaded_kmls[obj.text]['selected'] = not isSelected
     else:
-#      if self.map_view.maps.isPolyInView(obj.text):
+      if len(polygons) == 1 and self.map_view.maps.isPolyInView(polygons[0]) or\
+         len(polygons) > 1 and self.map_view.maps.isPolyInView(polygons[-1]):
         obj.background_color = (1,1,1,1)
         #for placemark in placemarks:
   #        self.map_view.removePolygon(self.app.getPolygonFromPlacemark(placemark))
         self.map_view.hidePolygons(polygons)
         #self.map_view.removePolygon(obj.text)
         self.app.loaded_kmls[obj.text]['selected'] = not isSelected
-#      else:
-#        self.map_view.showPolygons(polygons)
+      else:
+        self.map_view.showPolygons(polygons)
         #self.map_view.addPolygon((obj.text, self.app.getPolygonFromPlacemark(placemark)))
 
   def addItem(self, name):
