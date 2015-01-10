@@ -85,7 +85,6 @@ class KMLObject():
     stylesToParse = []
     
     fileNameIndex = filename.rfind(os.sep)
-    #Mabe remove file ending
     if fileNameIndex > 0:
       kmlName = filename[fileNameIndex+1:]
     else:
@@ -406,9 +405,6 @@ class Placemark():
     #Add this line by hand in order to be able to compare with truth string better.
     #Results in having to unescape the <> in the kmlObject though
     description.text ="<img src='"+ self.imageName + "' width = '400' />"
-#    image = ET.SubElement(description, "img")
-#    image.attrib["src"] = self.name
-#    image.attrib["width"] = '400'
     style = ET.SubElement(root, "styleUrl")
     style.text = self.style
     

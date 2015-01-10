@@ -112,5 +112,4 @@ class SUR():
         surs.append(sur)
         lastID = line[0]
       
-    #return SURs
     return surs
