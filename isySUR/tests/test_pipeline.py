@@ -10,6 +10,7 @@ from Queue import Queue
 from isySUR import program
 from isySUR import sur
 from isySUR import kmlData
+from isySUR import osmData
 import os
 
 class TestProgrammPipeline(unittest.TestCase):
@@ -36,6 +37,18 @@ class TestProgrammPipeline(unittest.TestCase):
     self.assertTrue(len(kml.placemarks)>0)
     for pl in kml.placemarks:
       self.assertTrue(pl.hasPolygon())
+      
+  def test_createPolyString(self):
+    self.testOSM=osmData.OSM()
+    self.testOSM.addNodeList([osmData.Node(1, 52.12, 4.12, {}),
+                               osmData.Node(2, 52.13, 4.12,{}),
+                               osmData.Node(3, 52.12, 4.13, {})])
+
+    self.testWay = osmData.Way(1, [1,2,3,1], {"highway":"residential","name":"Clipstone Street"},self.testOSM)
+    self.testOSM.addWay(self.testWay)
+    self.pipeObj.osm = self.testOSM
+    polyString = self.pipeObj._createPolyString(self.testWay)
+    self.assertEqual(polyString, '52.12 4.12 52.13 4.12 52.12 4.13 ')
   
   def test_createBBox(self):
     centralPoint = (53.86351, 8.65816)

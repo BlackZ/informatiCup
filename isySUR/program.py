@@ -119,7 +119,7 @@ class Pipeline:
     
     self.osm = self._getOSMData(surObj, coords)  
 
-    if surObj.classification in ["I","IO"]:
+    if surObj.classification in ["I"]:#,"IO"]:
       nearObjs = self._getNearestObj(coords, {"building":"*"})
     else:
       nearObjs = self._getNearestObj(coords)
@@ -135,26 +135,37 @@ class Pipeline:
         for mem in tmpRel.members:
           if mem[2] == "outer":
             tmpWay = self.osm.ways[mem[1]]
+#            print "using way", mem[1]
       if tmpObj[1] == osmData.Way:
         tmpWay = self.osm.ways[tmpObj[0]]
+#        print "using way", tmpObj[0]
         
       if tmpWay.tags.has_key("landuse"):
-        print "is landuse"
+        
         if tmpWay.tags["landuse"] == "residential":
-          otherWayIds = self.osm.ways.keys()
-          otherWayIds.remove(tmpWay.id)
-          buildings = self.osm.getNearestWay(coords, True, {"building":"*"}, otherWayIds)
+          print "is residential landuse, searching for buildings"
+          
+          polyString = self._createPolyString(tmpWay)
+#          print polyString
+          landUseData = self.osmAPI.getDataFromPoly(polyString)    
+          
+          buildings = landUseData.getNearestWay(coords, True, {"building":"*"})
+#          
+#          otherWayIds = self.osm.ways.keys()
+#          otherWayIds.remove(tmpWay.id)
+#          buildings = self.osm.getNearestWay(coords, True, {"building":"*"}, otherWayIds)
 
           if len(buildings) > 1:
             print "more than one potential building."
           usedStyle = self.uncertainStyle
           for build in buildings:
             tmpBuild = build.nearestObj
-            tmpWay = self.osm.ways[tmpBuild[0]]
-            usedStyle = self.certainStyle
-#            possibleWays.append(tmpWay)
-#            #Set to None to prevent adding it multiple times
-#            tmpWay = None              
+            if self.osm.ways.has_key(tmpBuild[0]):
+              tmpWay = self.osm.ways[tmpBuild[0]]
+              usedStyle = self.certainStyle
+              possibleWays.append(tmpWay)
+              #Set to None to prevent adding it multiple times
+              tmpWay = None              
             
       
       if tmpWay != None:
@@ -163,6 +174,9 @@ class Pipeline:
     if len(possibleWays) == 0:
       print "No ways found :-(."
       return None
+
+    #Filter out potential building parts:
+    possibleWays = [way for way in possibleWays if not way.tags.has_key("building:part")]  
           
     bestWay = None
     closestDist = sys.float_info.max
@@ -171,10 +185,12 @@ class Pipeline:
       for ref in way.refs:
         dist += self.osm.nodes[ref].getDistance(coords).distance
       dist /= len(way.refs)
+#      print "dist for", way.id, dist
       if dist < closestDist:
         closestDist = dist
         bestWay = way
             
+#    print "best way:", bestWay.id
     points = []  
     for ref in bestWay.refs[:-1]:
       points.append(self.osm.nodes[ref].getCoordinateString())
@@ -198,6 +214,14 @@ class Pipeline:
     
     return kmlObj
     
+    
+  def _createPolyString(self, way):
+    res = ""
+    for ref in way.refs[:-1]:
+      res += str(self.osm.nodes[ref].lat) + " " + str(self.osm.nodes[ref].lon) + " " 
+      
+    return res
+    
   def _getOSMData(self, surObj, coords):
     """
       Private function to start with a small bounding box and increase it's size
@@ -215,11 +239,17 @@ class Pipeline:
     bBox = self._createBBox(coords)
     storeWidth = self.widthBBox
     storeHeight = self.heightBBox
+    rules = [('node',['"building"','"type"!~"^route"']),
+             ('way',['"building"','"type"!~"^route"']),
+              ('relation',['"building"','"type"!~"^route"'])]
+    defaultRulesNoRoutes = [('node',['"type"!~"^route"']),
+                            ('way',['"type"!~"^route"','"highway"!~"."']),
+                ('relation',['"type"!~"^route"'])]
     osm = None
     if surObj.classification == "I":
-      osm = self.osmAPI.performRequest(bBox, [(["node","way","relation"],"building","")])
+      osm = self.osmAPI.performRequest(bBox, rules)
     else:
-      osm = self.osmAPI.performRequest(bBox)
+      osm = self.osmAPI.performRequest(bBox, defaultRulesNoRoutes)
       
     #Increase boundingBox until we actually find SOMETHING
     while len(osm.nodes) < 3:
@@ -227,9 +257,9 @@ class Pipeline:
       self.heightBBox *= 2
       bBox = self._createBBox(coords)
       if surObj.classification == "I":
-        osm = self.osmAPI.performRequest(bBox, [(["node","way","relation"],"building","")])
+        osm = self.osmAPI.performRequest(bBox, rules)
       else:
-        osm = self.osmAPI.performRequest(bBox)
+        osm = self.osmAPI.performRequest(bBox, defaultRulesNoRoutes)
         
     self.widthBBox = storeWidth
     self.heightBBox = storeHeight
@@ -252,9 +282,11 @@ class Pipeline:
     nearObjs = self.osm.getNearestRelation(coords, tags=tags)
     
     if len(nearObjs) == 0:
+      nearObjs = self.osm.getNearestWay(coords, True, tags=tags)
+    if len(nearObjs) == 0:
       nearObjs = self.osm.getNearestWay(coords, True)
     if len(nearObjs) == 0:
-      nearObjs = self.osm.getNearestWay(coords, False)  
+      nearObjs = self.osm.getNearestWay(coords, False)
 #    if nearObj.distance == "-1":    
 #      nearObj = self.osm.getNearestNode(coords)
 #      
