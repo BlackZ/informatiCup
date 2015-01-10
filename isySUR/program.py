@@ -127,7 +127,7 @@ class Pipeline:
       nearObjs = self._getNearestObj(coords)
     
 
-#    print "number nearObjs", len(nearObjs)
+    print "number nearObjs", len(nearObjs)
     usedStyle = self.certainStyle
     possibleWays = []
     for obj in nearObjs:
@@ -138,10 +138,10 @@ class Pipeline:
         for mem in tmpRel.members:
           if mem[2] == "outer":
             tmpWay = self.osm.ways[mem[1]]
-#            print "using way from relation", mem[1]
+            print "using way from relation", mem[1]
       if tmpObj[1] == osmData.Way:
         tmpWay = self.osm.ways[tmpObj[0]]
-#        print "using way", tmpObj[0]
+        print "using way", tmpObj[0]
         
       if tmpWay != None and tmpWay.tags.has_key("landuse"):
         
@@ -168,27 +168,25 @@ class Pipeline:
               usedStyle = self.certainStyle
               possibleWays.append(tmpWay)
               #Set to None to prevent adding it multiple times
-              tmpWay = None              
-              
-      #If we find a building part -> Search for building
-#      if tmpWay != None and tmpWay.tags.has_key("building:part"):
-#        completeBuildings = self.osm.getNearestWay(coords, True, {"building":"*"})
-#        for build in completeBuildings:
-#          tmpBuild = build.nearestObj
-#          if self.osm.ways.has_key(tmpBuild[0]):
-            
+              tmpWay = None                          
       
       if tmpWay != None:
         possibleWays.append(tmpWay)
-        
-    
 
-    #Filter out potential building parts:
-#    possibleWays = [way for way in possibleWays if not way.tags.has_key("building:part")]  
 
     if len(possibleWays) == 0:
       print "No ways found :-(."
       return None    
+      
+    buildingsIncluded = False  
+    # Prever buildings if rule is applicable indoor
+    for way in possibleWays:
+      if way.tags.has_key("building"):
+        buildingsIncluded = True
+        break
+    
+    if buildingsIncluded and surObj.classification in ["I","IO"]:
+      possibleWays = [x for x in possibleWays if x.tags.has_key("building")]
       
     bestWay = None
     closestDist = sys.float_info.max
@@ -197,12 +195,12 @@ class Pipeline:
       for ref in way.refs:
         dist += self.osm.nodes[ref].getDistance(coords).distance
       dist /= len(way.refs)
-#      print "dist for", way.id, dist
+      print "dist for", way.id, dist
       if dist < closestDist:
         closestDist = dist
         bestWay = way
             
-#    print "best way:", bestWay.id
+    print "best way:", bestWay.id
     points = []  
     for ref in bestWay.refs[:-1]:
       points.append(self.osm.nodes[ref].getCoordinateString())
@@ -252,11 +250,11 @@ class Pipeline:
     storeWidth = self.widthBBox
     storeHeight = self.heightBBox
     rules = [('node',['"building"','"type"!~"^route"','"type"!~"TMC"']),
-             ('way',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"TMC"']),
-              ('relation',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"','"type"!~"TMC"'])]
+             ('way',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"TMC"', '"building:part"!~"."']),
+              ('relation',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"','"type"!~"TMC"', '"building:part"!~"."'])]
     defaultRulesNoRoutes = [('node',['"type"!~"^route"','"type"!~"TMC"']),
-                            ('way',['"type"!~"^route"','"highway"!~"."', '"type"!~"associatedStreet"','"type"!~"TMC"']),
-                ('relation',['"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"','"type"!~"TMC"'])]
+                            ('way',['"type"!~"^route"','"highway"!~"."', '"type"!~"associatedStreet"','"type"!~"TMC"', '"building:part"!~"."']),
+                ('relation',['"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"','"type"!~"TMC"', '"building:part"!~"."'])]
     osm = None
     if surObj.classification == "I":
       osm = self.osmAPI.performRequest(bBox, rules)

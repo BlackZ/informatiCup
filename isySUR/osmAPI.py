@@ -90,7 +90,7 @@ class osmAPI():
     return res
 
   def _parseDataET(self, obj):
-#    print obj
+    print obj
     osmObj = osmData.OSM()
     
     root=ET.fromstring(obj)
