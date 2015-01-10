@@ -40,13 +40,13 @@ def gui(args):
     import isySUR.gui.MapGUI as gui
     mapApp = gui.MapApp(args.config)
     mapApp.run()
-  except BaseException as e:
+  except BaseException:
     if not mapApp == None:
       mapApp.on_stop()
     import traceback
     traceback.print_exc()
     sys.exit('Program stopped unexpected!')
-  except Exception as e:
+  except Exception:
     print "GUI could not be loaded. Is kivy installed correctly?"
     import traceback
     traceback.print_exc()

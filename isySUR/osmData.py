@@ -578,7 +578,7 @@ class Way(object):
     # Calculate the t that minimizes the distance.
     t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)
   
-    # See if this represents one of the segment's
+    # See if this represents one of the segments
     # end points or a point in the middle.
     if t < 0:
       dx = px - x1
@@ -658,7 +658,6 @@ class Way(object):
     if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("getDistance only accepts Tupels from type types.TupelType with 2 Entries from type float")
     
-    #minDist=sys.float_info.max
     result=distanceResult(sys.float_info.max,(self.id,self.__class__))
     for s in self._sides():
       dist=self._distPointLine(point[0],point[1],s[0][0],s[0][1],s[1][0],s[1][1])
@@ -747,7 +746,6 @@ class Relation(object):
           ways.append(m[1])
       for w1_key in ways:             # for all ways proove if it could be completed to a polygon
         if not any([w1_key in x for x in rel.polygons]):
-          w1=self.osmObj.ways[w1_key]          # get polygon by id
           tmpResult=[w1_key]
           tmpWays=copy.deepcopy(ways)   # make a deep copy of the remaining way-objects
           tmpWays.remove(w1_key)        # and delete the current way
