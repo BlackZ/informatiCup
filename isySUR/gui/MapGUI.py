@@ -381,37 +381,37 @@ class Menue(DropDown):
     isDir = os.path.isdir(os.path.join(path, filename))
     completeKML = kmlData.KMLObject("complete")
     
-    #selection = self.app.getSelectedPolygons()
-    #if len(selection) > 0:
-    for elem in selection:         
-      if isDir:  
+    selection = self.app.getSelectedPolygons()
+    if len(selection) > 0:
+      for elem in selection:         
+        if isDir:  
+          try:
+            selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
+          except:
+            import traceback
+            traceback.print_exc()
+            self.map_view.toast(elem + " could not be saved!")
+        print selection[elem].placemarks
+        completeKML.placemarks.extend(selection[elem].placemarks)
+        completeKML.addStyles(selection[elem].styles)
+      if len(completeKML.placemarks) > 0:
         try:
-          selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
-        except:
+          if isDir:
+            completeKML.saveAsXML(path + os.path.sep + 'complete.kml')
+          else:
+            name, ext = os.path.splitext(filename)
+            if ext == '':
+              filename = filename + '.kml'
+            with open(os.path.join(path, filename), 'w') as stream:
+              stream.write(completeKML.getXML())
+        except Exception as e:
+          print e
           import traceback
           traceback.print_exc()
-          self.map_view.toast(elem + " could not be saved!")
-      print selection[elem].placemarks
-      completeKML.placemarks.extend(selection[elem].placemarks)
-      completeKML.addStyles(selection[elem].styles)
-    if len(completeKML.placemarks) > 0:
-      try:
-        if isDir:
-          completeKML.saveAsXML(path + os.path.sep + 'complete.kml')
-        else:
-          name, ext = os.path.splitext(filename)
-          if ext == '':
-            filename = filename + '.kml'
-          with open(os.path.join(path, filename), 'w') as stream:
-            stream.write(completeKML.getXML())
-      except Exception as e:
-        print e
-        import traceback
-        traceback.print_exc()
-        self.map_view.toast('An error occured while saving!')
-        #map_view.ids.toast.text = "An error occured while saving!"
-    #else:
-      #self.map_view.toast("No KML files selected or loaded!")
+          self.map_view.toast('An error occured while saving!')
+          #map_view.ids.toast.text = "An error occured while saving!"
+    else:
+      self.map_view.toast("No KML files selected or loaded!")
 
     self.dismiss_save()
   
@@ -656,56 +656,62 @@ class ConfigDialog(FloatLayout):
             oldArea.remove(rule)    
     
   def action(self, obj):
-    if len(self.app.configContent) > 0:
-      if "New" in obj.text:
-        obj.text = "Add Rule"
-        self.ruleInput.text = ""
-        self.layout.add_widget(self.ruleInput)
-        self.ids.view.scroll_y = 0 
-      elif "Add" in obj.text:
-        obj.text = "New Rule"
-        self.layout.remove_widget(self.ruleInput)
-        if self.ruleInput.text != "":
-          self.app.configContent['[Both]'].append(self.ruleInput.text)
-          
-          group = str(self.counter)
-          label = Label(text=self.ruleInput.text, size_hint=(.4,.1))
-          self.labels.append(label)
-          btn1 = CheckBox(group=group, active=False, size_hint=(.1,.1), id='[Indoor]')
-          btn2 = CheckBox(group=group, active=False, size_hint=(.1,.1), id='[Outdoor]')
-          btn3 = CheckBox(group=group, active=True, size_hint=(.1,.1), id='[Both]')
-          btn4 = CheckBox(size_hint=(.1, .1), id=group, active=False)
-          
-          btn1.bind(active=self.changeRuleArea)
-          btn2.bind(active=self.changeRuleArea)
-          btn3.bind(active=self.changeRuleArea)
-          btn4.bind(active=self.deleteEntry)
-          
-          self.layout.add_widget(label)
-          self.layout.add_widget(btn1)
-          self.layout.add_widget(btn2)
-          self.layout.add_widget(btn3)
-          self.layout.add_widget(btn4)
-          
-          self.counter += 1
-          self.ids.view.scroll_y = 0
-      elif 'Delete' in obj.text:
-        remove = []
-        print "Delete"
-        obj.text = "New Rule"
-        for selection in self.selected:
-          label = self.labels[int(selection) -1]
-          remove.append(label)
-          rule = label.text
-          for values in self.app.configContent.values():
-            if rule in values:
-              values.remove(rule)
-          for child in self.layout.children:
-            if isinstance(child, CheckBox) and \
-             (child.id == selection or child.group == selection):
-              remove.append(child)
-        self.layout.clear_widgets(remove)
+    #if len(self.app.configContent) > 0:
+    if "New" in obj.text:
+      if len(self.app.configContent)==0:
+        self.addConfigContent()
+      obj.text = "Add Rule"
+      self.ruleInput.text = ""
+      self.layout.add_widget(self.ruleInput)
+      self.ids.view.scroll_y = 0 
+    elif "Add" in obj.text:
+      obj.text = "New Rule"
+      self.layout.remove_widget(self.ruleInput)
+      if self.ruleInput.text != "":
+        if len(self.app.configContent.keys())==0:
+          self.app.configContent = {'[Both]':[],'[Indoor]':[],'[Outdoor]':[]}
+        self.app.configContent['[Both]'].append(self.ruleInput.text)
         
+        group = str(self.counter)
+        label = Label(text=self.ruleInput.text, size_hint=(.4,.1))
+        self.labels.append(label)
+        btn1 = CheckBox(group=group, active=False, size_hint=(.1,.1), id='[Indoor]')
+        btn2 = CheckBox(group=group, active=False, size_hint=(.1,.1), id='[Outdoor]')
+        btn3 = CheckBox(group=group, active=True, size_hint=(.1,.1), id='[Both]')
+        btn4 = CheckBox(size_hint=(.1, .1), id=group, active=False)
+        
+        btn1.bind(active=self.changeRuleArea)
+        btn2.bind(active=self.changeRuleArea)
+        btn3.bind(active=self.changeRuleArea)
+        btn4.bind(active=self.deleteEntry)
+        
+        self.layout.add_widget(label)
+        self.layout.add_widget(btn1)
+        self.layout.add_widget(btn2)
+        self.layout.add_widget(btn3)
+        self.layout.add_widget(btn4)
+        
+        self.counter += 1
+        self.ids.view.scroll_y = 0
+    elif 'Delete' in obj.text:
+      remove = []
+      print "Delete"
+      obj.text = "New Rule"
+      for selection in self.selected:
+        label = self.labels[int(selection) -1]
+        remove.append(label)
+        rule = label.text
+        for values in self.app.configContent.values():
+          if rule in values:
+            values.remove(rule)
+        for child in self.layout.children:
+          if isinstance(child, CheckBox) and \
+           (child.id == selection or child.group == selection):
+            remove.append(child)
+      self.layout.clear_widgets(remove)
+      if len([y for x in self.app.configContent.values() for y in x])==0:
+        self.layout.clear_widgets()  
+        self.layout.add_widget(self.info)
         
   def deleteEntry(self, *args):
     for value in args:
@@ -749,13 +755,14 @@ class MapApp(App):
   
   def loadConfig(self, configPath):
     if configPath != '':
-      self.configContent = {}
+      self.configContent = {'[Both]':[],'[Indoor]':[],'[Outdoor]':[]}
       with open(configPath, 'r') as stream:
         for line in stream:
           line = line.replace('\n','')
           if line.startswith('['):
             key = line
-            self.configContent.update({key:[]})
+            if not key in self.configContent.keys():
+              self.configContent.update({key:[]})
           else:
             self.configContent[key].append(line)
   
