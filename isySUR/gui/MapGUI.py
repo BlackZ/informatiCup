@@ -278,9 +278,13 @@ class Menue(DropDown):
       content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
     else:
       content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
-    content.ids.filechooser.path = self.path
-    self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
-    self._popup_save.open()
+    selection = self.app.getSelectedPolygons()
+    if len(selection) > 0:
+      content.ids.filechooser.path = self.path
+      self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
+      self._popup_save.open()
+    else:
+      self.map_view.toast("No KML files selected or loaded!")
     
       
   def show_config(self):
@@ -376,37 +380,38 @@ class Menue(DropDown):
   def saveKML(self, path, filename):
     isDir = os.path.isdir(os.path.join(path, filename))
     completeKML = kmlData.KMLObject("complete")
-    selection = self.app.getSelectedPolygons()
-    if len(selection) > 0:
-      for elem in selection:         
-        if isDir:  
-          try:
-            selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
-          except:
-            import traceback
-            traceback.print_exc()
-            self.map_view.toast(elem + " could not be saved!")
-        print selection[elem].placemarks
-        completeKML.placemarks.extend(selection[elem].placemarks)
-        completeKML.addStyles(selection[elem].styles)
-      if len(completeKML.placemarks) > 0:
+    
+    #selection = self.app.getSelectedPolygons()
+    #if len(selection) > 0:
+    for elem in selection:         
+      if isDir:  
         try:
-          if isDir:
-            completeKML.saveAsXML(path + os.path.sep + 'complete.kml')
-          else:
-            name, ext = os.path.splitext(filename)
-            if ext == '':
-              filename = filename + '.kml'
-            with open(os.path.join(path, filename), 'w') as stream:
-              stream.write(completeKML.getXML())
-        except Exception as e:
-          print e
+          selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
+        except:
           import traceback
           traceback.print_exc()
-          self.map_view.toast('An error occured while saving!')
-          #map_view.ids.toast.text = "An error occured while saving!"
-    else:
-      self.map_view.toast("No KML files selected or loaded!")
+          self.map_view.toast(elem + " could not be saved!")
+      print selection[elem].placemarks
+      completeKML.placemarks.extend(selection[elem].placemarks)
+      completeKML.addStyles(selection[elem].styles)
+    if len(completeKML.placemarks) > 0:
+      try:
+        if isDir:
+          completeKML.saveAsXML(path + os.path.sep + 'complete.kml')
+        else:
+          name, ext = os.path.splitext(filename)
+          if ext == '':
+            filename = filename + '.kml'
+          with open(os.path.join(path, filename), 'w') as stream:
+            stream.write(completeKML.getXML())
+      except Exception as e:
+        print e
+        import traceback
+        traceback.print_exc()
+        self.map_view.toast('An error occured while saving!')
+        #map_view.ids.toast.text = "An error occured while saving!"
+    #else:
+      #self.map_view.toast("No KML files selected or loaded!")
 
     self.dismiss_save()
   
