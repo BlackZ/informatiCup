@@ -674,7 +674,8 @@ class ConfigDialog(FloatLayout):
           self.ids.view.scroll_y = 0
       elif 'Delete' in obj.text:
         remove = []
-        self.text = "New Rule"
+        print "Delete"
+        obj.text = "New Rule"
         for selection in self.selected:
           label = self.labels[int(selection) -1]
           remove.append(label)
