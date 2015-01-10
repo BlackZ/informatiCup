@@ -181,13 +181,14 @@ class Pipeline:
     buildingsIncluded = False  
     # Prever buildings if rule is applicable indoor
     for way in possibleWays:
-      if way.tags.has_key("building"):
+      if way.tags.viewkeys() & {"building","shop"}:
         buildingsIncluded = True
         break
     
     if buildingsIncluded and surObj.classification in ["I","IO"]:
-      possibleWays = [x for x in possibleWays if x.tags.has_key("building")]
+      possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop"}]
       
+    print possibleWays
     bestWay = None
     closestDist = sys.float_info.max
     for way in possibleWays:
