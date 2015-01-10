@@ -5,6 +5,7 @@ Config.set('graphics','resizable',0)
 
 
 import os
+from signal import signal, SIGINT
 from threading import Thread,Lock
 from Queue import Queue
 
@@ -176,6 +177,7 @@ class Map(FloatLayout):
     #            size=(self.toastLabel.texture_size[0]*2+10, self.toastLabel.texture_size[1]+ 6))
     
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
+    thread.daemon=True
     thread.start()
     
     surID = "" # Ueberfluessig, wenn Name in KML!!!
@@ -336,6 +338,7 @@ class Menue(DropDown):
       if ext == '.txt':
         if self._SURThread==None or not self._SURThread.isAlive():
           self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, ))
+          self._SURThread.daemon=True
           self._SURThread.start()
           
   def saveConfig(self, path, filename):
@@ -722,6 +725,7 @@ class MapApp(App):
     self.map.cleanUpCache()
   
   def on_start(self):
+    signal(SIGINT, self.stop) #Captures ctrl-c to exit correctly
     self.icon = 'logo.png'
     self.title = 'isySUR'
     
