@@ -457,7 +457,8 @@ class MapView(Widget):
         self.add_layer(layer)
       else:
         layer = self._default_marker_layer
-    layer.add_widget(marker)
+    if not marker in layer.children:
+      layer.add_widget(marker)
     layer.set_marker_position(self, marker)
     
   def drawPolygon(self):
@@ -519,7 +520,7 @@ class MapView(Widget):
     if not self.placemarks.has_key(name):
 
       marker = None
-      if markerCoords != None:
+      if markerCoords != None and self.markers:
         marker = MapMarker()
         marker.lat, marker.lon = markerCoords
         self.trigger_update(True)
