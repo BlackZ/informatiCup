@@ -179,12 +179,13 @@ class Pipeline:
       return None    
       
     buildingsIncluded = False  
-    # Prever buildings if rule is applicable indoor
+    
     for way in possibleWays:
       if way.tags.viewkeys() & {"building","shop"}:
         buildingsIncluded = True
         break
     
+    # Prever buildings if rule is applicable indoor
     if buildingsIncluded and surObj.classification in ["I","IO"]:
       possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop"}]
       

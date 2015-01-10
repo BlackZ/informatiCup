@@ -490,14 +490,8 @@ class MapView(Widget):
     
     latLonBox = self.get_bbox()
     polyBBox = self.placemarks[name]["bBox"]
-    centerLat = (polyBBox[0] + polyBBox[2]) / 2.0
-    centerLon = (polyBBox[1] + polyBBox[3]) / 2.0
-    return ((polyBBox[0] > latLonBox[0] and polyBBox[1] > latLonBox[1] and 
-      polyBBox[0] < latLonBox[2] and polyBBox[1] < latLonBox[3]) or 
-      (polyBBox[2] > latLonBox[0] and polyBBox[3] > latLonBox[1] and
-      polyBBox[2] < latLonBox[2] and polyBBox[3] < latLonBox[3]) or 
-      (centerLat > latLonBox[0] and centerLon > latLonBox[1] and 
-      centerLat < latLonBox[2] and centerLon < latLonBox[3]))
+    return not(polyBBox[0] > latLonBox[2] or polyBBox[1] > latLonBox[3] or 
+      polyBBox[2] < latLonBox[0] or polyBBox[3] < latLonBox[1])
 
   def isPolyVisible(self, name):
     
