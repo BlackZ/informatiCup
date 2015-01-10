@@ -277,11 +277,11 @@ class MapView(Widget):
   """
 
   markers = BooleanProperty(True)
-
-  kmls = ListProperty()
-  triangles = ListProperty()
-  kml_colors = ListProperty()
-  marker = ListProperty()
+#
+#  kmls = ListProperty()
+#  triangles = ListProperty()
+#  kml_colors = ListProperty()
+#  marker = ListProperty()
 
   delta_x = NumericProperty(0)
   delta_y = NumericProperty(0)
@@ -536,6 +536,7 @@ class MapView(Widget):
       try:
         tri = Triangulator(polygon)
         triangles = tri.triangles()
+#        print triangles
         if len(triangles) == 0:
           raise Exception("No triangles computed.")
         triIdx = []
