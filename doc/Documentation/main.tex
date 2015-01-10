@@ -365,7 +365,50 @@ Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie da
 
 \chapter{Added SURs}\label{sec:surs}
 For the competition at least ten new space usage rules should be found. Here our 20 found SURs are presented.
-\todol{Add our SURs (maybe with screenshot of intuitive area?)}
+
+\newcommand{\sur}[3]{\begin{minipage}{0.2\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{surs/#1}
+	#2: #3
+\end{minipage}}
+\newcommand{\area}[2]{\begin{minipage}{0.2\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{intuitive_areas/#1}
+	intuitive area of #2
+\end{minipage}}
+
+\begin{tabular}{cccc}
+\sur{isy0001.jpg}{isy0001.jpg}{smoking="no"} & \area{isy0001.png}{isy0001.jpg} & \sur{isy0002.jpg}{isy0002.jpg}{smoking="no", access:dog="no"} & \area{isy0002.png}{isy0002.jpg} \\ 
+\hline
+~\\
+\sur{isy0003.jpg}{isy0003.jpg}{access:dog="no"} & \area{isy0003.png}{isy0003.jpg} & \sur{isy0004.jpg}{isy0004.jpg}{smoking="no"} & \area{isy0004.png}{isy0004.jpg}
+\end{tabular}
+
+\begin{tabular}{cccc}
+\sur{isy0005.jpg}{isy0005.jpg}{smoking="no"} & \area{isy0005.png}{isy0005.jpg} & \sur{isy0006.jpg}{isy0006.jpg}{smoking="no"} & \area{isy0006.png}{isy0006.jpg} \\
+\hline
+~\\
+\sur{isy0007.jpg}{isy0007.jpg}{smoking="no"} & \area{isy0007.png}{isy0007.jpg} & \sur{isy0008.jpg}{isy0008.jpg}{smoking="no"} & \area{isy0008.png}{isy0008.jpg} \\
+\hline
+~\\
+\sur{isy0009.jpg}{isy0009.jpg}{smoking="no", access:bicycle="no"} & \area{isy0009.png}{isy0009.jpg} & \sur{isy0010.jpg}{isy0010.jpg}{access:bicycle="no"} & \area{isy0010.png}{isy0010.jpg} \\
+\hline
+~\\
+\sur{isy0011.jpg}{isy0011.jpg}{access="no"} &\area{isy0011and12.png}{isy0011.jpg}  & \sur{isy0012.jpg}{isy0012.jpg}{access:pram="no"} & \area{isy0011and12.png}{isy0012.jpg}
+\end{tabular}
+
+\begin{tabular}{cccc}
+\sur{isy0013.jpg}{isy0013.jpg}{smoking="no"} & \area{isy0013.png}{isy0013.jpg} & \sur{isy0014.jpg}{isy0014.jpg}{smoking="no", noise="no"} & \area{isy0014.png}{isy0014.jpg} \\
+\hline
+~\\
+\sur{isy0015.jpg}{isy0015.jpg}{smoking="no", access:dog="no"} & \area{isy0015.png}{isy0015.jpg} & \sur{isy0016.jpg}{isy0016.jpg}{access:fire\_case="no"} & \area{isy0016.png}{isy0016.jpg} \\
+\hline
+~\\
+\sur{isy0017.jpg}{isy0017.jpg}{dog\_waste="no"} & \area{isy0017.png}{isy0017.jpg} & \sur{isy0018.jpg}{isy0018.jpg}{smoking="no"} & \area{isy0018.png}{isy0018.jpg} \\
+\hline
+~\\
+\sur{isy0019.jpg}{isy0019.jpg}{access:bicycle="no"} & \area{isy0019.png}{isy0019.jpg} & \sur{isy0020.jpg}{isy0020.jpg}{access:dog="no", access:skate="no"} & \area{isy0020.png}{isy0020.jpg}
+\end{tabular}
 
 %----------------------------------------------------------------------------------------
 %	List of TODOS
