@@ -52,7 +52,7 @@ class TestOsmAPI(unittest.TestCase):
     polyString = "50.9263254 5.3972612 50.9264940 5.3967052 50.9260380 5.3963340 "\
                   "50.9258307 5.3968185 50.9261209 5.3971911"
     testData = self.osmAPIobj.getDataFromPoly(polyString)
-    self.assertEqual(len(testData.nodes),23)
+    self.assertEqual(len(testData.nodes),75)
     self.assertEqual(len(testData.ways),6)
     self.assertEqual(len(testData.relations),0)
   
@@ -67,7 +67,7 @@ class TestOsmAPI(unittest.TestCase):
     self.assertEqual(testObj['data'],'[out:xml][timeout:25];'\
                      '(node[""=""](52.032736,8.486593,52.042113,8.501194);'\
                      'way[""=""](52.032736,8.486593,52.042113,8.501194);'\
-                     'relation[""=""](52.032736,8.486593,52.042113,8.501194);<;);(._;>;); out body qt;')
+                     'relation[""=""](52.032736,8.486593,52.042113,8.501194););(._;>;); out body qt;')
     
     testObj2 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
                                                  self.boundingBox[1],
@@ -83,7 +83,7 @@ class TestOsmAPI(unittest.TestCase):
                      '(node["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
                      'way["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
                      'relation["amenity"="university"]["building"!="true"](52.032736,8.486593,52.042113,8.501194);'\
-                     '<;);(._;>;); out body qt;')
+                     ');(._;>;); out body qt;')
                      
     testObj3 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
                                                  self.boundingBox[1],
@@ -99,7 +99,7 @@ class TestOsmAPI(unittest.TestCase):
                      '(node["building"](52.032736,8.486593,52.042113,8.501194);'\
                      'way["building"](52.032736,8.486593,52.042113,8.501194);'\
                      'relation["building"](52.032736,8.486593,52.042113,8.501194);'\
-                     '<;);(._;>;); out body qt;')
+                     ');(._;>;); out body qt;')
    
   #def test_performRequest(self):
     #self.requestData = self.osmAPIobj.performRequest(self.boundingBox)

@@ -21,7 +21,7 @@ class osmAPI():
       return {'data': '[out:xml][timeout:25];'\
               '(node[""=""]({minLat},{minLon},{maxLat},{maxLon});'\
               'way[""=""]({minLat},{minLon},{maxLat},{maxLon});'\
-              'relation[""=""]({minLat},{minLon},{maxLat},{maxLon});<;);'\
+              'relation[""=""]({minLat},{minLon},{maxLat},{maxLon}););'\
               '(._;>;); out body qt;'.format(**locals())} #out body;>;out body qt;'.format(**locals())}
     else:
       compactOverpassQLstring = '[out:xml][timeout:25];('
@@ -35,7 +35,7 @@ class osmAPI():
                 #    compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);'% (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
                 #else:
                 #    compactOverpassQLstring += '%s["%s"](%s,%s,%s,%s);'% (obj, fil[1], minLat, minLon, maxLat, maxLon)
-      compactOverpassQLstring += '<;);(._;>;); out body qt;'
+      compactOverpassQLstring += ');(._;>;); out body qt;'
       return  {'data':compactOverpassQLstring}
       
   def getDataFromPoly(self, polyString):
@@ -48,7 +48,7 @@ class osmAPI():
       @return: The parsed osmData
       @rtype: osmData.OSM
     """
-    return self._parseDataET(requests.get(self.osmurl, params={'data':'(node(poly:"'+polyString+'");<;);out body qt;'}).content)
+    return self._parseDataET(requests.get(self.osmurl, params={'data':'(node(poly:"'+polyString+'");<;);(._;>;); out body qt;'}).content)
 
 
   def performRequest(self, boundingBox, filterList=[]):
@@ -90,6 +90,7 @@ class osmAPI():
     return res
 
   def _parseDataET(self, obj):
+#    print obj
     osmObj = osmData.OSM()
     
     root=ET.fromstring(obj)

@@ -120,11 +120,14 @@ class Pipeline:
     self.osm = self._getOSMData(surObj, coords)  
 
     if surObj.classification in ["I"]:#,"IO"]:
+#      print "searching buildings"
       nearObjs = self._getNearestObj(coords, {"building":"*"})
     else:
+#      print "searching everything"
       nearObjs = self._getNearestObj(coords)
     
 
+#    print "number nearObjs", len(nearObjs)
     usedStyle = self.certainStyle
     possibleWays = []
     for obj in nearObjs:
@@ -135,12 +138,12 @@ class Pipeline:
         for mem in tmpRel.members:
           if mem[2] == "outer":
             tmpWay = self.osm.ways[mem[1]]
-#            print "using way", mem[1]
+#            print "using way from relation", mem[1]
       if tmpObj[1] == osmData.Way:
         tmpWay = self.osm.ways[tmpObj[0]]
 #        print "using way", tmpObj[0]
         
-      if tmpWay.tags.has_key("landuse"):
+      if tmpWay != None and tmpWay.tags.has_key("landuse"):
         
         if tmpWay.tags["landuse"] == "residential":
           print "is residential landuse, searching for buildings"
@@ -166,18 +169,27 @@ class Pipeline:
               possibleWays.append(tmpWay)
               #Set to None to prevent adding it multiple times
               tmpWay = None              
+              
+      #If we find a building part -> Search for building
+#      if tmpWay != None and tmpWay.tags.has_key("building:part"):
+#        completeBuildings = self.osm.getNearestWay(coords, True, {"building":"*"})
+#        for build in completeBuildings:
+#          tmpBuild = build.nearestObj
+#          if self.osm.ways.has_key(tmpBuild[0]):
             
       
       if tmpWay != None:
         possibleWays.append(tmpWay)
         
-    if len(possibleWays) == 0:
-      print "No ways found :-(."
-      return None
+    
 
     #Filter out potential building parts:
-    possibleWays = [way for way in possibleWays if not way.tags.has_key("building:part")]  
-          
+#    possibleWays = [way for way in possibleWays if not way.tags.has_key("building:part")]  
+
+    if len(possibleWays) == 0:
+      print "No ways found :-(."
+      return None    
+      
     bestWay = None
     closestDist = sys.float_info.max
     for way in possibleWays:
@@ -239,12 +251,12 @@ class Pipeline:
     bBox = self._createBBox(coords)
     storeWidth = self.widthBBox
     storeHeight = self.heightBBox
-    rules = [('node',['"building"','"type"!~"^route"']),
-             ('way',['"building"','"type"!~"^route"']),
-              ('relation',['"building"','"type"!~"^route"'])]
-    defaultRulesNoRoutes = [('node',['"type"!~"^route"']),
-                            ('way',['"type"!~"^route"','"highway"!~"."']),
-                ('relation',['"type"!~"^route"'])]
+    rules = [('node',['"building"','"type"!~"^route"','"type"!~"TMC"']),
+             ('way',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"TMC"']),
+              ('relation',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"','"type"!~"TMC"'])]
+    defaultRulesNoRoutes = [('node',['"type"!~"^route"','"type"!~"TMC"']),
+                            ('way',['"type"!~"^route"','"highway"!~"."', '"type"!~"associatedStreet"','"type"!~"TMC"']),
+                ('relation',['"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"','"type"!~"TMC"'])]
     osm = None
     if surObj.classification == "I":
       osm = self.osmAPI.performRequest(bBox, rules)
@@ -279,18 +291,18 @@ class Pipeline:
       
       @return: A list of nearstObjects (see osmData.getNearestX for more details)
     """
-    nearObjs = self.osm.getNearestRelation(coords, tags=tags)
-    
-    if len(nearObjs) == 0:
-      nearObjs = self.osm.getNearestWay(coords, True, tags=tags)
-    if len(nearObjs) == 0:
-      nearObjs = self.osm.getNearestWay(coords, True)
-    if len(nearObjs) == 0:
-      nearObjs = self.osm.getNearestWay(coords, False)
+    nearRelations = self.osm.getNearestRelation(coords, tags=tags)
+    nearWays = self.osm.getNearestWay(coords, True, tags=tags)
+    if len(nearWays) == 0:
+#      print "no polygons with tags"
+      nearWays = self.osm.getNearestWay(coords, True)
+    if len(nearWays) == 0:
+#      print "no polygons"
+      nearWays = self.osm.getNearestWay(coords, False)
 #    if nearObj.distance == "-1":    
 #      nearObj = self.osm.getNearestNode(coords)
 #      
-    return nearObjs
+    return nearRelations + nearWays
   
   def _createDictionary(self):
     self.allObjects.update({self.osm.relations.__class__:self.osm.relations})
