@@ -12,6 +12,7 @@ import sur
 import os
 import sys
 
+from Queue import Queue
 
 class Pipeline:
   def __init__(self):
@@ -72,7 +73,7 @@ class Pipeline:
     else:
       print "Error: Could not compute placemarks."
   
-  def _computeKMLs(self, inPath, kmlList, configPath=''):
+  def _computeKMLs(self, inPath, kmlList, stopCalc, configPath=''):
     """
     Function to compute kmls from a given file of SURs. Only needed for GUI.
     
@@ -95,6 +96,8 @@ class Pipeline:
     #kmlList = []
     
     for s in surs:
+      if not stopCalc.empty():
+        break
       kmlList.put(s.id)
       kmlObj = self.calcKML(s)
       if kmlObj != None:

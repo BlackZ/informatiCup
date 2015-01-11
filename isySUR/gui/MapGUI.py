@@ -6,7 +6,7 @@ Config.set('graphics','resizable',0)
 
 import os
 from signal import signal, SIGINT
-from threading import Thread,Lock
+from threading import Thread,Lock, Event
 from Queue import Queue
 
 from isySUR import kmlData, program
@@ -42,9 +42,12 @@ class Map(FloatLayout):
     self.maps.center_on(52.023368, 8.538291)
     self.add_widget(self.maps, 20)
     self.toastLabel = Label(bold=True, font_size=20, color=(1,1,1,1))
-    
+    self.stop = Queue()
     self.kmlList = KMLList(self, app)
     self.menue = Menue(self, app)
+  
+  def setStop(self):
+    self.stop.put(True)
   
   def cleanUpCache(self):
     """
@@ -157,11 +160,11 @@ class Map(FloatLayout):
     toast.stayVisible("Calculating ... ")
     
     kmlList = Queue()
-    thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
-    thread.daemon=True
+    thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList, self.stop))
+    #thread.daemon=True
     thread.start()
     
-    while not kmlList.empty() or thread.isAlive():
+    while not self.stop.empty() and (not kmlList.empty() or thread.isAlive()):
       item = kmlList.get()
       if isinstance(item, IOError):
         toast.remove()
@@ -243,10 +246,6 @@ class Menue(DropDown):
       content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
       selection = self.app.getSelectedPolygons()
       if len(selection) == 0:
-        #content.ids.filechooser.path = self.path
-        #self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
-        #self._popup_save.open()
-      #else:
         self.map_view.toast("No KML files selected or loaded!")
         return
     content.ids.filechooser.path = self.path
@@ -290,7 +289,7 @@ class Menue(DropDown):
       if ext == '.txt':
         if self._SURThread==None or not self._SURThread.isAlive():
           self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, ))
-          self._SURThread.daemon=True
+          #self._SURThread.daemon=True
           self._SURThread.start()
           
   def saveConfig(self, path, filename):
@@ -390,7 +389,6 @@ class CustomFileChooser(FileChooserListView):
         if os.path.isdir(newPath):
           self.path = newPath 
           self.selection = []
-
 
 class KMLList(DropDown):
   def __init__(self, mapview, app):
@@ -682,10 +680,11 @@ class MapApp(App):
     self.loaded_kmls = {}
 
   def on_stop(self):
+    self.map.setStop()
     self.map.cleanUpCache()
   
   def on_start(self):
-    signal(SIGINT, self.stop) #Captures ctrl-c to exit correctly
+    #signal(SIGINT, self.stop) #Captures ctrl-c to exit correctly
     self.icon = 'logo.png'
     self.title = 'isySUR'
     
@@ -721,10 +720,7 @@ class MapApp(App):
   
   def clearConfig(self):
     for key in self.configContent.keys():
-      print self.configContent[key], key
       self.configContent[key] = []
-      print self.configContent[key]
-    print self.configContent
   
   def isConfigEmpty(self):
     return len([y for x in self.configContent.values() for y in x])==0
