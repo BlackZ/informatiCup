@@ -511,7 +511,7 @@ class ConfigDialog(FloatLayout):
     
     self.selected = []
     self.labels = []
-    self.ruleInput = TextInput(focus=True, size_hint=(.4,.15))
+    self.ruleInput = TextInput(focus=True, size_hint=(.4, None), height=35, multiline=False)
     if len(self.app.configContent) > 0:
       self.addConfigContent()
     else:
@@ -530,14 +530,15 @@ class ConfigDialog(FloatLayout):
         self.addConfigEntry(ruleArea, rule)
   
   def addContentHeader(self):
-    label1 = Label(text='', size_hint=(.4,.1))      
-    label2 = Label(text='Indoor', size_hint=(.1,.1))
-    label3 = Label(text='Outdoor', size_hint=(.1,.1))
-    label4 = Label(text='Both', size_hint=(.1,.1))
-    label5 = Label(text='Delete', size_hint=(.1,.1))
+    label1 = Label(text='', size_hint=(.4, None))      
+    label2 = Label(text='Indoor', size_hint=(.1, None), heigth=35)
+    label3 = Label(text='Outdoor', size_hint=(.1, None), heigth=35)
+    label4 = Label(text='Both', size_hint=(.1, None), heigth=35)
+    label5 = Label(text='Delete', size_hint=(.1, None), heigth=35)
     
     
     self.layout.add_widget(label1)
+    label1.height = '15'
     self.layout.add_widget(label2)
     self.layout.add_widget(label3)
     self.layout.add_widget(label4)
@@ -548,7 +549,7 @@ class ConfigDialog(FloatLayout):
     active[ruleArea] = True
     
     group = str(self.counter)
-    label = Label(text=rule, size_hint=(.4,.1))
+    label = Label(text=rule, size_hint=(.4, None), height=15)
     self.labels.append(label)
     btn1 = CheckBox(group=group, active=active['[Indoor]'], size_hint=(.1,.1), id='[Indoor]')
     btn2 = CheckBox(group=group, active=active['[Outdoor]'], size_hint=(.1,.1), id='[Outdoor]')
