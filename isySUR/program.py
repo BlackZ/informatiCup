@@ -84,9 +84,13 @@ class Pipeline:
     @type configPath: String
     """
     
-    surFile = open(inPath,'r')
-    surs = sur.SUR.fromFile(surFile, configPath)
-    surFile.close()
+    try:
+      surFile = open(inPath,'r')
+      surs = sur.SUR.fromFile(surFile, configPath)
+      surFile.close()
+    except:
+      kmlList.put(IOError("SUR file incorrect"))
+      return
     
     #kmlList = []
     

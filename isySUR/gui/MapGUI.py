@@ -163,7 +163,11 @@ class Map(FloatLayout):
     
     while not kmlList.empty() or thread.isAlive():
       item = kmlList.get()
-      if isinstance(item, kmlData.KMLObject):
+      if isinstance(item, IOError):
+        toast.remove()
+        self.toast("SUR file is incorrect!")
+        return
+      elif isinstance(item, kmlData.KMLObject):
         if not item.placemarks == []:
           self.lock.acquire()
           name = self.app.addKML(item)
@@ -275,7 +279,7 @@ class Menue(DropDown):
           print e
           import traceback
           traceback.print_exc()
-          self.map_view.toast('The loaded KML file is incomplete!')
+          self.map_view.toast('KML file is incorrect!')
       
       if ext == '.cfg':
         self.app.loadConfig(path)
