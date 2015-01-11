@@ -579,12 +579,12 @@ class MapView(Widget):
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 1
       marker = self.placemarks[name]["marker"]
-      marker.visible = 1
 #      print marker
       if marker != None and \
          (self._default_marker_layer == None or \
          (self._default_marker_layer != None and \
          not marker in self._default_marker_layer.children)):
+          marker.visible = 1
           self.add_marker(marker)
       self.drawPolygon()
   
@@ -592,8 +592,8 @@ class MapView(Widget):
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 0
       marker = self.placemarks[name]["marker"]#self.marker[index]
-      marker.visible = 0
       if marker != None:
+        marker.visible = 0
         self._default_marker_layer.clear_widgets([marker])
       self.drawPolygon()
   
