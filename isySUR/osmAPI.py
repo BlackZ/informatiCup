@@ -14,8 +14,27 @@ class osmAPI():
       
   def _getOsmRequestData(self, minLat, minLon, maxLat, maxLon, filterList):
     """
-    Builds the paramter string for the OSM Request depending if a filterList is
-    given or not.
+      Builds the paramter string for the OSM Request depending if a filterList is
+      given or not.
+      
+      @param minLat: the left bottom corner lat value of the bounnding box
+      @type minLat: float
+      
+      @param minLon: the left bottom corner lon value of the bounnding box
+      @type minLon: float
+      
+      @param maxLat: the right upper corner lat value of the bounnding box
+      @type maxLat: float
+      
+      @param maxLon: the right upper corner lon value of the bounnding box
+      @type maxLon: float
+      
+      @param filterList: List of tupel of filter-rules e.g.[('way',['"amenity"="univerity"',..]),..]
+                          or ('way',['"building"=""']) for some kind of wild-card
+      @type filterList: [Tupel(str,[str,..])]
+      
+      @return returns the request-string, which could be send to the openStreetMap-Api
+      @rtype: str
     """
     if len(filterList) == 0:
       return {'data': '[out:xml][timeout:25];'\
@@ -49,11 +68,15 @@ class osmAPI():
 
   def performRequest(self, boundingBox, filterList=[]):
     """
-    This function requests data from openStreetMap
-    @param boundingBox: a list of the points of the boundingBox [minLat,minLon,maxLat,maxLon]
-    @param filterList: (optional) List of tupel of filter-rules e.g.[('way',['"amenity"="univerity"',..]),..]
-                        or ('way',['"building"=""']) for some kind of wild-card
-    @return: an request object with the data-xml in the content property
+      This function requests data from openStreetMap
+      @param boundingBox: a list of the points of the boundingBox [minLat,minLon,maxLat,maxLon]
+      @type boundingBox: [float,float,float,flaot]
+      
+      @param filterList: (optional) List of tupel of filter-rules e.g.[('way',['"amenity"="univerity"',..]),..]
+                          or ('way',['"building"=""']) for some kind of wild-card
+      @type filterList: [Tupel(str,[str,..])]
+      
+      @return: an request object with the data-xml in the content property
     """
     if not isinstance(filterList,types.ListType):
       raise TypeError('performRequest only accepts a list of filterrules')
@@ -130,8 +153,10 @@ class osmAPI():
 
   def _parseData(self, obj):
     """
-    Splits the incoming OSM Date into Nodes, Ways and Relations
-    and stores it into an OSMObject for further calculations.
+      Splits the incoming OSM Date into Nodes, Ways and Relations
+      and stores it into an OSMObject for further calculations.
+      
+      @param obj: result object of request to openStreetMap
     """
 
     osmObj=osmData.OSM()
@@ -196,7 +221,7 @@ class osmAPI():
 
   def _getTags(self, elem):
     """
-    Returns a dictionary of tags for a given element.    
+      Returns a dictionary of tags for a given element.   
     """
     tags = {}
     for element in elem.getElementsByTagName('tag'):
@@ -206,7 +231,7 @@ class osmAPI():
   
   def _getRefs(self, node):
     """
-    Returns a list of refereences for a given element.
+      Returns a list of refereences for a given element.
     """
     refs = []
     for element in node.getElementsByTagName('nd'):
@@ -216,7 +241,7 @@ class osmAPI():
 
   def _getMembers(self, rel):
     """
-    Returns a list of members for a given relation. 
+      Returns a list of members for a given relation. 
     """
     members = []
     for element in rel.getElementsByTagName('member'):

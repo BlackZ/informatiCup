@@ -28,8 +28,6 @@ class TestWayObject(unittest.TestCase):
     
     self.wayType=self.testOSM.ways[1].__class__
     self.nodeType=self.testOSM.nodes[1].__class__
-    
-    #self.testVertices=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13),(52.12, 4.12)]
   
   def test_verticies(self):
     trueList=[(52.12, 4.12),(52.13, 4.12),(52.12, 4.13),(52.12, 4.12)]

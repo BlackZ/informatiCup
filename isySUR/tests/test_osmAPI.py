@@ -8,7 +8,6 @@ Created on Thu Nov  6 11:47:29 2014
 import unittest
 from isySUR import osmAPI
 from isySUR import osmData
-import os
 import xml.dom.minidom as dom
 
 class TestOsmAPI(unittest.TestCase):
@@ -101,10 +100,6 @@ class TestOsmAPI(unittest.TestCase):
                      'relation["building"](52.032736,8.486593,52.042113,8.501194);'\
                      ');(._;>;); out body qt;')
    
-  #def test_performRequest(self):
-    #self.requestData = self.osmAPIobj.performRequest(self.boundingBox)
-    #self.assertIsNotNone(self.requestData)
-   
   def test_parseDataET(self):
     
     testFile = open(self.osmDataFilename, "r").read()
@@ -116,7 +111,6 @@ class TestOsmAPI(unittest.TestCase):
     self.assertIsNotNone(testDataObj.ways)
     self.assertIsNotNone(testDataObj.relations)    
 
-    #self.assertTrue(self.testOsmObj == testDataObj)
     self.assertEqual(self.testOsmObj, testDataObj)
    
   def test_getTagsET(self):
@@ -154,7 +148,6 @@ class TestOsmAPI(unittest.TestCase):
     self.assertIsNotNone(testDataObj.ways)
     self.assertIsNotNone(testDataObj.relations)    
 
-    #self.assertTrue(self.testOsmObj == testDataObj)
     self.assertEqual(self.testOsmObj, testDataObj)
    
   def test_getTags(self):
@@ -182,5 +175,4 @@ class TestOsmAPI(unittest.TestCase):
     self.assertEqual(members, testMembers)
 
 if __name__ == '__main__':
-  os.chdir("../..")
   unittest.main()
