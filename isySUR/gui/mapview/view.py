@@ -118,6 +118,8 @@ class MapMarker(ButtonBehavior, Image):
   lon = NumericProperty(0)
   """Longitude of the marker
   """
+  
+  visible = NumericProperty(1)
 
   def __init__(self, **kwargs):
     super(MapMarker, self).__init__(**kwargs)
@@ -218,7 +220,7 @@ class MarkerMapLayer(MapLayer):
     set_marker_position = self.set_marker_position
     bbox = mapview.get_bbox(dp(48))
     for marker in self.markers:
-      if bbox.collide(marker.lat, marker.lon):
+      if marker.visible==1 and bbox.collide(marker.lat, marker.lon):
         set_marker_position(mapview, marker)
         if marker.parent:
           continue
@@ -457,7 +459,7 @@ class MapView(Widget):
         self.add_layer(layer)
       else:
         layer = self._default_marker_layer
-    if not marker in layer.children:
+    if not marker in layer.children and marker.visible==1 and self.markers:
       layer.add_widget(marker)
     layer.set_marker_position(self, marker)
     
@@ -517,6 +519,7 @@ class MapView(Widget):
       if markerCoords != None and self.markers:
         marker = MapMarker()
         marker.lat, marker.lon = markerCoords
+        marker.visible =  1
         self.trigger_update(True)
         if marker:
           self.add_marker(marker)
@@ -552,7 +555,7 @@ class MapView(Widget):
     for placemark in self.placemarks:
       self.trigger_update(True)
       marker = self.placemarks[placemark]['marker']
-      if marker != None:
+      if marker != None and marker.visible==1:
         self.add_marker(marker)
 
   def getBBoxOfPolygon(self, polygon):
@@ -576,6 +579,7 @@ class MapView(Widget):
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 1
       marker = self.placemarks[name]["marker"]
+      marker.visible = 1
 #      print marker
       if marker != None and \
          (self._default_marker_layer == None or \
@@ -588,6 +592,7 @@ class MapView(Widget):
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 0
       marker = self.placemarks[name]["marker"]#self.marker[index]
+      marker.visible = 0
       if marker != None:
         self._default_marker_layer.clear_widgets([marker])
       self.drawPolygon()

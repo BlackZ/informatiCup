@@ -424,15 +424,6 @@ class Menue(DropDown):
       obj.background_color = (0,0,2,1)
       self.map_view.maps.markers = True
       self.map_view.maps.showMarkers()
-    
-#    if "Hide" in obj.text:
-#      obj.text = "Show Markers"
-#      self.map_view.maps.markers = False
-#      self.map_view.maps.hideMarkers()
-#    elif "Show" in obj.text:
-#      obj.text = "Hide Markers"
-#      self.map_view.maps.markers = True
-#      self.map_view.maps.showMarkers()
 
 
 class CustomFileChooser(FileChooserListView):
