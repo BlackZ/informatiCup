@@ -164,7 +164,7 @@ class Map(FloatLayout):
     #thread.daemon=True
     thread.start()
     
-    while not self.stop.empty() and (not kmlList.empty() or thread.isAlive()):
+    while self.stop.empty() and (not kmlList.empty() or thread.isAlive()):
       item = kmlList.get()
       if isinstance(item, IOError):
         toast.remove()
