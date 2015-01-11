@@ -274,8 +274,7 @@ class Menue(DropDown):
       
       if ext == '.cfg':
         self.app.loadConfig(path)
-        if len(self.app.configContent) > 0:
-          self.config.addConfigContent()
+        self.config.addConfigContent()
           
       self.dismiss_load()
       
@@ -452,12 +451,12 @@ class Toast(Label):
     Clock.schedule_interval(self._in_out, 1/60.0)
 
   def show(self, text, length_long):
-    duration = 5000 if length_long else 1000
+    duration = 5000 if length_long else 2000
     rampdown = duration * 0.1
     if rampdown > 500:
       rampdown = 500
-    if rampdown < 100:
-      rampdown = 100
+    if rampdown < 200:
+      rampdown = 200
     
     self._rampdown = rampdown
     self._duration = duration - rampdown
@@ -512,22 +511,27 @@ class ConfigDialog(FloatLayout):
     self.selected = []
     self.labels = []
     self.ruleInput = TextInput(focus=True, size_hint=(.4, None), multiline=False)
-    if len(self.app.configContent) > 0:
-      self.addConfigContent()
-    else:
+    if self.app.isConfigEmpty():
       self.layout.add_widget(self.info)
+    else:
+      self.addConfigContent()
+    self.layout.bind(minimum_height=self.layout.setter('height'))  
     self.ids.view.add_widget(self.layout)
     
   def addConfigContent(self):
-    if self.info.parent != None:
-      self.layout.remove_widget(self.info)
-    if len(self.layout.children) > 1:
+    if not self.app.isConfigEmpty():
+      if self.info.parent != None:
+        self.layout.remove_widget(self.info)
+      if len(self.layout.children) > 1:
+        self.layout.clear_widgets()
+      
+      self.addContentHeader()
+      for ruleArea in self.app.configContent:
+        for rule in self.app.configContent[ruleArea]:
+          self.addConfigEntry(ruleArea, rule)
+    else:
       self.layout.clear_widgets()
-    self.addContentHeader()
-    
-    for ruleArea in self.app.configContent:
-      for rule in self.app.configContent[ruleArea]:
-        self.addConfigEntry(ruleArea, rule)
+      self.layout.add_widget(self.info)
   
   def addContentHeader(self):
     label1 = Label(text='', size_hint=(.4, None))      
@@ -582,7 +586,7 @@ class ConfigDialog(FloatLayout):
   def action(self, obj):
     #if len(self.app.configContent) > 0:
     if "New" in obj.text:
-      if len(self.app.configContent)==0:
+      if self.app.isConfigEmpty():
         self.addConfigContent()
       obj.text = "Add Rule"
       self.ruleInput.text = ""
@@ -641,8 +645,7 @@ class ConfigDialog(FloatLayout):
       self.clearConfig()
   
   def clearConfig(self):
-    if len([y for x in self.app.configContent.values() for y in x])==0:
-      self.app.configContent = {}
+    if self.app.isConfigEmpty():
       self.layout.clear_widgets()  
       self.layout.add_widget(self.info)
         
@@ -668,7 +671,7 @@ class MapApp(App):
   def __init__(self, configPath=""):
     super(MapApp, self).__init__()
     self.map = None
-    self.configContent = {}
+    self.configContent = {'[Indoor]':[], '[Outdoor]':[], '[Both]':[]}
     self.loadConfig(configPath)
     
     self.pipe = program.Pipeline()
@@ -688,16 +691,29 @@ class MapApp(App):
   
   def loadConfig(self, configPath):
     if configPath != '':
-      self.configContent = {'[Both]':[],'[Indoor]':[],'[Outdoor]':[]}
+      if not self.isConfigEmpty():
+        self.clearConfig()
       with open(configPath, 'r') as stream:
         for line in stream:
           line = line.replace('\n','')
-          if line.startswith('['):
+          if line == "":
+            next
+          elif line.startswith('['):
             key = line
             if not key in self.configContent.keys():
-              self.configContent.update({key:[]})
+              Toast(self.map).show('Unknown RuleArea. Config is incorrect!', False)
+              self.clearConfig()
+              break
+              #self.configContent = {'[Both]':[],'[Indoor]':[],'[Outdoor]':[]}
           else:
             self.configContent[key].append(line)
+  
+  def clearConfig(self):
+    for key in self.configContent.keys():
+      self.configContent[key] = []
+  
+  def isConfigEmpty(self):
+    return len([y for x in self.configContent.values() for y in x])==0
             
   def addKML(self, kmlObj):
     name = kmlObj.name
