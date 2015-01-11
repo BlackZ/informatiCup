@@ -86,36 +86,53 @@ class Map(FloatLayout):
       self.kmlList.open(self.ids.kmlList)
       self.kmlList.is_open = not self.kmlList.is_open      
   
-  #def addPolygon(self, polygon, first=True):
-  #  name, poly = polygon
-  #  style = self.app.loaded_kmls[name]['style']
-  #  markerCoords = self.app.loaded_kmls[name]['data'].ruleCoords
-  #  self.maps.addPolygon(name, poly, style, markerCoords)
-  #  
-  #  if first:
-  #    self.maps.zoom_to_Polygon(name, 15)
-  #  return name
-  
   def showPolygons(self, names):
+    """
+    Shows all polygones represented by names.
+    
+    @param names: Namelist of Polygons to be displayed
+                  on the GUI Map.
+    @type names: [str]
+    """
     for name in names:
       move_to = name
       self.maps.showPolygon(name)
     self.maps.zoom_to_Polygon(move_to, 15)
   
   def hidePolygons(self, names):
+    """
+    Hides all polygones represented by names.
+    
+    @param names: Namelist of Polygons to be removed
+                  from the GUI Map.
+    @type names: [str]
+    """
     for name in names:
       self.maps.hidePolygon(name)
    
   def addPolygon(self, kmlObj, kmlName, first=True):
-    print kmlObj.placemarks
+    """
+    Adds all Polygon from one KML Object to the Map.
+    
+    @param kmlObj: KML Data with Placemarks which will be displayed
+                   on the Map.
+    @type kmlObj: kmlData.KMLObject
+    
+    @param kmlName: Name of the kmlObj.
+    @type kmlName: str
+    
+    @param first:  Decides whether to jump to the first or last added
+                   Polygon. If there is only one Polygon in the KML
+                   Object and first is True, the Map moves to the Polygon.
+                   If first is False, the Map moves to the last added
+                   Polygon.
+    @type first: Boolean
+    """
     for placemark in kmlObj.placemarks:
       print placemark
       name = placemark.name
-      print "bla"
       polygon = self.app.getPolygonFromPlacemark(placemark)
-      print "blu"
       style = kmlObj.styles[placemark.style.lstrip('#')]
-      print 'bloe'
       i = 1
       print self.maps.placemarks.has_key(name)
       while self.maps.placemarks.has_key(name):
@@ -131,31 +148,6 @@ class Map(FloatLayout):
         moved = True
         self.maps.zoom_to_Polygon(name, 15)
     return name, moved
-  
-  #def addPolygon(self, kmlObj, name, first=True):
-  #  """
-  #  Adds all polygons from one KML.
-  #  
-  #  @param kmlObj: KML obect which will be added to map
-  #  @type kmlObj: kmlData.KMLObject
-  #  
-  #  @param first: Decides whether the map zooms to the
-  #                first or last added polygon.
-  #  @type first: Bool
-  #  
-  #  @return: Returns the coordinates to which will be moved.
-  #           Only relevant for move to the last added. 
-  #  """
-  #  placemarks = kmlObj.placemarks
-  #  for placemark in placemarks:
-  #    style = kmlObj.styles[placemark.style.lstrip('#')]
-  #    self.maps.addPolygon(name, self.app.getPolygonFromPlacemark(placemark), style, placemark.ruleCoords)
-  #    #moves to added Polygon
-  #    if first:
-  #      self.maps.zoom_to_Polygon(name, 15)
-  #       
-  #  return name
-    
     
   def removePolygon(self, name):#polygon):
     self.maps.removePolygon(name)
@@ -163,61 +155,27 @@ class Map(FloatLayout):
   def computeAndShowKmls(self, path, queue):
     toast = Toast(self)
     toast.stayVisible("Calculating ... ")
-    #self.toastLabel.text = "Calculating ..."
-    #self.toastLabel.texture_update()
-    #self.toastLabel.pos=(0, -self.center_y + self.toastLabel.texture_size[1]/2 + 10)
-    kmlList = Queue()
-    #self.add_widget(self.toastLabel)
-    #with self.toastLabel.canvas.before:
-    #  Color(0.6,0.6,0.6,1)#self._transparency)
-    #  Rectangle(pos=(self.center_x - self.toastLabel.texture_size[0] -10, 6), 
-    #            size=(self.toastLabel.texture_size[0]*2+14, self.toastLabel.texture_size[1]+ 10))
-    #  Color(0.2,0.2,0.2,1)#self._transparency)
-    #  Rectangle(pos=(self.center_x - self.toastLabel.texture_size[0] -8, 8), 
-    #            size=(self.toastLabel.texture_size[0]*2+10, self.toastLabel.texture_size[1]+ 6))
     
+    kmlList = Queue()
     thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList))
     thread.daemon=True
     thread.start()
     
-    surID = "" # Ueberfluessig, wenn Name in KML!!!
     while not kmlList.empty() or thread.isAlive():
       item = kmlList.get()
       if isinstance(item, kmlData.KMLObject):
         if not item.placemarks == []:
           self.lock.acquire()
-          #name = self.app.addKML(surID, item)
           name = self.app.addKML(item)
           self.kmlList.addItem(name)
           self.lock.release()
           move_to, moved = self.addPolygon(item, name, first=False)
-          #name = self.addPolygon(item, name, first=False)
-          #polygons = self.app.addKML(item)
-          #for polygon in polygons:
-          #  self.kmlList.addItem(polygon[0])
-          #  move_to = self.addPolygon(polygon, first=False)
-          #self.lock.release()
       else:
         toast.stayVisible("Calculating " + item + " ...")
-        #self.toastLabel.text = "Calculating " + item + " ..."
-        #self.toastLabel.texture_update()
     
     if not moved:
       self.maps.zoom_to_Polygon(move_to, 15)
     toast.remove()
-    #self.remove_widget(toast)
-    #Clock.schedule_interval(self._in_out, 1/60.0)
-  
-  #def _in_out(self, dt):
-  #  duration -= dt*1000
-  #  if self._duration <= 0:
-  #    self._transparency = 1.0 + (self._duration / self._rampdown)
-  #  if -(self._duration) > self._rampdown:
-  #    self.map_view.remove_widget(self)
-  #    return False
-  
-    
-    
     
 class Menue(DropDown):
   loadfile = ObjectProperty(None)
@@ -285,8 +243,7 @@ class Menue(DropDown):
       self._popup_save.open()
     else:
       self.map_view.toast("No KML files selected or loaded!")
-    
-      
+  
   def show_config(self):
     self.isOpen = False
     self.dismiss()
@@ -298,7 +255,6 @@ class Menue(DropDown):
   
   def load(self, path, filename, config=None):    
     if filename != []:
-      #path = os.path.join(path, filename[0])
       path = filename[0]
       name, ext = os.path.splitext(filename[0])
       name = (name.replace('\\','/').split('/'))[-1]
@@ -306,34 +262,18 @@ class Menue(DropDown):
         try:
           kmlObj = kmlData.KMLObject.parseKML(path)
           name = self.app.addKML(kmlObj)
-          
           self.map_view.kmlList.addItem(name)
           name, moved = self.map_view.addPolygon(kmlObj, name)
           if not moved:
             self.map_view.maps.zoom_to_Polygon(name, 15)
-          
-          #polygons = self.app.addKML(kmlObj)
-          
-          #for polygon in polygons:
-          #  self.map_view.kmlList.addItem(polygon[0])
-          #  self.map_view.addPolygon(polygon)
-          
-          #item_name, kmlObj = self.app.addKMLFromPath(path, name)
-          #if not kmlObj.placemarks==[]:
-          #  self.map_view.kmlList.addItem(item_name)
-          #  self.map_view.addPolygon(kmlObj, item_name)
-          #else:
-          #  self.map_view.toast('The loaded KML has no polygon!')
         except Exception as e:
           print e
           import traceback
           traceback.print_exc()
           self.map_view.toast('The loaded KML file is incomplete!')
-          #add new kml to dropdown menue
       
       if ext == '.cfg':
         self.app.loadConfig(path)
-        
         if len(self.app.configContent) > 0:
           self.config.addConfigContent()
           
@@ -409,7 +349,6 @@ class Menue(DropDown):
           import traceback
           traceback.print_exc()
           self.map_view.toast('An error occured while saving!')
-          #map_view.ids.toast.text = "An error occured while saving!"
     else:
       self.map_view.toast("No KML files selected or loaded!")
 
@@ -467,21 +406,16 @@ class KMLList(DropDown):
     if not isSelected:
       obj.background_color = (0,0,2,1)
       self.map_view.showPolygons(polygons)
-      #self.map_view.addPolygon((obj.text, self.app.getPolygonFromPlacemark(placemark)))
       self.app.loaded_kmls[obj.text]['selected'] = not isSelected
     else:
       if len(polygons) == 1 and self.map_view.maps.isPolyVisible(polygons[0]) or\
          len(polygons) > 1 and self.map_view.maps.isPolyVisible(polygons[-1]):
         obj.background_color = (1,1,1,1)
-        #for placemark in placemarks:
-  #        self.map_view.removePolygon(self.app.getPolygonFromPlacemark(placemark))
         self.map_view.hidePolygons(polygons)
-        #self.map_view.removePolygon(obj.text)
         self.app.loaded_kmls[obj.text]['selected'] = not isSelected
       else:
         self.map_view.showPolygons(polygons)
-        #self.map_view.addPolygon((obj.text, self.app.getPolygonFromPlacemark(placemark)))
-
+        
   def addItem(self, name):
     btn = Button(text=name, size_hint_y=None, height=44,background_color=(0,0,2,1))
     btn.bind(on_release=self.selectBut)
@@ -504,10 +438,10 @@ class Toast(Label):
     if self.parent != self.map_view:
       self.map_view.add_widget(self)
     with self.canvas.before:
-      Color(0.6,0.6,0.6,1)#self._transparency)
+      Color(0.6,0.6,0.6,self._transparency)
       Rectangle(pos=(self.map_view.center_x - self.texture_size[0] -10, 6), 
                 size=(self.texture_size[0]*2+14, self.texture_size[1]+ 10))
-      Color(0.2,0.2,0.2,1)#self._transparency)
+      Color(0.2,0.2,0.2,self._transparency)
       Rectangle(pos=(self.map_view.center_x - self.texture_size[0] -8, 8), 
                 size=(self.texture_size[0]*2+10, self.texture_size[1]+ 6))
     
@@ -532,10 +466,10 @@ class Toast(Label):
     self.pos=(0, -self.map_view.center_y + self.texture_size[1]/2 + 10)
     self.map_view.add_widget(self)
     with self.canvas.before:
-      Color(0.6,0.6,0.6,1)#self._transparency)
+      Color(0.6,0.6,0.6,self._transparency)
       Rectangle(pos=(self.map_view.center_x - self.texture_size[0] -10, 6), 
                 size=(self.texture_size[0]*2+14, self.texture_size[1]+ 10))
-      Color(0.2,0.2,0.2,1)#self._transparency)
+      Color(0.2,0.2,0.2,self._transparency)
       Rectangle(pos=(self.map_view.center_x - self.texture_size[0] -8, 8), 
                 size=(self.texture_size[0]*2+10, self.texture_size[1]+ 6))
   
@@ -576,8 +510,8 @@ class ConfigDialog(FloatLayout):
     self.layout = GridLayout(cols=5, size_hint_y=1.1)
     
     self.selected = []
-    self.ruleInput = TextInput(focus=True, size_hint=(.4,.15))
     self.labels = []
+    self.ruleInput = TextInput(focus=True, size_hint=(.4,.15))
     if len(self.app.configContent) > 0:
       self.addConfigContent()
     else:
@@ -756,25 +690,7 @@ class MapApp(App):
               self.configContent.update({key:[]})
           else:
             self.configContent[key].append(line)
-  
-  #def addKML(self, kmlObj):
-  #  addedPolygons = []
-  #  for placemark in kmlObj.placemarks:
-  #    name = placemark.name
-  #    styleID = placemark.style.lstrip('#')
-  #    
-  #    i = 1
-  #    while self.loaded_kmls.has_key(name):
-  #      name = placemark.name + '(' + str(i) + ')'
-  #      i += 1
-  #    
-  #    self.loaded_kmls.update({name:{'data':placemark,
-  #                                   'style':kmlObj.styles[styleID],
-  #                                   'selected': True}})
-  #    addedPolygons.append((name, self.getPolygonFromPlacemark(placemark)))
-  #  
-  #  return addedPolygons
-   
+            
   def addKML(self, kmlObj):
     name = kmlObj.name
     i = 1
@@ -786,27 +702,6 @@ class MapApp(App):
     
     return name
           
-  #def addKML(self, name, kmlObj):
-  #  newName = name
-  #  i = 1
-  #  while self.loaded_kmls.has_key(newName):
-  #    newName = name + '(' + str(i) + ')'
-  #    i += 1
-  #  self.loaded_kmls.update({newName:{'data':kmlObj, 'selected':True}})
-  #  
-  #  return newName
-  
-  #def addKMLFromPath(self, path, filename):
-  #  kmlObj = kmlData.KMLObject.parseKML(path)
-  #  name = filename
-  #  i = 1
-  #  while self.loaded_kmls.has_key(name):
-  #    name = filename + '(' + str(i) + ')'
-  #    i += 1
-  #  self.loaded_kmls.update({name:{'data':kmlObj, 'selected':True}})
-  #  
-  #  return name, kmlObj
-  
   def getPolygonFromPlacemark(self, placemark):
     polygon = []
     for i in range(len(placemark.polygon)):
