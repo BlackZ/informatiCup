@@ -490,9 +490,9 @@ class Way(object):
   
   def isPolygon(self):
     """
-    This functions prooves if the Way is a polygon
-    
-    @return true if polygon exists
+      This functions prooves if the Way is a polygon
+      
+      @return true if polygon exists
     """
     if len(self.refs)>=4 and self.refs[0]==self.refs[-1]:
       return True
@@ -616,12 +616,8 @@ class Way(object):
     else:
         if not vertices[0]==vertices[-1]:
             return False
-    #vertices=self._vertices()
+            
     cn = 0    # the crossing number counter
-
-    # repeat the first vertex at end if not already done
-    #if not vertices[0]==vertices[-1]:
-    #  vertices = tuple(vertices[:])+(vertices[0],)
 
     # loop through all edges of the polygon
     for i in range(len(vertices)-1):   # edge from vertices[i] to vertices[i+1]

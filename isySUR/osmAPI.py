@@ -31,10 +31,6 @@ class osmAPI():
             for obj in fil[1]:
               tmpFil+="[" + obj + "]"
             compactOverpassQLstring += '%s%s(%s,%s,%s,%s);'% (fil[0], tmpFil, minLat, minLon, maxLat, maxLon)
-                #if not fil[1]=="":
-                #    compactOverpassQLstring += '%s["%s"="%s"](%s,%s,%s,%s);'% (obj, fil[1],fil[2], minLat, minLon, maxLat, maxLon)
-                #else:
-                #    compactOverpassQLstring += '%s["%s"](%s,%s,%s,%s);'% (obj, fil[1], minLat, minLon, maxLat, maxLon)
       compactOverpassQLstring += ');(._;>;); out body qt;'
       return  {'data':compactOverpassQLstring}
       
@@ -90,7 +86,6 @@ class osmAPI():
     return res
 
   def _parseDataET(self, obj):
-#    print obj
     osmObj = osmData.OSM()
     
     root=ET.fromstring(obj)
