@@ -692,6 +692,7 @@ class MapApp(App):
   
   def loadConfig(self, configPath):
     if configPath != '':
+      key = None
       if not self.isConfigEmpty():
         self.clearConfig()
       with open(configPath, 'r') as stream:
@@ -708,7 +709,12 @@ class MapApp(App):
               break
               #self.configContent = {'[Both]':[],'[Indoor]':[],'[Outdoor]':[]}
           else:
-            self.configContent[key].append(line)
+            if key == None:
+              Toast(self.map).show('No RuleArea found. Config is incorrect!', False)
+              self.clearConfig()
+              break
+            else:
+              self.configContent[key].append(line)
   
   def clearConfig(self):
     for key in self.configContent.keys():
