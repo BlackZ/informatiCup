@@ -233,7 +233,7 @@ class Menue(DropDown):
           return      
     else:
       content.ids.filechooser.filters = ['*.cfg']
-    self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
+    self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.8), background_color=(0,0,0,0))
     self._popup_load.open()
   
   def show_save(self, isConfig=False):
@@ -249,7 +249,7 @@ class Menue(DropDown):
         self.map_view.toast("No KML files selected or loaded!")
         return
     content.ids.filechooser.path = self.path
-    self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
+    self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.8), background_color=(0,0,0,0))
     self._popup_save.open()
   
   def show_config(self):
@@ -257,7 +257,7 @@ class Menue(DropDown):
     self.dismiss()
     
     self.config = ConfigDialog(self.app, save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
-    self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.9))
+    self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.8), background_color=(0,0,0,0))
 
     self._popup_config.open()
   
