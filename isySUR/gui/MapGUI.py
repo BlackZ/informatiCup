@@ -535,12 +535,12 @@ class ConfigDialog(FloatLayout):
         for rule in self.app.configContent[ruleArea]:
           self.addConfigEntry(ruleArea, rule)
     else:
+      self.ids.save.disabled = True
       self.layout.clear_widgets()
       self.layout.add_widget(self.info)
   
   def addContentHeader(self):
     self.layout.clear_widgets()
-    self.ids.save.disabled = False
     label1 = Label(text='', size_hint=(.4, None))      
     label2 = Label(text='Indoor', size_hint=(.1, None))
     label3 = Label(text='Outdoor', size_hint=(.1, None))
@@ -554,6 +554,7 @@ class ConfigDialog(FloatLayout):
     self.layout.add_widget(label5)
   
   def addConfigEntry(self, ruleArea, rule):
+    self.ids.save.disabled = False
     active={"[Indoor]":False,"[Outdoor]":False,"[Both]":False}
     active[ruleArea] = True
     
@@ -602,6 +603,7 @@ class ConfigDialog(FloatLayout):
       obj.text = "New Rule"
       self.layout.remove_widget(self.ruleInput)
       if self.ruleInput.text != "":
+        self.ids.save.disabled = False
         self.app.configContent['[Both]'].append(self.ruleInput.text)
         
         group = str(self.counter)
@@ -627,6 +629,7 @@ class ConfigDialog(FloatLayout):
         self.ids.view.scroll_y = 0
       else:
         if self.app.isConfigEmpty():
+          self.ids.save.disabled = True
           self.layout.clear_widgets()  
           self.layout.add_widget(self.info)
     elif 'Delete' in obj.text:
@@ -644,9 +647,11 @@ class ConfigDialog(FloatLayout):
            (child.id == selection or child.group == selection):
             remove.append(child)
       self.layout.clear_widgets(remove)
-      self.clearConfig()
+      if self.app.isConfigEmpty():
+        self.clearConfig()
   
   def clearConfig(self):
+    self.ids.save.disabled = True
     if self.app.isConfigEmpty():
       self.layout.clear_widgets()  
       self.layout.add_widget(self.info)
