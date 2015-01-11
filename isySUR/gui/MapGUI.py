@@ -232,17 +232,22 @@ class Menue(DropDown):
   def show_save(self, isConfig=False):
     self.isOpen = False
     self.dismiss()
+    print isConfig
     if isConfig:
       content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
     else:
       content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
-    selection = self.app.getSelectedPolygons()
-    if len(selection) > 0:
-      content.ids.filechooser.path = self.path
-      self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
-      self._popup_save.open()
-    else:
-      self.map_view.toast("No KML files selected or loaded!")
+      selection = self.app.getSelectedPolygons()
+      if len(selection) == 0:
+        #content.ids.filechooser.path = self.path
+        #self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
+        #self._popup_save.open()
+      #else:
+        self.map_view.toast("No KML files selected or loaded!")
+        return
+    content.ids.filechooser.path = self.path
+    self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
+    self._popup_save.open()
   
   def show_config(self):
     self.isOpen = False
@@ -522,8 +527,6 @@ class ConfigDialog(FloatLayout):
     if not self.app.isConfigEmpty():
       if self.info.parent != None:
         self.layout.remove_widget(self.info)
-      if len(self.layout.children) > 1:
-        self.layout.clear_widgets()
       
       self.addContentHeader()
       for ruleArea in self.app.configContent:
@@ -534,6 +537,8 @@ class ConfigDialog(FloatLayout):
       self.layout.add_widget(self.info)
   
   def addContentHeader(self):
+    self.layout.clear_widgets()
+    self.ids.save.disabled = False
     label1 = Label(text='', size_hint=(.4, None))      
     label2 = Label(text='Indoor', size_hint=(.1, None))
     label3 = Label(text='Outdoor', size_hint=(.1, None))
@@ -584,10 +589,9 @@ class ConfigDialog(FloatLayout):
             oldArea.remove(rule)    
     
   def action(self, obj):
-    #if len(self.app.configContent) > 0:
     if "New" in obj.text:
       if self.app.isConfigEmpty():
-        self.addConfigContent()
+        self.addContentHeader()
       obj.text = "Add Rule"
       self.ruleInput.text = ""
       self.layout.add_widget(self.ruleInput)
@@ -596,8 +600,6 @@ class ConfigDialog(FloatLayout):
       obj.text = "New Rule"
       self.layout.remove_widget(self.ruleInput)
       if self.ruleInput.text != "":
-        if len(self.app.configContent.keys())==0:
-          self.app.configContent = {'[Both]':[],'[Indoor]':[],'[Outdoor]':[]}
         self.app.configContent['[Both]'].append(self.ruleInput.text)
         
         group = str(self.counter)
@@ -628,7 +630,6 @@ class ConfigDialog(FloatLayout):
           self.layout.add_widget(self.info)
     elif 'Delete' in obj.text:
       remove = []
-      print "Delete"
       obj.text = "New Rule"
       for selection in self.selected:
         label = self.labels[int(selection) -1]
@@ -695,6 +696,7 @@ class MapApp(App):
         self.clearConfig()
       with open(configPath, 'r') as stream:
         for line in stream:
+          print line
           line = line.replace('\n','')
           if line == "":
             next

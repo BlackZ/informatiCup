@@ -79,8 +79,10 @@
                 text: "Load"
                 on_release: root.load(self, root)
             Button:
+                id: save
                 text: "Save"
                 on_release: root.save(isConfig=True)
+                disabled: True
             Button:
                 text: "Close"
                 on_release: root.cancel()
