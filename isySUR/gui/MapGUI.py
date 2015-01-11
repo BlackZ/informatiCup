@@ -511,7 +511,7 @@ class ConfigDialog(FloatLayout):
     self.save = save
     self.cancel = cancel
     
-    self.info = Label(text="No configuration file loaded!")
+    self.info = Label(text=self.app.error + "\nNo configuration file loaded!")
     self.counter = 1
     self.layout = GridLayout(cols=5, size_hint_y=None, row_default_height=35, row_force_default=True)
     
@@ -538,6 +538,7 @@ class ConfigDialog(FloatLayout):
       self.ids.save.disabled = True
       self.layout.clear_widgets()
       self.layout.add_widget(self.info)
+      self.info.text = self.app.error + "\nNo configuration file loaded!"
   
   def addContentHeader(self):
     self.layout.clear_widgets()
@@ -632,6 +633,7 @@ class ConfigDialog(FloatLayout):
           self.ids.save.disabled = True
           self.layout.clear_widgets()  
           self.layout.add_widget(self.info)
+          self.info.text = self.app.error + "\nNo configuration file loaded!"
     elif 'Delete' in obj.text:
       remove = []
       obj.text = "New Rule"
@@ -655,6 +657,7 @@ class ConfigDialog(FloatLayout):
     if self.app.isConfigEmpty():
       self.layout.clear_widgets()  
       self.layout.add_widget(self.info)
+      self.info.text = self.app.error + "\n\nNo configuration file loaded!"
         
   def deleteEntry(self, *args):
     for value in args:
@@ -681,12 +684,15 @@ class MapApp(App):
     self.configContent = {'[Indoor]':[], '[Outdoor]':[], '[Both]':[]}
     self.loadConfig(configPath)
     
+    self.error = ""
+    
     self.pipe = program.Pipeline()
     self.loaded_kmls = {}
 
   def on_stop(self):
-    self.map.setStop()
-    self.map.cleanUpCache()
+    if self.map != None:
+      self.map.setStop()
+      self.map.cleanUpCache()
   
   def on_start(self):
     #signal(SIGINT, self.stop) #Captures ctrl-c to exit correctly
@@ -710,17 +716,20 @@ class MapApp(App):
             next
           elif line.startswith('['):
             key = line
+            self.error = ""
             if not key in self.configContent.keys():
-              Toast(self.map).show('Unknown RuleArea. Config is incorrect!', False)
+              #Toast(self.map).show('Unknown RuleArea. Config is incorrect!', False)
+              self.error = 'Unknown RuleArea. Config is incorrect!'
               self.clearConfig()
               break
-              #self.configContent = {'[Both]':[],'[Indoor]':[],'[Outdoor]':[]}
           else:
             if key == None:
-              Toast(self.map).show('No RuleArea found. Config is incorrect!', False)
+              #Toast(self.map).show('No RuleArea found. Config is incorrect!', False)
+              self.error = 'No RuleArea found. Config is incorrect!'
               self.clearConfig()
               break
             else:
+              self.error = ""
               self.configContent[key].append(line)
   
   def clearConfig(self):

@@ -41,7 +41,7 @@ def gui(args):
     mapApp = gui.MapApp(args.config)
     mapApp.run()
   except BaseException:
-    if not mapApp == None:
+    if mapApp != None:
       mapApp.on_stop()
     import traceback
     traceback.print_exc()
