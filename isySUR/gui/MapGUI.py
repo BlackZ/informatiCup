@@ -507,11 +507,11 @@ class ConfigDialog(FloatLayout):
     
     self.info = Label(text="No configuration file loaded!")
     self.counter = 1
-    self.layout = GridLayout(cols=5, size_hint_y=1.1)
+    self.layout = GridLayout(cols=5, size_hint_y=None, row_default_height=35, row_force_default=True)
     
     self.selected = []
     self.labels = []
-    self.ruleInput = TextInput(focus=True, size_hint=(.4, None), height=35, multiline=False)
+    self.ruleInput = TextInput(focus=True, size_hint=(.4, None), multiline=False)
     if len(self.app.configContent) > 0:
       self.addConfigContent()
     else:
@@ -531,14 +531,12 @@ class ConfigDialog(FloatLayout):
   
   def addContentHeader(self):
     label1 = Label(text='', size_hint=(.4, None))      
-    label2 = Label(text='Indoor', size_hint=(.1, None), heigth=35)
-    label3 = Label(text='Outdoor', size_hint=(.1, None), heigth=35)
-    label4 = Label(text='Both', size_hint=(.1, None), heigth=35)
-    label5 = Label(text='Delete', size_hint=(.1, None), heigth=35)
-    
+    label2 = Label(text='Indoor', size_hint=(.1, None))
+    label3 = Label(text='Outdoor', size_hint=(.1, None))
+    label4 = Label(text='Both', size_hint=(.1, None))
+    label5 = Label(text='Delete', size_hint=(.1, None))
     
     self.layout.add_widget(label1)
-    label1.height = '15'
     self.layout.add_widget(label2)
     self.layout.add_widget(label3)
     self.layout.add_widget(label4)
@@ -619,6 +617,11 @@ class ConfigDialog(FloatLayout):
         
         self.counter += 1
         self.ids.view.scroll_y = 0
+      else:
+        if len([y for x in self.app.configContent.values() for y in x])==0:
+          self.app.configContent = {}
+          self.layout.clear_widgets()  
+          self.layout.add_widget(self.info)
     elif 'Delete' in obj.text:
       remove = []
       print "Delete"
@@ -635,9 +638,13 @@ class ConfigDialog(FloatLayout):
            (child.id == selection or child.group == selection):
             remove.append(child)
       self.layout.clear_widgets(remove)
-      if len([y for x in self.app.configContent.values() for y in x])==0:
-        self.layout.clear_widgets()  
-        self.layout.add_widget(self.info)
+      self.clearConfig()
+  
+  def clearConfig(self):
+    if len([y for x in self.app.configContent.values() for y in x])==0:
+      self.app.configContent = {}
+      self.layout.clear_widgets()  
+      self.layout.add_widget(self.info)
         
   def deleteEntry(self, *args):
     for value in args:
