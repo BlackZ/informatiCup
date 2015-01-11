@@ -628,8 +628,7 @@ class ConfigDialog(FloatLayout):
         self.counter += 1
         self.ids.view.scroll_y = 0
       else:
-        if len([y for x in self.app.configContent.values() for y in x])==0:
-          self.app.configContent = {}
+        if self.app.isConfigEmpty():
           self.layout.clear_widgets()  
           self.layout.add_widget(self.info)
     elif 'Delete' in obj.text:
@@ -722,7 +721,10 @@ class MapApp(App):
   
   def clearConfig(self):
     for key in self.configContent.keys():
+      print self.configContent[key], key
       self.configContent[key] = []
+      print self.configContent[key]
+    print self.configContent
   
   def isConfigEmpty(self):
     return len([y for x in self.configContent.values() for y in x])==0
