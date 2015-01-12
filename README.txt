@@ -1,7 +1,7 @@
 ===============================================================================
 isySUR
 ===============================================================================
-09/01/2015
+12/01/2015
 
 -------------------------------------------------------------------------------
 General usage
@@ -16,6 +16,10 @@ For the command line version type:
  
 For the gui version type:
  $ python run_isySUR.py gui
+ 
+When just tiping
+ $ python run_isySUR.py
+the gui version as default is used.
 
 For more information about optional and required parameters (cli/gui, inPath,
 outPath) check the help parameter (-h) or the manual.
