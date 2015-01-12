@@ -327,10 +327,10 @@ class Menu(DropDown):
       try:
         kmlObj = kmlData.KMLObject.parseKML(path)
         name = self.app.addKML(kmlObj)
-        self.map_view.kmlList.addItem(name)
-        name, moved = self.map_view.addPolygon(kmlObj, name)
+        polyName, moved = self.map_view.addPolygon(kmlObj, name)
+        self.map_view.kmlList.addItem(name)        
         if not moved:
-          self.map_view.maps.zoom_to_Polygon(name, 15)
+          self.map_view.maps.zoom_to_Polygon(polyName, 15)
       except:
         self.map_view.toast('KML file is incorrect!')
     self.dismiss_load()
