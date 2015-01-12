@@ -50,9 +50,6 @@ def gui(args=None):
   except BaseException:
     if mapApp != None:
       mapApp.on_stop()
-    #TODO remove traceback
-    import traceback
-    traceback.print_exc()
     sys.exit('Program stopped unexpected!')
   
 def dealWithImportError():

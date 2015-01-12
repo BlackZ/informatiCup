@@ -331,9 +331,7 @@ class Menu(DropDown):
         name, moved = self.map_view.addPolygon(kmlObj, name)
         if not moved:
           self.map_view.maps.zoom_to_Polygon(name, 15)
-      except Exception as e:
-        import traceback
-        traceback.print_exc()
+      except:
         self.map_view.toast('KML file is incorrect!')
     self.dismiss_load()
   
@@ -437,8 +435,6 @@ class Menu(DropDown):
           try:
             selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
           except:
-            import traceback
-            traceback.print_exc()
             self.map_view.toast(elem + " could not be saved!")
         completeKML.placemarks.extend(selection[elem].placemarks)
         completeKML.addStyles(selection[elem].styles)
@@ -452,9 +448,7 @@ class Menu(DropDown):
               filename = filename + '.kml'
             with open(os.path.join(path, filename), 'w') as stream:
               stream.write(completeKML.getXML())
-        except Exception as e:
-          import traceback
-          traceback.print_exc()
+        except:
           self.map_view.toast('An error occured while saving!')
     else:
       self.map_view.toast("No KML files selected or loaded!")
