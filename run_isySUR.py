@@ -10,6 +10,7 @@ Name should change once a final name for the program has been found.
 import isySUR.program
 import argparse
 import sys
+import os.path
 
 def parseArguments():
   parser = argparse.ArgumentParser(description='isySUR script to calculate \
@@ -35,7 +36,7 @@ def parseArguments():
   
 def gui(args=None):
   mapApp = None
-  try:
+  try: 
     sys.argv = ['']
     import isySUR.gui.MapGUI as gui
     if hasattr(args, 'config'):
@@ -43,19 +44,35 @@ def gui(args=None):
     else:
       mapApp = gui.MapApp()
     mapApp.run()
+  except ImportError:
+    print "GUI could not be loaded. Is kivy installed correctly?"
+    dealWithImportError()
   except BaseException:
     if mapApp != None:
       mapApp.on_stop()
+    #TODO remove traceback
     import traceback
     traceback.print_exc()
     sys.exit('Program stopped unexpected!')
-  except Exception:
-    print "GUI could not be loaded. Is kivy installed correctly?"
-    import traceback
-    traceback.print_exc()
+  
+def dealWithImportError():
+  print "You can still use the command line version. Just give the SUR file and output path. Or type 'exit' to close."
+  pathin = raw_input("SUR file: ")
+  if (pathin=="exit"):
+    sys.exit()
+  if not (os.path.isfile(pathin)):
+    print "input file does not exist"
+    sys.exit()
+  pathout = raw_input("Path for output: ")
+  if (pathout=="exit"):
+    sys.exit()
+  isySUR.program.Pipeline().computeKMLsAndStore(pathin, pathout)
   
 def cli(args):
-  isySUR.program.Pipeline().computeKMLsAndStore(args.input, args.output, args.config)
+  if os.path.isfile(args.input):
+    isySUR.program.Pipeline().computeKMLsAndStore(args.input, args.output, args.config)
+  else:
+    print "input file does not exist"
 
 if __name__ == '__main__':
   if (('cli' not in sys.argv) and ('gui' not in sys.argv)):
