@@ -264,18 +264,17 @@ class Menu(DropDown):
     """
     self.isOpen = False
     self.dismiss()
-    content = LoadDialog(load=self.load, cancel=self.dismiss_load)
-    content.ids.filechooser.path = self.path
     if 'KML' in obj.text:
-      content.ids.filechooser.filters = ['*.kml']
+      content = LoadDialog(load=self.load_kml, cancel=self.dismiss_load)
     elif 'SUR' in obj.text:
       if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
-        content.ids.filechooser.filters = ['*.txt']
+        content = LoadDialog(load=self.load_sur, cancel=self.dismiss_load)
       elif self._SURThread != None or self._SURThread.isAlive():
           self.map_view.toast('Already calculating!')
           return      
     else:
-      content.ids.filechooser.filters = ['*.cfg']
+      content = LoadDialog(load=self.load_cfg, cancel=self.dismiss_load)
+    content.ids.filechooser.path = self.path    
     self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
     self._popup_load.open()
   
@@ -313,49 +312,65 @@ class Menu(DropDown):
 
     self._popup_config.open()
   
-  def load(self, path, filename):
+  def load_kml(self, path, filename):
     """
-    Loads a given file.
-    
-    Type of files:
-      - .kml: KML file
-      - .cfg: Config file
-      - .txt: SUR file
+    Loads a given kml file.
     
     @param path: Path to the selected files.
     @type path: str
     
-    @param filename: Names of selected the files.
+    @param filename: Names of selected files.
     @type filename: [Str]
     """
     if filename != []:
       path = filename[0]
-      name, ext = os.path.splitext(filename[0])
-      name = (name.replace('\\','/').split('/'))[-1]
-      if ext == '.kml':
-        try:
-          kmlObj = kmlData.KMLObject.parseKML(path)
-          name = self.app.addKML(kmlObj)
-          self.map_view.kmlList.addItem(name)
-          name, moved = self.map_view.addPolygon(kmlObj, name)
-          if not moved:
-            self.map_view.maps.zoom_to_Polygon(name, 15)
-        except Exception as e:
-          import traceback
-          traceback.print_exc()
-          self.map_view.toast('KML file is incorrect!')
+      try:
+        kmlObj = kmlData.KMLObject.parseKML(path)
+        name = self.app.addKML(kmlObj)
+        self.map_view.kmlList.addItem(name)
+        name, moved = self.map_view.addPolygon(kmlObj, name)
+        if not moved:
+          self.map_view.maps.zoom_to_Polygon(name, 15)
+      except Exception as e:
+        import traceback
+        traceback.print_exc()
+        self.map_view.toast('KML file is incorrect!')
+    self.dismiss_load()
+  
+  def load_sur(self, path, filename):
+    """
+    Loads a given SUR file.
+    
+    @param path: Path to the selected files.
+    @type path: str
+    
+    @param filename: Names of selected files.
+    @type filename: [Str]
+    """
+    if filename != []:
+      path = filename[0]
       
-      if ext == '.cfg':
-        self.app.loadConfig(path)
-        self.config.addConfigContent()
-          
-      self.dismiss_load()
+      if self._SURThread==None or not self._SURThread.isAlive():
+        self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, ))
+        self._SURThread.start()
+    self.dismiss_load()
+  
+  def load_cfg(self, path, filename):
+    """
+    Loads a given config file.
+    
+    @param path: Path to the selected files.
+    @type path: str
+    
+    @param filename: Names of selected files.
+    @type filename: [Str]
+    """
+    if filename != []:
+      path = filename[0]
+      self.app.loadConfig(path)
+      self.config.addConfigContent()
+    self.dismiss_load()
       
-      if ext == '.txt':
-        if self._SURThread==None or not self._SURThread.isAlive():
-          self._SURThread=Thread(target=self.map_view.computeAndShowKmls, args=(path, self.queue, ))
-          self._SURThread.start()
-          
   def saveConfig(self, path, filename):
     """
     Saves the config to the given path and filename.
@@ -1020,8 +1035,3 @@ class MapApp(App):
         selection.update({kml:self.loaded_kmls[kml]['data']})
     
     return selection
-
-if __name__ == '__main__':
-  MapApp().run()  
-
-
