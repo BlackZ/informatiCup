@@ -714,20 +714,33 @@ class MapView(Widget):
         "triangles":None, "marker": marker,
         "bBox": self.getBBoxOfPolygon(polygon)}
       
-  #    self.kmls.append(polygon)
       try:
-        tri = Triangulator(polygon)
-        triangles = tri.triangles()
-#        print triangles
+        
+#        polygon = [p*1000 for p in polygon]     
+        # Modify lat,lon values for more numerical stability
+        newPoly = []
+        for p in polygon:
+          newPoly.append((p[0]*100, p[1]*100))
+                
+        triangles = Triangulator().triangulate(newPoly)
+
+#        print "#triangles", len(triangles)
         if len(triangles) == 0:
-          raise Exception("No triangles computed.")
+          print "Triangulation failed (no triangles). Will just visualise the border."
+          return
         triIdx = []
         for tri in triangles:
           for point in tri:
+            #Revert the lat,lon modification to find appropriate indices
+            point = (round(point[0]*0.01,8), round(point[1]*0.01,8))
             triIdx.append(polygon.index(point))   
+            
         self.placemarks[name]["triangles"] = triIdx
         self.drawPolygon()
-      except:
+      except Exception, e:
+        print e.message
+        import traceback
+        traceback.print_exc()
         print "Triangulation failed. Will just visualise the border."
     else:
       self.showPolygon(name)
