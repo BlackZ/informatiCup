@@ -129,7 +129,7 @@ class MapMarker(ButtonBehavior, Image):
   @property
   def default_marker_fn(self):
     """
-      @return: the path to the default marker picture
+      @return: The path to the default marker picture.
       @rtype: str
     """
     return join(dirname(__file__), "icons", "marker.png")
@@ -142,9 +142,9 @@ class MapMarkerPopup(MapMarker):
 
   def add_widget(self, widget):
     """
-      This function adds a widget to the gui
+      This function adds a widget to the gui.
       
-      @param widget: the widget to be added
+      @param widget: The widget to be added.
       @type widget: kivy.uix.widget.Widget
     """
     if not self.placeholder:
@@ -156,9 +156,9 @@ class MapMarkerPopup(MapMarker):
 
   def remove_widget(self, widget):
     """
-      This function removes a widget to the gui
+      This function removes a widget to the gui.
       
-      @param widget: the widget to be removed
+      @param widget: The widget to be removed.
       @type widget: kivy.uix.widget.Widget
     """
     if widget is not self.placeholder:
@@ -184,7 +184,7 @@ class MapMarkerPopup(MapMarker):
 
   def refresh_open_status(self):
     """
-      This function refreshes the open status from the gui elementes
+      This function refreshes the open status from the gui elementes.
     """
     if not self.is_open and self.placeholder.parent:
       super(MapMarkerPopup, self).remove_widget(self.placeholder)
@@ -215,25 +215,25 @@ class MapLayer(Widget):
     
 class PolyMapLayer(MapLayer):
   """
-    A map layer to draw polygons on
+    A map layer to draw polygons on.
   """
   def __init__(self, **kwargs):
     super(PolyMapLayer, self).__init__(**kwargs)
 
   def add_widget(self, marker):
     """
-      This function adds a marker as widget to the MapLayer
+      This function adds a marker as widget to the MapLayer.
       
-      @param marker: the marker to be added
+      @param marker: The marker to be added.
       @type: view.MapMarker
     """
     super(PolyMapLayer, self).add_widget(marker)
 
   def remove_widget(self, marker):
     """
-      This function removes a marker as widget to the MapLayer
+      This function removes a marker to the MapLayer.
       
-      @param marker: the marker to be removed
+      @param marker: The marker to be removed.
       @type: view.MapMarker
     """
     super(PolyMapLayer, self).remove_widget(marker)
@@ -241,7 +241,7 @@ class PolyMapLayer(MapLayer):
 
   def unload(self):
     """
-      This function deletes all widget on the current layer
+      This function deletes all widgets on the current layer.
     """
     self.clear_widgets()
 
@@ -256,9 +256,9 @@ class MarkerMapLayer(MapLayer):
     
   def add_widget(self, marker):
     """
-      This function adds a marker as widget to the MapLayer
+      This function adds a marker to the MapLayer.
       
-      @param marker: the marker to be added
+      @param marker: The marker to be added.
       @type: view.MapMarker
     """
     self.markers.append(marker)
@@ -266,9 +266,9 @@ class MarkerMapLayer(MapLayer):
 
   def remove_widget(self, marker):
     """
-      This function removes a marker as widget to the MapLayer
+      This function removes a marker to the MapLayer.
       
-      @param marker: the marker to be removed
+      @param marker: The marker to be removed.
       @type: view.MapMarker
     """
     if marker in self.markers:
@@ -299,10 +299,10 @@ class MarkerMapLayer(MapLayer):
     """
       This function sets the marker position in respect to the current mapview.
       
-      @param mapview: the current mapview object
+      @param mapview: The current mapview object.
       @type mapview: view.MarkerMapLayer
       
-      @param marker: the marker for which the position should be set
+      @param marker: The marker for which the position should be set.
       @type marker: view.Marker
     """
     x, y = mapview.get_window_xy_from(marker.lat, marker.lon, mapview.zoom)
@@ -311,7 +311,7 @@ class MarkerMapLayer(MapLayer):
 
   def unload(self):
     """
-      This function deletes all widget on the current layer
+      This function deletes all widgets on the current layer.
     """
     self.clear_widgets()
     del self.markers[:]
@@ -373,9 +373,9 @@ class MapView(Widget):
   @property
   def viewport_pos(self):
     """
-      Returns the current viewport position
+      Returns the current viewport position.
       
-      @return: the current viewport position
+      @return: The current viewport position.
       @rtype float,float
     """
     vx, vy = self._scatter.to_local(self.x, self.y)
@@ -384,9 +384,9 @@ class MapView(Widget):
   @property
   def scale(self):
     """
-      Returns the current scalefaktor
+      Returns the current scalefaktor.
       
-      @return: the current scalefaktor
+      @return: The current scalefaktor.
       @rtype: float
     """
     return self._scatter.scale
@@ -396,10 +396,10 @@ class MapView(Widget):
       Returns the bounding box from the bottom/left (lat1, lon1) to
       top/right (lat2, lon2).
       
-      @param margin: (optional) addition margin for the boundingbox
+      @param margin: (Optional) addition margin for the boundingbox.
       @type: float
       
-      @return the boundingbox
+      @return: The boundingbox.
       @rtype mapview.Bbox
     """
     x1, y1 = self.to_local(0 - margin, 0 - margin)
@@ -421,9 +421,9 @@ class MapView(Widget):
   def get_window_xy_from(self, lat, lon, zoom):
     """
       Returns the x/y position in the widget absolute coordinates
-      from a lat/lon
+      from a lat/lon.
     
-      @return: the x/y position in the widget
+      @return: The x/y position in the widget.
       @rtype: float,float
           
     """
@@ -436,7 +436,7 @@ class MapView(Widget):
 
   def center_on(self, *args):
     """
-      Center the map on the coordinate :class:`Coordinate`, or a (lat, lon)
+      Center the map on the coordinate :class:`Coordinate`, or a (lat, lon.
     """
     map_source = self.map_source
     zoom = self._zoom
@@ -463,16 +463,16 @@ class MapView(Widget):
       Sets the zoom level, leaving the (x, y) at the exact same point
       in the view.
       
-      @param zoom: the zoom level
+      @param zoom: tThe zoom level.
       @param type: int
       
-      @param x: the x-coordinate of the point 
+      @param x: The x-coordinate of the point.
       @type x: float
       
-      @param y: the y-coordinate of the point
+      @param y: The y-coordinate of the point.
       @type y: float
       
-      @param scale: (optinal) the scalefaktor for the scatter
+      @param scale: (Optinal) the scalefaktor for the scatter.
       @type scale: int
     """
     zoom = clamp(zoom,
@@ -509,15 +509,15 @@ class MapView(Widget):
     
   def zoom_to(self, lat, lon, zoom):
     """
-      Zooms to the given zoom level at the given position
+      Zooms to the given zoom level at the given position.
       
-      @param lat: lat-coordinate of the given position
+      @param lat: Lat-coordinate of the given position.
       @type lat: float
       
-      @param lon: lon-coordinate of the given position
+      @param lon: Lon-coordinate of the given position.
       @type lon: float
       
-      @param zoom: zoom-faktor
+      @param zoom: Zoom-factor.
       @type zoom: int
     """
     lat = float(lat)
@@ -577,13 +577,13 @@ class MapView(Widget):
       Return the current :class:`Coordinate` within the (x, y) widget
       coordinate.
       
-      @param x: the x-coordinate of the point
+      @param x: The x-coordinate of the point.
       @type x: float
       
-      @param y: the y-coordinate of the point
+      @param y: The y-coordinate of the point.
       @type y: float      
       
-      @return the current Coordinate within the (x,y) widget coordinate
+      @return: The current Coordinate within the (x,y) widget coordinate.
       @rtype: mapview.Coordinate
     """
     if zoom is None:
@@ -595,15 +595,15 @@ class MapView(Widget):
 
   def add_marker(self, marker, layer=None):
     """
-      Add a marker into the layer. If layer is None, it will be added in
+      Add a marker onto the layer. If layer is None, it will be added in
       the default marker layer. If there is no default marker layer, a new
-      one will be automatically created
+      one will be automatically created.
       
-      @param marker: the marker to be added
+      @param marker: The marker to be added.
       @type marker: view.MapMarker
       
-      @param layer: (optional) the layer the marker should be added to
-      @type layer: view.MarkerMapLayer()
+      @param layer: (Optional) the layer the marker should be added to.
+      @type layer: view.MarkerMapLayer
     """
     if layer is None:
       if not self._default_marker_layer:
@@ -644,12 +644,12 @@ class MapView(Widget):
 
   def isPolyInView(self, name):
     """
-      This function prooves is a polygon is in the current viewspace
+      This function proves if a polygon is in the current viewspace.
       
-      @param name: the name of the placemark, which contains the polygone to proove
+      @param name: The name of the polygon.
       @type name: str
       
-      @return: true if in viewspace else false
+      @return: True if in viewspace otherwise False.
       @rtype: boolean
     """    
     latLonBox = self.get_bbox()
@@ -659,12 +659,12 @@ class MapView(Widget):
 
   def isPolyVisible(self, name): 
     """
-      This function prooves if a polygon is complete visible in viewspace
+      This function proves if a polygon is completely visible in viewspace.
       
-      @param name: the name of the placemark, which contains the polygone to proove
+      @param name: The name of the polygon.
       @type name: str
       
-      @return: true if complete in viewspace else false
+      @return: True if completely in viewspace otherwise False.
       @rtype: boolean
     """
     latLonBox = self.get_bbox()
@@ -734,7 +734,7 @@ class MapView(Widget):
   
   def hideMarkers(self):
     """
-      Hides all markers on the Marker Layer
+      Hides all markers on the Marker Layer.
     """
     if self._default_marker_layer != None:
       self._default_marker_layer.unload()
@@ -753,11 +753,11 @@ class MapView(Widget):
     """
       This function calculates a boundingbox in respect to the given polygon.
       
-      @param polygon: the polygon for which the bbox should be computed 
-                      e.g. [(1.0,2.0),(2.0,1.0),(1.0,1.0),(1.0,2.0)]
-      @type: [(float,float),...]
+      @param polygon: The polygon for which the bbox should be computed,
+                      e.g. [(1.0,2.0),(2.0,1.0),(1.0,1.0),(1.0,2.0)].
+      @type: [(float,float)]
       
-      @return: the calculated bbox e.g. [minLat,minLon, maxLat,maxLon]
+      @return: The calculated bbox, e.g. [minLat,minLon, maxLat,maxLon].
       @rtype: [float,float,float,float]
     """
     minLat = 99999.9
@@ -780,7 +780,7 @@ class MapView(Widget):
     """
       Makes a polygon visible on the Map.
       
-      @param name: Name of the polygon to be visible.
+      @param name: Name of the polygon to be shown.
       @type name: str
     """
     if self.placemarks.has_key(name):
@@ -827,7 +827,7 @@ class MapView(Widget):
 
   def remove_marker(self, marker):
     """
-      Remove a marker from its layer
+      Remove a marker from its layer.
     """
     marker.detach()
     
@@ -841,10 +841,10 @@ class MapView(Widget):
       widget yourself: think as Z-sprite / billboard.
       Defaults to "window".
       
-      @param layer: the layer for updating
+      @param layer: The layer for updating.
       @type layer: kivy.uix.widget.Widget
       
-      @param mode: (optional) the mode for updating could be "scatter" or "window"
+      @param mode: (Optional) The mode for updating could be "scatter" or "window".
       @type mode: str
     """
     assert(mode in ("scatter", "window"))
@@ -863,9 +863,9 @@ class MapView(Widget):
 
   def remove_layer(self, layer):
     """
-      Remove the layer
+      Remove the layer.
       
-      @param layer: the layer to be removed
+      @param layer: The layer to be removed.
       @type kivy.uix.widget.Widget
     """
     self._layers.remove(layer)
