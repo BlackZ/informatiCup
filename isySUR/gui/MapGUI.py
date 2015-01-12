@@ -34,6 +34,15 @@ class Map(FloatLayout):
   text = StringProperty()
   
   def __init__(self, app):
+    """
+      Basic class containing an osm Node
+  
+      Parameters
+      ==========
+      
+      @param app: 
+      @type app:
+    """
     super(Map, self).__init__()
     
     self.lock = Lock()
@@ -51,18 +60,18 @@ class Map(FloatLayout):
   
   def cleanUpCache(self):
     """
-    Triggers function to delete cache folder.
+      Triggers function to delete cache folder.
     """
     self.maps.cleanUpCache()
   
   def toast(self, text, long_duration=False):
     """
-    Shows a toast.
-    
-    @param duration: If paramter is True the toast is
-                     visible for a long time. Otherwise
-                     it has a shorter duration.
-    @type duration: Boolean
+      Shows a toast.
+      
+      @param duration: If paramter is True the toast is
+                       visible for a long time. Otherwise
+                       it has a shorter duration.
+      @type duration: Boolean
     """
     Toast(self).show(text, long_duration)
       
