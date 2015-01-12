@@ -49,7 +49,16 @@ class Pipeline:
     """
     isOutputDir = os.path.isdir(outPath)
     surFile = open(inPath,'r')
-    surs = sur.SUR.fromFile(surFile, configPath)
+    try:
+      surs = sur.SUR.fromFile(surFile, configPath)
+    except ValueError:
+      print "Invalid SUR data file: First line is no number."
+      surFile.close()
+      sys.exit()
+    except IndexError:
+      print "Not as much lines with SUR information as stated."
+      surFile.close()
+      sys.exit()
     surFile.close()
     
     completeKML = kml.KMLObject("complete.kml")

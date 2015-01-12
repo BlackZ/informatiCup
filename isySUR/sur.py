@@ -92,10 +92,7 @@ class SUR():
         print "No config file will be used!"
     # open file and read first line (num of SURs)
     num = f.readline()
-    try:
-      num=int(num)
-    except ValueError:
-      print "Invalid data file: First line is no number."
+    num=int(num)
     
     # build SURs
     surs = []
