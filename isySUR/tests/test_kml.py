@@ -125,7 +125,7 @@ class TestKMLObject(unittest.TestCase):
     self.assertTrue(kmlObj.styles.has_key("Poly1"))
     self.assertTrue(kmlObj.styles.has_key("Poly10"))
     self.assertEqual(kmlObj.styles["Poly1"]["polyColour"], testStyle["Poly1"]["polyColour"])
-    self.assertEqual(kmlObj.styles["Poly1"]["lineColour"], "7f00ff00")
+    self.assertEqual(kmlObj.styles["Poly1"]["lineColour"], "9900ff00")
     self.assertEqual(kmlObj.styles["Poly1"]["lineWidth"], "2")
     
   def test_addPolyStyle(self):
