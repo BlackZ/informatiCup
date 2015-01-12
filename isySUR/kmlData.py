@@ -6,6 +6,7 @@ Created on Sun Nov  9 15:09:52 2014
 """
 
 import xml.etree.cElementTree as ET
+from  xml.etree.cElementTree import ParseError
 import xml.sax.saxutils as xmlUtils
 import os
 
@@ -83,17 +84,12 @@ class KMLObject():
       @return: The parsed KMLObject.
     """
     stylesToParse = []
-    
-#    fileNameIndex = filename.rfind(os.sep)
-#    
-#    #Mabe remove file ending
-#    if fileNameIndex > 0:
-#      kmlName = filename[fileNameIndex+1:]
-#    else:
-#      kmlName = filename
     kmlName = os.path.basename(filename)
 
-    tree=ET.parse(filename)  
+    try:
+      tree=ET.parse(filename)  
+    except ParseError: 
+      raise ParseError("Could not parse the kml file.")
     root=tree.getroot()
     res=cls(kmlName)
     namespace = root.tag[:root.tag.find("}")+1]
