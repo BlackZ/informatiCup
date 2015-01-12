@@ -259,7 +259,6 @@ class TestKMLObject(unittest.TestCase):
     
       
   def test_saveAsXML(self):
-    #Not too nice since this works only if the the input file is unformatted.
     filename="testData/dataOnlyForTests/TestOfKmlUnformatted.kml"
     kmlObj = kmlData.KMLObject.parseKML(filename)
     output = "testData/dataOnlyForTests/OutputKML.kml"

@@ -315,8 +315,25 @@ class KMLObject():
     
     for p in self.placemarks:
       documentE.append(p.getXMLTree())
-    return '<?xml version="1.0" encoding="UTF-8"?>' + xmlUtils.unescape(ET.tostring(root, encoding='utf-8'))
+    indent(root)
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n' + xmlUtils.unescape(ET.tostring(root, encoding='utf-8'))).rstrip("\n")
     
+def indent(elem, level=0):
+  if elem.tag=='coordinates':
+    elem.text=elem.text.replace('\n', '\n'+ (level+1)*"  ")
+  i = "\n" + level*"  "
+  if len(elem):
+    if not elem.text or not elem.text.strip():
+      elem.text = i + "  "
+    if not elem.tail or not elem.tail.strip():
+      elem.tail = i
+    for elem in elem:
+      indent(elem, level+1)
+    if not elem.tail or not elem.tail.strip():
+      elem.tail = i
+  else:
+    if level and (not elem.tail or not elem.tail.strip()):
+      elem.tail = i
   
 class Placemark():
   
