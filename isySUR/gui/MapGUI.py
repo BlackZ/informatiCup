@@ -179,7 +179,7 @@ class Map(FloatLayout):
     toast.stayVisible("Calculating ... ")
     
     kmlList = Queue()
-    thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList, self.stop))
+    thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList, self.stop, self.app.configPath))
     thread.start()
     
     while self.stop.empty() and (not kmlList.empty() or thread.isAlive()):
@@ -289,7 +289,6 @@ class Menu(DropDown):
     """
     self.isOpen = False
     self.dismiss()
-    print isConfig
     if isConfig:
       content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
     else:
@@ -342,7 +341,6 @@ class Menu(DropDown):
           if not moved:
             self.map_view.maps.zoom_to_Polygon(name, 15)
         except Exception as e:
-          print e
           import traceback
           traceback.print_exc()
           self.map_view.toast('KML file is incorrect!')
@@ -427,7 +425,6 @@ class Menu(DropDown):
             import traceback
             traceback.print_exc()
             self.map_view.toast(elem + " could not be saved!")
-        print selection[elem].placemarks
         completeKML.placemarks.extend(selection[elem].placemarks)
         completeKML.addStyles(selection[elem].styles)
       if len(completeKML.placemarks) > 0:
@@ -441,7 +438,6 @@ class Menu(DropDown):
             with open(os.path.join(path, filename), 'w') as stream:
               stream.write(completeKML.getXML())
         except Exception as e:
-          print e
           import traceback
           traceback.print_exc()
           self.map_view.toast('An error occured while saving!')
@@ -567,7 +563,6 @@ class Toast(Label):
     """
     super(Toast, self).__init__()
     self.map_view = mapview
-    print self.texture_size, self.text_size
   
   def stayVisible(self, text):
     """
@@ -905,6 +900,7 @@ class MapApp(App):
     super(MapApp, self).__init__()
     self.map = None
     self.configContent = {'[Indoor]':[], '[Outdoor]':[], '[Both]':[]}
+    self.configPath = configPath
     self.loadConfig(configPath)
     
     self.error = ""
@@ -940,12 +936,12 @@ class MapApp(App):
     @type configPath: str
     """
     if configPath != '':
-      key = None
+      self.configPath = configPath
+      key = '[Both]'
       if not self.isConfigEmpty():
         self.clearConfig()
       with open(configPath, 'r') as stream:
         for line in stream:
-          print line
           line = line.replace('\n','')
           if line == "":
             next
@@ -957,13 +953,9 @@ class MapApp(App):
               self.clearConfig()
               break
           else:
-            if key == None:
-              self.error = 'No RuleArea found. Config is incorrect!'
-              self.clearConfig()
-              break
-            else:
-              self.error = ""
-              self.configContent[key].append(line)
+            self.error = ""
+            self.configContent[key].append(line)
+    print self.configContent
   
   def clearConfig(self):
     """
