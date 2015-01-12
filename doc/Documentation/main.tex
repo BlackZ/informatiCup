@@ -128,9 +128,9 @@ You can leave out \texttt{python} if you have installed the program before. For 
 For information about input and output file types see section \ref{sec:io}.
 
 \subsection{\ProjectTitle\ in window version}\label{sec:QuickstartWindow}
-For the window version type
+For the window version just type
 \begin{verbatim}
-	$ python run_isySUR.py gui
+	$ python run_isySUR.py
 \end{verbatim}
 In Menu you find the possibility to load an SUR input file. After calculating you can save the area(s) of influence.
 
@@ -260,7 +260,7 @@ For using the command line interface type:
 \end{verbatim}
 For using the graphical user interface type:
 \begin{verbatim}
-	$ run_isySUR.py gui [parameters]
+	$ run_isySUR.py
 \end{verbatim}
 
 Notice that the gui version has more requirements than the command line version. See \ref{sec:requirements} for more details.
@@ -285,6 +285,13 @@ Usage of the gui version:
 \begin{verbatim}
 	$ run_isySUR.py gui [-h] [-c CONFIG]
 \end{verbatim}
+If you do not want to give parameters you can also start the gui version with
+\begin{verbatim}
+	$ run_isySUR.py
+\end{verbatim}
+or a simple double click on the file.
+
+When the gui version could not be started, e.g. because of missing requirements, you can proceed with the command line version. You will be asked for an input file and an output path, to run the program. If you do not want to use this version you can type \texttt{'exit'} to exit the program.
 
 \subsubsection{Parameters}
 The parameters of \texttt{run\_isySUR.py gui}:
