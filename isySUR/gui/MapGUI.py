@@ -266,7 +266,6 @@ class Menu(DropDown):
     self.dismiss()
     if 'KML' in obj.text:
       content = LoadDialog(load=self.load_kml, cancel=self.dismiss_load)
-      content.ids.filechooser.filters = ['*.kml']
     elif 'SUR' in obj.text:
       if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
         content = LoadDialog(load=self.load_sur, cancel=self.dismiss_load)
@@ -275,22 +274,7 @@ class Menu(DropDown):
           return      
     else:
       content = LoadDialog(load=self.load_cfg, cancel=self.dismiss_load)
-    content.ids.filechooser.path = self.path
-    #content = LoadDialog(load=self.load, cancel=self.dismiss_load)
-    #content.ids.filechooser.path = self.path
-    #if 'KML' in obj.text:
-    #  content.ids.filechooser.filters = ['*.kml']
-    #elif 'SUR' in obj.text:
-    #  if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
-    #    content.ids.filechooser.filters = ['*.txt']
-    #  elif self._SURThread != None or self._SURThread.isAlive():
-    #      self.map_view.toast('Already calculating!')
-    #      return      
-    #else:
-    #  content.ids.filechooser.filters = ['*.cfg']
-    
-    print content.load
-    
+    content.ids.filechooser.path = self.path    
     self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
     self._popup_load.open()
   
