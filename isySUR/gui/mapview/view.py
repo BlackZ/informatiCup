@@ -548,10 +548,10 @@ class MapView(Widget):
       @zoom: New zoom level of the map.
       @type zoom: int
     """
-    if zoom > self.zoom or not self.isPolyVisible(name):
+    if zoom > self.zoom or (not self.isPolyVisible(name) and self.isPolyInView(name)):
       x = self.map_source.get_x(zoom, self.lon) - self.delta_x
       y = self.map_source.get_y(zoom, self.lat) - self.delta_y
-      self.set_zoom_at(zoom, 0, 0)
+      self.set_zoom_at(zoom, x, y)
     if not self.isPolyVisible(name):
       bBox = self.placemarks[name]["bBox"]
       centerLat = (bBox[0] + bBox[2]) / 2.0
