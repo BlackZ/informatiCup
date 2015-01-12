@@ -3,6 +3,7 @@
 __all__ = ["MapView", "MapMarker", "MapMarkerPopup", "MapLayer", "MarkerMapLayer"]
 
 import os
+from types import *
 from os.path import join, dirname
 from kivy.clock import Clock
 from kivy.metrics import dp
@@ -413,6 +414,15 @@ class MapView(Widget):
     self.drawPolygon()
     
   def zoom_to_Polygon(self, name, zoom):
+    """
+    Zooms to the given zoom level at the given polygon.
+    
+    @param name: Name of the polygon.
+    @type name: str
+    
+    @zoom: New zoom level of the map.
+    @type zoom: int
+    """
     if zoom > self.zoom:
       x = self.map_source.get_x(zoom, self.lon) - self.delta_x
       y = self.map_source.get_y(zoom, self.lat) - self.delta_y
@@ -424,9 +434,7 @@ class MapView(Widget):
 
       self.center_on(centerLat,centerLon)
 
-    self.drawPolygon()
-      
-    
+    self.drawPolygon()  
 
   def on_zoom(self, instance, zoom):
     if zoom == self._zoom:
@@ -464,6 +472,9 @@ class MapView(Widget):
     layer.set_marker_position(self, marker)
     
   def drawPolygon(self):
+    """
+    Draws a Polygon onto the Map.
+    """
     self.polyLayer.canvas.clear()   
     for k,v in self.placemarks.items():
       if v["show"] and self.isPolyInView(k):
@@ -488,21 +499,34 @@ class MapView(Widget):
             Mesh(vertices=vertices, indices=indices, mode="line_loop")
 
 
-  def isPolyInView(self, name):
-    
+  def isPolyInView(self, name):    
     latLonBox = self.get_bbox()
     polyBBox = self.placemarks[name]["bBox"]
     return not(polyBBox[0] > latLonBox[2] or polyBBox[1] > latLonBox[3] or 
       polyBBox[2] < latLonBox[0] or polyBBox[3] < latLonBox[1])
 
-  def isPolyVisible(self, name):
-    
+  def isPolyVisible(self, name):    
     latLonBox = self.get_bbox()
     polyBBox = self.placemarks[name]["bBox"]
     return (polyBBox[0] > latLonBox[0] and polyBBox[1] > latLonBox[1] 
       and polyBBox[2] < latLonBox[2] and polyBBox[3] < latLonBox[3])
 
   def addPolygon(self, name, polygon, color, markerCoords):
+    """
+    Adds and draws a new polygon onto the map.
+    
+    @param name: Name of the polygon to be added.
+    @type name: str
+    
+    @param polygon: List of vertices of the polygon.
+    @type polygon: [(float, float)]
+    
+    @param color: Style value of KML
+    @type color: dict
+    
+    @param markerCoords: Coordinates of the SUR.
+    @type markerCoords: Tuple(float, float)
+    """
     
 #      print marker.source
 #      print marker.parent
@@ -548,10 +572,16 @@ class MapView(Widget):
       self.showPolygon(name)
   
   def hideMarkers(self):
+    """
+    Hides all markers on the Marker Layer
+    """
     if self._default_marker_layer != None:
       self._default_marker_layer.unload()
 
   def showMarkers(self):
+    """
+    Shows all markers.
+    """
     for placemark in self.placemarks:
       self.trigger_update(True)
       marker = self.placemarks[placemark]['marker']
@@ -576,10 +606,15 @@ class MapView(Widget):
     return [minLat,minLon, maxLat,maxLon]
     
   def showPolygon(self, name):
+    """
+    Makes a polygon visible on the Map.
+    
+    @param name: Name of the polygon to be visible.
+    @type name: str
+    """
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 1
       marker = self.placemarks[name]["marker"]
-#      print marker
       if marker != None and \
          (self._default_marker_layer == None or \
          (self._default_marker_layer != None and \
@@ -589,23 +624,29 @@ class MapView(Widget):
       self.drawPolygon()
   
   def hidePolygon(self, name):
+    """
+    Removes a polygon from the Map.
+    
+    @param name: Name of the polygon to be removed.
+    @type name: str
+    """
     if self.placemarks.has_key(name):
       self.placemarks[name]["show"] = 0
-      marker = self.placemarks[name]["marker"]#self.marker[index]
+      marker = self.placemarks[name]["marker"]
       if marker != None:
         marker.visible = 0
         self._default_marker_layer.clear_widgets([marker])
       self.drawPolygon()
   
-  def removePolygon(self, name):
-    self.hidePolygon(name)
-    #    del self.marker[index]
-  
   def convertKMLColor(self, kmlColor):
     """
     Convert a KML Color to its rgba value between 0 and 1.
+    
+    @param kmlColor: Color to be converted.
+    @type kmlColor: str
+    
+    @return: Returns the rgba values of kmlColor.
     """
-#    print "KML:", kmlColor
     lv = len(kmlColor)
     #alpha, blue, green, red
     abgr = tuple(tuple(int(kmlColor[i:i + lv // 4], 16) for i in range(0, lv, lv // 4)))
