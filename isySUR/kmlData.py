@@ -33,6 +33,12 @@ class KMLObject():
       for p in placemarks:
         self.addPlacemark(p)
         
+  def getStyle(self, styleName):
+    if self.styles.has_key(styleName):
+      return self.styles[styleName]
+    else:
+      return {"polyColour": "99000000", "lineColour": "99000000", "lineWidth":"2"}
+        
   def addStyles(self, styles):
     """
       Function that allows to add styles to the kml. If styles does not include lineColour, or
@@ -44,7 +50,7 @@ class KMLObject():
     for key, value in styles.items():
       self.styles[key] = value
       if not value.has_key("lineColour"):
-        self.styles[key]["lineColour"] = "7f00ff00"
+        self.styles[key]["lineColour"] = "9900ff00"
       if not value.has_key("lineWidth"):
         self.styles[key]["lineWidth"] = "2"
       
@@ -262,7 +268,8 @@ class KMLObject():
           pointList.append(node)
         elif startlat!=lastlat or startlon!=lastlon:
           #if it's the last node: check equality of first and last node
-          raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
+          raise IOError("Invalid kml-file: Placemark does not start and end "\
+          "with the same coordinates.")
           
     return pointList
 

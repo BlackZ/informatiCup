@@ -146,7 +146,7 @@ class Map(FloatLayout):
     for placemark in kmlObj.placemarks:
       name = placemark.name
       polygon = self.app.getPolygonFromPlacemark(placemark)
-      style = kmlObj.styles[placemark.style.lstrip('#')]
+      style = kmlObj.getStyle(placemark.style.lstrip('#'))
       i = 1
       while self.maps.placemarks.has_key(name):
         name = placemark.name + '(' + str(i) + ')'
