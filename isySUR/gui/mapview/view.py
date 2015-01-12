@@ -842,7 +842,7 @@ class MapView(Widget):
       Defaults to "window".
       
       @param layer: the layer for updating
-      @type layer: view.MarkerMapLayer
+      @type layer: kivy.uix.widget.Widget
       
       @param mode: (optional) the mode for updating could be "scatter" or "window"
       @type mode: str
@@ -862,7 +862,11 @@ class MapView(Widget):
     self.canvas = c
 
   def remove_layer(self, layer):
-    """Remove the layer
+    """
+      Remove the layer
+      
+      @param layer: the layer to be removed
+      @type kivy.uix.widget.Widget
     """
     self._layers.remove(layer)
     c = self.canvas
@@ -871,7 +875,8 @@ class MapView(Widget):
     self.canvas = c
 
   def sync_to(self, other):
-    """Reflect the lat/lon/zoom of the other MapView to the current one.
+    """
+      Reflect the lat/lon/zoom of the other MapView to the current one.
     """
     if self._zoom != other._zoom:
       self.set_zoom_at(other._zoom, *self.center)
