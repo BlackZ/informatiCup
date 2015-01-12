@@ -84,12 +84,14 @@ class KMLObject():
     """
     stylesToParse = []
     
-    fileNameIndex = filename.rfind(os.sep)
-    #Mabe remove file ending
-    if fileNameIndex > 0:
-      kmlName = filename[fileNameIndex+1:]
-    else:
-      kmlName = filename
+#    fileNameIndex = filename.rfind(os.sep)
+#    
+#    #Mabe remove file ending
+#    if fileNameIndex > 0:
+#      kmlName = filename[fileNameIndex+1:]
+#    else:
+#      kmlName = filename
+    kmlName = os.path.basename(filename)
     tree=ET.parse(filename)  
     root=tree.getroot()
     res=cls(kmlName)
