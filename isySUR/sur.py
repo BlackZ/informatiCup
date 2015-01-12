@@ -85,7 +85,11 @@ class SUR():
     classification = "IO"
     #Get surTypeManager    
     if configPath != '':
-      typeManager = stm.surTypeManager(configPath)
+      try:
+        typeManager = stm.surTypeManager(configPath)
+      except IOError, e:
+        print e.message
+        print "No config file will be used!"
     # open file and read first line (num of SURs)
     num = f.readline()
     try:
