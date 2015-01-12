@@ -17,7 +17,6 @@ class OSM():
       
       Initialises the dictionaries for the nodes, ways and relations that will be 
       contained in this osmObject.
-      
     """
     self.nodes = {}
     self.ways = {}
@@ -104,37 +103,38 @@ class OSM():
   
   def getNearestNode(self, point, tags={}, otherNodes=[]):
     """
-    This function returns the ids of the nodes and its distance which are closest to the given point 
-    
-    @param point: The point - (lat, lon) - for which the function has
-                  to compute the closest node.
-    @type point: Tuple(float,float)
-
-    @param tags: A dictionary of tags, given as a key value pair, which
-                will be used to filter the nodes. You can use * as wildcard
-                for the value or key but NOT both.
-                
-                e.g. dict("type":"xyz") or dict("type":"*")               
-    @type tags: dict(str:str)
-    
-    @param otherNodes: Use only this nodes, given by a list of
-                           its IDs, to find the nearest relation.                       
-    @type otherNodes: [str,]
-    
-    @return The function returns a list distanceResult-Objects (e.g [distObj1,distObj2,...])
-            which holds the following informations:
-            
-            - distance (float): If an object is found, it contains the
-                                distance to the nearest object
+      This function returns the ids of the nodes and its distance which are closest to the given point 
+      
+      @param point: The point - (lat, lon) - for which the function has
+                    to compute the closest node.
+      @type point: Tuple(float,float)
   
-            - nearestObj (str, type):   it contains the ID and the type
-                                        of the nearest object
-                                      
-                                      For example:
-                                        found object: ("1", osmData.Node)
-                                      
-            - nearestSubObj [(str, type)]:  Is empty: [("-1",None)]
-        If nothing is found, the resulting list is empty.
+      @param tags: A dictionary of tags, given as a key value pair, which
+                  will be used to filter the nodes. You can use * as wildcard
+                  for the value or key but NOT both.
+                  
+                  e.g. dict("type":"xyz") or dict("type":"*")               
+      @type tags: dict(str:str)
+      
+      @param otherNodes: Use only this nodes, given by a list of
+                             its IDs, to find the nearest relation.                       
+      @type otherNodes: [str,]
+      
+      @return: The function returns a list distanceResult-Objects (e.g [distObj1,distObj2,...])
+              which holds the following informations:
+              
+              - distance (float): If an object is found, it contains the
+                                  distance to the nearest object
+    
+              - nearestObj (str, type):   it contains the ID and the type
+                                          of the nearest object
+                                        
+                                        For example:
+                                          found object: ("1", osmData.Node)
+                                        
+              - nearestSubObj [(str, type)]:  Is empty: [("-1",None)]
+          If nothing is found, the resulting list is empty.
+      @rtype: [osmData.distanceResult,..]
     """
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
@@ -184,48 +184,49 @@ class OSM():
   
   def getNearestWay(self, point, onlyPolygons,tags={}, otherWays=[]):
     """
-    This function returns the ids of the ways, the distance which is closest to the given point.
-    
-    @param point: The point - (lat, lon) - for which the function has
-                  to compute the closest way.
-    @type point: Tuple(float,float)
-    
-    @param onlyPolygons: True for only using Ways with complete Polygons for computation
-                         False for use all
-    
-    @type onlyPolygons: boolean
-
-    @param tags: A dictionary of tags, given as a key value pair, which
-                will be used to filter the ways. You can use * as wildcard
-                for the value or key but NOT both.
-                
-                e.g. dict("type":"xyz") or dict("type":"*")       
-    @type tags: dict(str:str)
-    
-    @param otherWays: Use only these ways, given by a list of
-                           its IDs, to find the nearest way.                       
-    @type otherWays: [str,]
-    
-    @return The function returns a list of distanceResult-Objects (e.g [distObj1,distObj2,...])
-            which holds the following informations:
-            
-            - distance (float): If an object is found, it contains the
-                                distance to the nearest object
+      This function returns the ids of the ways, the distance which is closest to the given point.
+      
+      @param point: The point - (lat, lon) - for which the function has
+                    to compute the closest way.
+      @type point: Tuple(float,float)
+      
+      @param onlyPolygons: True for only using Ways with complete Polygons for computation
+                           False for use all
+      
+      @type onlyPolygons: boolean
   
-            - nearestObj [(str, type)]: If one object is found, it contains the ID and
-                                        the type of the nearest object
-                                      
-                                      For example:
-                                        found object: ("1", osmData.Way)
-                                      
-            - nearestSubObj [(str, type)]:  If an object is found, it contains the IDs
-                                          of the two Nodes, which defines the nearest Edge.
-                                          There could be several edges, which have the same
-                                          distance
-                                          
-                                          For example:
-                                            found object: [(["1","2"], osmData.Node),..]
-        If nothing is found, the resulting list is empty.
+      @param tags: A dictionary of tags, given as a key value pair, which
+                  will be used to filter the ways. You can use * as wildcard
+                  for the value or key but NOT both.
+                  
+                  e.g. dict("type":"xyz") or dict("type":"*")       
+      @type tags: dict(str:str)
+      
+      @param otherWays: Use only these ways, given by a list of
+                             its IDs, to find the nearest way.                       
+      @type otherWays: [str,]
+      
+      @return: The function returns a list of distanceResult-Objects (e.g [distObj1,distObj2,...])
+              which holds the following informations:
+              
+              - distance (float): If an object is found, it contains the
+                                  distance to the nearest object
+    
+              - nearestObj [(str, type)]: If one object is found, it contains the ID and
+                                          the type of the nearest object
+                                        
+                                        For example:
+                                          found object: ("1", osmData.Way)
+                                        
+              - nearestSubObj [(str, type)]:  If an object is found, it contains the IDs
+                                            of the two Nodes, which defines the nearest Edge.
+                                            There could be several edges, which have the same
+                                            distance
+                                            
+                                            For example:
+                                              found object: [(["1","2"], osmData.Node),..]
+          If nothing is found, the resulting list is empty.
+      @rtype: [osmData.distanceResult,..]
     """
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestWay only accepts Tupels from type types.TupelType with 2 Entries from type float")
@@ -276,42 +277,43 @@ class OSM():
   
   def getNearestRelation(self, point, tags={}, otherRelations=[]):
     """
-    This function returns the ids of the relation,its way and its distance which is closest to the given point 
-    
-    @param point: The point - (lat, lon) - for which the function has
-                  to compute the closest relation.
-    @type point: Tuple(float,float)
-
-    @param tags: A dictionary of tags, given as a key value pair, which
-                will be used to filter the realtions. You can use * as wildcard
-                for the value or key but NOT both.
-                
-                e.g. dict("type":"multipolyon")  or dict("type":"*")         
-    @type tags: dict(str:str)
-    
-    @param otherRelations: Use only this relations, given by a list of
-                           its IDs, to find the nearest relation.                       
-    @type otherRelations: [str,]
-    
-    @return The function returns a list of distanceResult-Object (e.g [distObj1,distObj2,...])
-            which holds the following informations:
-            
-            - distance (float): If an object is found, it contains the
-                                distance to the nearest object
+      This function returns the ids of the relation,its way and its distance which is closest to the given point 
+      
+      @param point: The point - (lat, lon) - for which the function has
+                    to compute the closest relation.
+      @type point: Tuple(float,float)
   
-            - nearestObj (str, type): If one object is found, it contains the ID and
-                                      the type of the nearest object
-                                      
-                                      For example:
-                                        found object: ("1", osmData.Relation)
-                                      
-            - nearestSubObj [(str, type)]:  If an object is found, it contains the ID
-                                          and the type of the neares subobject in
-                                          the relation.
+      @param tags: A dictionary of tags, given as a key value pair, which
+                  will be used to filter the realtions. You can use * as wildcard
+                  for the value or key but NOT both.
+                  
+                  e.g. dict("type":"multipolyon")  or dict("type":"*")         
+      @type tags: dict(str:str)
+      
+      @param otherRelations: Use only this relations, given by a list of
+                             its IDs, to find the nearest relation.                       
+      @type otherRelations: [str,]
+      
+      @return: The function returns a list of distanceResult-Object (e.g [distObj1,distObj2,...])
+              which holds the following informations:
+              
+              - distance (float): If an object is found, it contains the
+                                  distance to the nearest object
+    
+              - nearestObj (str, type): If one object is found, it contains the ID and
+                                        the type of the nearest object
                                         
-                                          For example:
-                                              found object: [("1", osmData.Relation),..]
-        If nothing is found, the resulting list is empty.
+                                        For example:
+                                          found object: ("1", osmData.Relation)
+                                        
+              - nearestSubObj [(str, type)]:  If an object is found, it contains the ID
+                                            and the type of the neares subobject in
+                                            the relation.
+                                          
+                                            For example:
+                                                found object: [("1", osmData.Relation),..]
+          If nothing is found, the resulting list is empty.
+      @rtype: [osmData.distanceResult,..]
     """
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getNearestRelation only accepts Tupels from type types.TupelType with 2 Entries from type float")
@@ -369,21 +371,21 @@ class Node(object):
   
   def __init__(self, identifier, lat, lon, tags):
     """
-    Basic class containing an osm Node
-
-    Parameters
-    ==========
-    
-    @param identifier: The id of the node.
-    @type identifier: Will be parsed to string
-    
-    @param lat: Latitude of the node as float.
-    @type lat: Will be parsed to float.
-    
-    @param lon: Longitude of the node as float.
-    @type lon: Will be parsed to float.
-    
-    @param tags: A dictionary containing all the tags for the node.
+      Basic class containing an osm Node
+  
+      Parameters
+      ==========
+      
+      @param identifier: The id of the node.
+      @type identifier: Will be parsed to string
+      
+      @param lat: Latitude of the node as float.
+      @type lat: Will be parsed to float.
+      
+      @param lon: Longitude of the node as float.
+      @type lon: Will be parsed to float.
+      
+      @param tags: A dictionary containing all the tags for the node.
     """
     self.id = identifier
     self.lat = float(lat)
@@ -434,28 +436,30 @@ class Node(object):
   @property
   def coords(self):
     """
-    This function-property returns latitude and longitude as tupel
-    
-    @return (lat, lon) as tupel
+      This function-property returns latitude and longitude as tupel
+      
+      @return: (lat, lon) as tupel
+      @rtype: Tupel(float,float)
     """
     return (self.lat,self.lon)
   
   def getDistance(self, point):
     """
-    This function computes the distance between two points
+      This function computes the distance between two points
+      
+      @param point: the point the distance should be computed with
+      @type point: tuple of latitude and longitude (float,float)
+      
+      @return: The function returns a distanceResult-Object which holds the
+              following informations:
+              
+              - distance (float): Distance between the current and the given point
     
-    @param point: the point the distance should be computed with
-    @type point: tuple of latitude and longitude (float,float)
-    
-    @return The function returns a distanceResult-Object which holds the
-            following informations:
-            
-            - distance (float): Distance between the current and the given point
-  
-            - nearestObj (str, type): The current node
-                                        For example: ("1", osmData.Node)
-                                      
-            - nearestSubObj [(str, type)]:  is empty: [("-1", None)]
+              - nearestObj (str, type): The current node
+                                          For example: ("1", osmData.Node)
+                                        
+              - nearestSubObj [(str, type)]:  is empty: [("-1", None)]
+      @rtype: osmData.distanceResult
     """
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
@@ -467,15 +471,21 @@ class Way(object):
   
   def __init__(self, identifier, refs, tags, osmObj):
     """
-    Basic class containing an osm Way
+      Basic class containing an osm Way
+      
+      Parameters
+      ==========
     
-    @param identifier: The id of the way as a string
-    
-    @param refs: An ordered list of node id's that make up the way
-    
-    @param tags: A dictionary containing all the tags for the way
-    
-    @param osmObj: Reference to the osmObj, this way is included in.
+      @param identifier: The id of the way as a string
+      
+      @param refs: An ordered list of node id's that make up the way
+      @type refs: [str,..]
+      
+      @param tags: A dictionary containing all the tags for the way
+      @type tags: dict(str:str,..)
+      
+      @param osmObj: Reference to the osmObj, this way is included in.
+      @type osmObj: osmData.OSM
     """
     self.id = identifier
     if not isinstance(refs, list):
@@ -490,9 +500,10 @@ class Way(object):
   
   def isPolygon(self):
     """
-    This functions prooves if the Way is a polygon
-    
-    @return true if polygon exists
+      This functions prooves if the Way is a polygon
+      
+      @return: true if polygon exists
+      @rtype: boolean
     """
     if len(self.refs)>=4 and self.refs[0]==self.refs[-1]:
       return True
@@ -529,9 +540,10 @@ class Way(object):
   
   def _sides(self):
     """
-    This function returns a list of lists of tuples, which describes all edges of the polygone
-    
-    @return edgeList: a list of lists of tuples (e.g. [[(0,0),(0,1)],[(0,1),(1,1)]]) a sublist represents an edge 
+      This function returns a list of lists of tuples, which describes all edges of the polygone
+      
+      @return: edgeList: a list of lists of tuples (e.g. [[(0,0),(0,1)],[(0,1),(1,1)]]) a sublist represents an edge 
+      @rtype: [[Tupel(float,float),Tupel(float,float)],..]
     """
     edgeList = []
     args = self._vertices()
@@ -541,9 +553,10 @@ class Way(object):
   
   def _vertices(self):
     """
-    This function converts the points contained by node objects to a list of tuples
-    
-    @return listOfPoints: a list of tuples, where each tuple reprent a point (e.g. [(0,0),(0,1),(1,1),(1,0)])
+      This function converts the points contained by node objects to a list of tuples
+      
+      @return: listOfPoints: a list of tuples, where each tuple reprent a point (e.g. [(0,0),(0,1),(1,1),(1,0)])
+      @rtype: [Tupel(float,float),..]
     """
     listOfPoints=[]
     for n in self.osmObj.ways[self.id].refs:
@@ -552,23 +565,24 @@ class Way(object):
   
   def _distPointLine(self,px,py,x1,y1,x2,y2):
     """
-    This function calculates the shortest distance from a point to a line
-    
-    @param px: x-coord of the point
-    @type px: float
-    @param py: y-coord of the point
-    @type py: float
-    
-    @param x1: x-coord of the first point of the line
-    @type x1: float
-    @param y1: y-coord of the first point of the line
-    @type y1: float
-    @param x2: x-coord of the second point of the line
-    @type x2: float
-    @param y2: y-coord of the second point of the line
-    @type y1: float
-    
-    @return: shortest distance from point to line
+      This function calculates the shortest distance from a point to a line
+      
+      @param px: x-coord of the point
+      @type px: float
+      @param py: y-coord of the point
+      @type py: float
+      
+      @param x1: x-coord of the first point of the line
+      @type x1: float
+      @param y1: y-coord of the first point of the line
+      @type y1: float
+      @param x2: x-coord of the second point of the line
+      @type x2: float
+      @param y2: y-coord of the second point of the line
+      @type y1: float
+      
+      @return: shortest distance from point to line
+      @rtype: float
     """
     dx = x2 - x1
     dy = y2 - y1
@@ -578,7 +592,7 @@ class Way(object):
     # Calculate the t that minimizes the distance.
     t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)
   
-    # See if this represents one of the segment's
+    # See if this represents one of the segments
     # end points or a point in the middle.
     if t < 0:
       dx = px - x1
@@ -597,16 +611,17 @@ class Way(object):
   
   def isInside(self, point, vertices=[]):
     """
-    This function proves if a points is envolved in a polygone
-    
-    @param point: x and y-coord of the point
-    @type point: Tupel(float,float)
-    
-    @param vertices: list of points to calculate with (e.g used for combined polygons)
-    @type vertices: [Tupel(float,float),..]
-
-    @return: true if point is inside
-             false if point is outside or on edge or way isn't a polygon
+      This function proves if a points is envolved in a polygone
+      
+      @param point: x and y-coord of the point
+      @type point: Tupel(float,float)
+      
+      @param vertices: list of points to calculate with (e.g used for combined polygons)
+      @type vertices: [Tupel(float,float),..]
+  
+      @return: true if point is inside
+               false if point is outside or on edge or way isn't a polygon
+      @rtype: boolean
     """
     if len(vertices)==0:  
         vertices=self._vertices()
@@ -616,12 +631,8 @@ class Way(object):
     else:
         if not vertices[0]==vertices[-1]:
             return False
-    #vertices=self._vertices()
+            
     cn = 0    # the crossing number counter
-
-    # repeat the first vertex at end if not already done
-    #if not vertices[0]==vertices[-1]:
-    #  vertices = tuple(vertices[:])+(vertices[0],)
 
     # loop through all edges of the polygon
     for i in range(len(vertices)-1):   # edge from vertices[i] to vertices[i+1]
@@ -637,28 +648,28 @@ class Way(object):
   
   def getDistance(self, point):
     """
-    Function that returns the distance of the given point to the current way.
+      Function that returns the distance of the given point to the current way.
+      
+      @param point: The point(lat,lon) to which the distance is calculated
+      @type point: Tuple(float,float)
+      
+      @return: The function returns a distanceResult-Object which holds the
+               following informations:
+              
+               - distance (float): The distance between the current way and the given point
     
-    @param point: The point(lat,lon) to which the distance is calculated
-    @type point: Tuple(float,float)
-    
-    @return The function returns a distanceResult-Object which holds the
-            following informations:
-            
-            - distance (float): The distance between the current way and the given point
-  
-            - nearestObj [(str, type)]: The current way
-                                        For example: [("1", osmData.Way)]
-                                      
-            - nearestSubObj [(str, type)]:  The edge from the current way which is closest
-                                            For example: [(["1","2"], osmData.Node)]
+               - nearestObj [(str, type)]: The current way
+                                           For example: [("1", osmData.Way)]
+                                        
+               - nearestSubObj [(str, type)]:  The edge from the current way which is closest
+                                               For example: [(["1","2"], osmData.Node)]
+      @rtype: osmData.distanceResult
     """
     if not isinstance(point, types.TupleType) or not len(point)==2:
       raise TypeError("getDistance only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("getDistance only accepts Tupels from type types.TupelType with 2 Entries from type float")
     
-    #minDist=sys.float_info.max
     result=distanceResult(sys.float_info.max,(self.id,self.__class__))
     for s in self._sides():
       dist=self._distPointLine(point[0],point[1],s[0][0],s[0][1],s[1][0],s[1][1])
@@ -673,17 +684,21 @@ class Relation(object):
   
   def __init__(self, identifier, members, tags, osmObj):
     """
-    Basic class containing an osm Relation
-    
-    @param identifier: The id of the relation.
-    
-    @param members: The members of this relation.
-    @type members: A list of tripel [membertype(e.g.  way), id of the member, addition tags (e.g. outer)]
-    
-    @param tags: A dictionary containing all the tags for the relation
-    @type tags: {key: value,}
-    
-    @param osmObj: Reference to the osmObj, this way is included in.
+      Basic class containing an osm Relation
+      
+      Parameters
+      ==========      
+      
+      @param identifier: The id of the relation.
+      
+      @param members: The members of this relation.
+      @type members: A list of tripel [membertype(e.g.  way), id of the member, addition tags (e.g. outer)]
+      
+      @param tags: A dictionary containing all the tags for the relation
+      @type tags: {key: value,}
+      
+      @param osmObj: Reference to the osmObj, this way is included in.
+      @type osmObj: osmData.OSM
     """
     self.id = identifier
     if not isinstance(members, list):
@@ -701,21 +716,22 @@ class Relation(object):
     
   def getDistance(self, point):
     """
-    Function that returns the distance of the given point to the current relation.
+      Function that returns the distance of the given point to the current relation.
+      
+      @param point: The point(lat,lon) to which the distance is calculated
+      @type point: Tuple(float,float)
+      
+      @return: The function returns a distanceResult-Object which holds the
+              following informations:
+              
+              - distance (float): Distance between the current and the given point
     
-    @param point: The point(lat,lon) to which the distance is calculated
-    @type point: Tuple(float,float)
-    
-    @return The function returns a distanceResult-Object which holds the
-            following informations:
-            
-            - distance (float): Distance between the current and the given point
-  
-            - nearestObj (str, type): The current relation
-                                        For example: ("1", osmData.Relation)
-                                      
-            - nearestSubObj [(str, type)]:  The nearestSubObject of the current relation
-                                            For example: [("3", osmData.Way),..]
+              - nearestObj (str, type): The current relation
+                                          For example: ("1", osmData.Relation)
+                                        
+              - nearestSubObj [(str, type)]:  The nearestSubObject of the current relation
+                                              For example: [("3", osmData.Way),..]
+      @rtype: osmData.distanceResult
     """
     nearestElem=distanceResult(sys.float_info.max,(self.id,self.__class__))
     rel=self.osmObj.relations[self.id]
@@ -736,8 +752,8 @@ class Relation(object):
   
   def _searchForPolygons(self):
     """
-    This function searches hidden polygons, which are defined by more then one way
-    and saves them in the list "polygons" of the given relation
+      This function searches hidden polygons, which are defined by more then one way
+      and saves them in the list "polygons" of the given relation
     """
     rel=self.osmObj.relations[self.id]
     for pos in ["outer","inner"]:     # only outer ways and inner ways together
@@ -747,7 +763,6 @@ class Relation(object):
           ways.append(m[1])
       for w1_key in ways:             # for all ways proove if it could be completed to a polygon
         if not any([w1_key in x for x in rel.polygons]):
-          w1=self.osmObj.ways[w1_key]          # get polygon by id
           tmpResult=[w1_key]
           tmpWays=copy.deepcopy(ways)   # make a deep copy of the remaining way-objects
           tmpWays.remove(w1_key)        # and delete the current way
@@ -764,12 +779,13 @@ class Relation(object):
   
   def isInside(self, point):
     """
-    This function prooves, if a point is inside a relation.
-    
-    @param point: the point to proove
-    @type point; Tuple(float,float)
-    
-    @return the result e.g. (True,([1],osmData.Way)) or (True,([1,2,5],osmData.Way)) for polygon combinded of more then one way
+      This function prooves, if a point is inside a relation.
+      
+      @param point: the point to proove
+      @type point; Tuple(float,float)
+      
+      @return: the result e.g. (True,([1],osmData.Way)) or (True,([1,2,5],osmData.Way)) for polygon combinded of more then one way
+      @rtype: Tupel(boolean,Tupel([str/int,..],osmData.Types))
     """
     rel=self.osmObj.relations[self.id]
     if len(rel.polygons)==0:
@@ -803,11 +819,11 @@ class Relation(object):
   
   def addPolygon(self, wayList):
     """
-    Function to add a polygon to the relation.
-    
-    @param wayList: List of way ids that make up the polygon 
-    @type wayList: A list of ids. The id's can be of any type but must match
-                  the type of the actual objects.
+      Function to add a polygon to the relation.
+      
+      @param wayList: List of way ids that make up the polygon 
+      @type wayList: A list of ids. The id's can be of any type but must match
+                    the type of the actual objects.
     """
     self.polygons.append(wayList)
     

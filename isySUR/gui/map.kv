@@ -2,13 +2,13 @@
        
 <Map>:
     Button:
-        id: menueBut
+        id: menuBut
         text: "Menu"
         background_color: (0,0,1,1)
         size_hint: 0.15, 0.075
         pos: 0, 0
         bold: True
-        on_release: root.open_menue()
+        on_release: root.open_menu()
         
     Button:
         id: kmlList
@@ -21,7 +21,7 @@
         on_release: root.open_kmlList()
     
 
-<Menue>:
+<Menu>:
     id: menue
     Button:
         text: 'Load SUR'
@@ -42,7 +42,7 @@
         background_color: (0,0,2,1)
         on_release: root.show_save()
     Button:
-        text: 'Hide Markers'
+        text: 'SUR Position'
         size_hint_y: None
         height: 44
         background_color: (0,0,2,1)
@@ -65,6 +65,7 @@
             size_hint_y: 0.7
             pos: root.pos
             id: view
+            do_scroll_x: False
         
         BoxLayout:
             id: footer
@@ -76,10 +77,12 @@
                 on_release: root.action(self)
             Button:
                 text: "Load"
-                on_release: root.load(self, root)
+                on_release: root.load(self)
             Button:
+                id: save
                 text: "Save"
                 on_release: root.save(isConfig=True)
+                disabled: True
             Button:
                 text: "Close"
                 on_release: root.cancel()

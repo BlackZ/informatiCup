@@ -33,20 +33,23 @@ def parseArguments():
                         help='Path to config file for SUR classification (indoor, outdoor, both).')
   return parser.parse_args()
   
-def gui(args):
+def gui(args=None):
   mapApp = None
   try:
     sys.argv = ['']
     import isySUR.gui.MapGUI as gui
-    mapApp = gui.MapApp(args.config)
+    if hasattr(args, 'config'):
+      mapApp = gui.MapApp(args.config)
+    else:
+      mapApp = gui.MapApp()
     mapApp.run()
-  except BaseException as e:
-    if not mapApp == None:
+  except BaseException:
+    if mapApp != None:
       mapApp.on_stop()
     import traceback
     traceback.print_exc()
     sys.exit('Program stopped unexpected!')
-  except Exception as e:
+  except Exception:
     print "GUI could not be loaded. Is kivy installed correctly?"
     import traceback
     traceback.print_exc()
@@ -55,5 +58,8 @@ def cli(args):
   isySUR.program.Pipeline().computeKMLsAndStore(args.input, args.output, args.config)
 
 if __name__ == '__main__':
-  args = parseArguments()
-  args.func(args)
+  if (('cli' not in sys.argv) and ('gui' not in sys.argv)):
+    gui()
+  else:
+    args = parseArguments()
+    args.func(args)
