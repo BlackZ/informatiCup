@@ -433,7 +433,8 @@ class Menu(DropDown):
       for elem in selection:         
         if isDir:  
           try:
-            selection[elem].saveAsXML(path + os.path.sep + elem + '.kml')
+            print elem
+            selection[elem].saveAsXML(path + os.path.sep + elem)
           except:
             self.map_view.toast(elem + " could not be saved!")
         completeKML.placemarks.extend(selection[elem].placemarks)
