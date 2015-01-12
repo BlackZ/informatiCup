@@ -121,7 +121,7 @@ For the command line version type
 \begin{verbatim}
 	$ python run_isySUR.py cli {input} {output}
 \end{verbatim}
-where \texttt{input} is the path to the input file containing the SURs which area of influence is to be computed and \texttt{output} is the path for the resulting area(s) of influence. If the path points to a file, only one kml file will be created, containing all calculated areas. If path points to a directory a kml file for each SUR will be created as well as one containing all areas.
+where \texttt{input} is the path to the input file containing the SURs which areas of influence should be computed and \texttt{output} is the path for the resulting area(s) of influence. If the path points to a file, only one kml file will be created, containing all calculated areas. If path points to a directory a kml file for each SUR will be created as well as one containing all areas.
 
 You can leave out \texttt{python} if you have installed the program before. For installation instructions see section \ref{sec:installation}. For additional parameters see section \ref{sec:cli}.
 
@@ -140,9 +140,9 @@ For information about input and output file types see section \ref{sec:io}.
 
 \section{What is \ProjectTitle?}\label{sec:whatFor}
 \todol{add screenshot}
-\pt is a program that calculates the sphere of influence of a space usage rule by its coordinates and data from OpenStreetMap. It was developed within the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called isy and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `intelligent systems' at Bielefeld University.
+\pt\ is a program that calculates the sphere of influence of a space usage rule by its coordinates and data from OpenStreetMap. It was developed within the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called isy and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `Intelligent Systems' at Bielefeld University.
 
-Using is very easy. You give an input file with the coordinates of the SURs and the sphere of influence is computed. Optionally you can add a configuration file that classifies SURs in those that are applicable only indoor, those that are only outdoor or those that are applicable indoor as well as outdoor (both) to get a better result. The calculated areas are shown on a map (GUI version) and you can choose which ones you want to be displayed. They can be saved into a file to reload them whenever you want to have a look at them.
+Using \pt\ is very easy. You give an input file with the coordinates of the SURs and the sphere of influence is computed. Optionally you can add a configuration file that classifies SURs in those that are applicable only indoor, those that are only outdoor or those that are applicable indoor as well as outdoor (both) to get a better result. The calculated areas are shown on a map (GUI version) and you can choose which ones you want to be displayed. They can be saved into a file to reload them whenever you want to have a look at them.
 
 \section{Content of \ProjectTitle}
 In the archive you can find the following data (bold printed files will be installed with the install command):
@@ -325,11 +325,11 @@ In this chapter the implemented algorithm to calculate the spheres of influence 
 \todol{Code documentation -> pydoc?}
 
 \section{Development}
-For this project we decided to use Python. First of all, we all wanted to challenge and expand upon our Python knowledge. Furthermore Python is mostly os independent and can even be ported to android for tablet usage which seems to be a good feature here.
+For this project we decided to use Python. First of all, we all wanted to challenge and expand upon our Python knowledge. Furthermore Python is mostly OS independent and can even be ported to android for tablet usage which seems to be a good feature here.
 
 This project was created using test driven development on the unittest layer. This does not only allow us to keep track of unwanted side effects of new functionality, but also helps assigning work load to the different members, because it can be easier to write a failing unittest with a bit of information, that is assigned to someone, than it is to explain all the requirements for some new functionality.
 
-\pt was created in two steps: First the command line version was created and the first versions of the algorithm were implemented. While the algorithm was improved and reworked it was decided to add a GUI because a lightweight tool for displaying the calculated areas was missing. Furthermore not all people like to use a command line tool. At the beginning of the project the idea of an app came up and with the kivy framework for the GUI the foundations for this was laid. With buildozer\footnote{see \url{https://github.com/kivy/buildozer}} a nice tool for packaging an apk file from our project was found.
+\pt\ was created in two steps: First the command line version was created and the first versions of the algorithm were implemented. While the algorithm was improved and reworked it was decided to add a GUI because a lightweight tool for displaying the calculated areas was missing. Furthermore it helped in improving the algorithm by enabling rapid testing of changes. On top of that not all people like to use a command line tool. At the beginning of the project the idea of an app came up and with the kivy framework for the GUI the foundations for this was laid. With buildozer\footnote{see \url{https://github.com/kivy/buildozer}} a nice tool for packaging an apk file from our project was found.
 
 \subsection{Data usage}\label{sec:config}
 We deliberately do not use the images in our analysis. This is because they do not give us reliable information about the interesting polygons. The variety of possible signs, including totally unknown ones, (and their placement in/on/around the intended area) make it infeasible to perform robust image recognition or classification. Furthermore the only relevant information we think one could extract from images in special cases refers to an inside/outside classification of the rule. However even this classification would not be reliable and robust enough in the general use case.
@@ -340,7 +340,7 @@ We do use the rule types/names (e.g. access:21="no") to some minimal extend in t
 
 \todol{Maybe an image of the pipeline?}
 
-Our main focus lies upon the coordinate of the SUR. In a bounding box (currently 100m\todo{this is not up to date is it?} might be reduced further) around the given coordinates, we start by searching for the closest OSM relations and ways (we emit nodes for now, since they hardly provide any connectivity information, necessary to be able to construct reasonable polygons). We use a bounding box of limited size because we want to reduce the amount of data that we need to request from OSM and we work on the assumption that these coordinates should always relatively close to the intended area. Unfortunately some coordinates (at least in the test data) are quite far away from the intended area, which can lead to finding unintended polygons that are closer to the coordinates. Furthermore the OSM data is not complete and even some elements from the test data are not present in OSM, which means, that we have no way of ever finding the intended polygon.
+Our main focus lies upon the coordinate of the SUR. In a bounding box (currently 100m\todo{this is not up to date is it?} might be reduced further) around the given coordinates, we start by searching for the closest OSM relations and ways (we omit nodes for now, since they hardly provide any connectivity information, necessary to be able to construct reasonable polygons). We use a bounding box of limited size because we want to reduce the amount of data that we need to request from OSM and we work on the assumption that these coordinates should always relatively close to the intended area. Unfortunately some coordinates (at least in the test data) are quite far away from the intended area, which can lead to finding unintended polygons that are closer to the coordinates. Furthermore the OSM data is not complete and even some elements from the test data are not present in OSM, which means, that we have no way of ever finding the intended polygon.
 \todol{add another section with more detailed algorithm information? or expand this one?}
 
 \subsection{Data structure}
@@ -379,6 +379,7 @@ For the competition at least ten new space usage rules should be found. Here our
 
 \begin{tabular}{cccc}
 \sur{isy0001.jpg}{isy0001.jpg}{smoking="no"} & \area{isy0001.png}{isy0001.jpg} & \sur{isy0002.jpg}{isy0002.jpg}{smoking="no", access:dog="no"} & \area{isy0002.png}{isy0002.jpg} \\ 
+~\\
 \hline
 ~\\
 \sur{isy0003.jpg}{isy0003.jpg}{access:dog="no"} & \area{isy0003.png}{isy0003.jpg} & \sur{isy0004.jpg}{isy0004.jpg}{smoking="no"} & \area{isy0004.png}{isy0004.jpg}
@@ -386,12 +387,15 @@ For the competition at least ten new space usage rules should be found. Here our
 
 \begin{tabular}{cccc}
 \sur{isy0005.jpg}{isy0005.jpg}{smoking="no"} & \area{isy0005.png}{isy0005.jpg} & \sur{isy0006.jpg}{isy0006.jpg}{smoking="no"} & \area{isy0006.png}{isy0006.jpg} \\
+~\\
 \hline
 ~\\
 \sur{isy0007.jpg}{isy0007.jpg}{smoking="no"} & \area{isy0007.png}{isy0007.jpg} & \sur{isy0008.jpg}{isy0008.jpg}{smoking="no"} & \area{isy0008.png}{isy0008.jpg} \\
+~\\
 \hline
 ~\\
 \sur{isy0009.jpg}{isy0009.jpg}{smoking="no", access:bicycle="no"} & \area{isy0009.png}{isy0009.jpg} & \sur{isy0010.jpg}{isy0010.jpg}{access:bicycle="no"} & \area{isy0010.png}{isy0010.jpg} \\
+~\\
 \hline
 ~\\
 \sur{isy0011.jpg}{isy0011.jpg}{access="no"} &\area{isy0011and12.png}{isy0011.jpg}  & \sur{isy0012.jpg}{isy0012.jpg}{access:pram="no"} & \area{isy0011and12.png}{isy0012.jpg}
@@ -399,12 +403,15 @@ For the competition at least ten new space usage rules should be found. Here our
 
 \begin{tabular}{cccc}
 \sur{isy0013.jpg}{isy0013.jpg}{smoking="no"} & \area{isy0013.png}{isy0013.jpg} & \sur{isy0014.jpg}{isy0014.jpg}{smoking="no", noise="no"} & \area{isy0014.png}{isy0014.jpg} \\
+~\\
 \hline
 ~\\
 \sur{isy0015.jpg}{isy0015.jpg}{smoking="no", access:dog="no"} & \area{isy0015.png}{isy0015.jpg} & \sur{isy0016.jpg}{isy0016.jpg}{access:fire\_case="no"} & \area{isy0016.png}{isy0016.jpg} \\
+~\\
 \hline
 ~\\
 \sur{isy0017.jpg}{isy0017.jpg}{dog\_waste="no"} & \area{isy0017.png}{isy0017.jpg} & \sur{isy0018.jpg}{isy0018.jpg}{smoking="no"} & \area{isy0018.png}{isy0018.jpg} \\
+~\\
 \hline
 ~\\
 \sur{isy0019.jpg}{isy0019.jpg}{access:bicycle="no"} & \area{isy0019.png}{isy0019.jpg} & \sur{isy0020.jpg}{isy0020.jpg}{access:dog="no", access:skate="no"} & \area{isy0020.png}{isy0020.jpg}
@@ -416,4 +423,4 @@ For the competition at least ten new space usage rules should be found. Here our
 
 \listoftodos  %to be deleated in the end
 
-\end{document}                            
+\end{document}
