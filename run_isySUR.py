@@ -80,6 +80,7 @@ def dealWithImportError():
   pathout = raw_input("Path for output: ")
   if (pathout=="exit"):
     sys.exit()
+  pathout=os.path.normpath(pathout)
   if pathout[-1]!=os.sep or os.path.isdir(pathout):
     isySUR.program.KMLCalculator().computeKMLsAndStore(pathin, pathout)
   else:
