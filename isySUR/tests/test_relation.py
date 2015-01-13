@@ -7,10 +7,12 @@ Created on Thu Nov  6 12:53:23 2014
 
 import unittest
 from isySUR import osmData
+from isySUR import isyUtils
 
 class TestRelationObject(unittest.TestCase):
   
   def setUp(self):
+    isyUtils._relativeNullPoint=(0.0,0.0)
     self.id = "0001"
     self.members = [("way",8125151,"outer"),("way",249285853,"inner")]
     self.tags = {"name":"Tween Pond", "natural":"water"}

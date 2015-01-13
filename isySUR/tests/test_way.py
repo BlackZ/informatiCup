@@ -7,10 +7,12 @@ Created on Thu Nov  6 12:25:34 2014
 
 import unittest
 from isySUR import osmData
+from isySUR import isyUtils
 
 class TestWayObject(unittest.TestCase):
   
   def setUp(self):
+    isyUtils._relativeNullPoint=(0.0,0.0)
     self.id = "0001"
     self.refs = ["0001","0002","0003"]
     self.tags = {"highway":"residential","name":"Clipstone Street"}

@@ -8,11 +8,13 @@ Created on Thu Nov  6 11:46:54 2014
 import unittest
 from isySUR import osmData
 from isySUR import osmAPI
+from isySUR import isyUtils
 import sys
 
 class TestOSMObject(unittest.TestCase):
   
   def setUp(self):
+    isyUtils._relativeNullPoint=(0.0,0.0)
     self.testOSM = osmData.OSM()
     self.testNode = osmData.Node(1, 0.1, 2.1, {"highway":"traffic_signals"})
     self.testRelation=osmData.Relation(5, [("way",1,"outer"),("way",2,"inner")], 

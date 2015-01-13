@@ -8,10 +8,12 @@ Created on Thu Nov  6 12:23:35 2014
 
 import unittest
 from isySUR import osmData
+from isySUR import isyUtils
 
 class TestNodeObject(unittest.TestCase):
   
   def setUp(self):
+    isyUtils._relativeNullPoint=(0.0,0.0)
     self.id = "0001"
     self.lat = 0.1
     self.lon = 2.1
