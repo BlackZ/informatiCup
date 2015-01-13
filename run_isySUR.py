@@ -13,6 +13,9 @@ import sys
 import os.path
 
 def parseArguments():
+  """
+    Function that takes program parameters and checks for required arguments.
+  """
   parser = argparse.ArgumentParser(description='isySUR script to calculate \
     the subjective area of influence of space usage rules (SURs).')
   subparsers = parser.add_subparsers(title='Version',
@@ -35,6 +38,14 @@ def parseArguments():
   return parser.parse_args()
   
 def gui(args=None):
+  """
+    Function that starts the gui version of the program. When importing fails,
+    a message is printed and dealWithImportError is called.
+    
+    @param args: the arguments to give to the gui version.
+    @type argparse.Namespace
+  """
+  print type(args)
   mapApp = None
   try:
     sys.argv = ['']
@@ -55,6 +66,10 @@ def gui(args=None):
     sys.exit('Program stopped unexpected!')
   
 def dealWithImportError():
+  """
+    Function that gives a prompt to get the parameters for the cli version
+    without sys.argv.
+  """
   print "You can still use the command line version. Just give the SUR file and output path. Or type 'exit' to close."
   pathin = raw_input("SUR file: ")
   if (pathin=="exit"):
@@ -71,6 +86,12 @@ def dealWithImportError():
     print "output directory does not exist." 
   
 def cli(args):
+  """
+    Function that starts the command line version of the program.
+    
+    @param args: the arguments to give to the cli version.
+    @type argparse.Namespace
+  """
   if os.path.isfile(args.input):
     if args.output[-1]!=os.sep or os.path.isdir(args.output):
       isySUR.program.KMLCalculator().computeKMLsAndStore(args.input, args.output, args.config)
