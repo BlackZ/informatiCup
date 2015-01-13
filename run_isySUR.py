@@ -65,11 +65,11 @@ def dealWithImportError():
   pathout = raw_input("Path for output: ")
   if (pathout=="exit"):
     sys.exit()
-  isySUR.program.Pipeline().computeKMLsAndStore(pathin, pathout)
+  isySUR.program.KMLCalculator().computeKMLsAndStore(pathin, pathout)
   
 def cli(args):
   if os.path.isfile(args.input):
-    isySUR.program.Pipeline().computeKMLsAndStore(args.input, args.output, args.config)
+    isySUR.program.KMLCalculator().computeKMLsAndStore(args.input, args.output, args.config)
   else:
     print "input file does not exist"
 
