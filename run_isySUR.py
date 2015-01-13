@@ -36,10 +36,7 @@ def parseArguments():
   
 def gui(args=None):
   mapApp = None
-  try: 
-    
-    import pusemuckel     
-    
+  try:
     sys.argv = ['']
     import isySUR.gui.MapGUI as gui
     if hasattr(args, 'config'):
