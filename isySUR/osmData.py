@@ -468,6 +468,7 @@ class Node(object):
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     tmpPoint=isyUtils.getXYpos(isyUtils._relativeNullPoint,point)
     ownPoint=isyUtils.getXYpos(isyUtils._relativeNullPoint,(self.lat,self.lon))
+
     return distanceResult(round(math.hypot(tmpPoint[0] - ownPoint[0], tmpPoint[1] - ownPoint[1]),8),(self.id,self.__class__))
   
 class Way(object):

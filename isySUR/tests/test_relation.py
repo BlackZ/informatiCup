@@ -166,7 +166,7 @@ class TestRelationObject(unittest.TestCase):
   #Tests for isInside
   #========================================================
   def test_getDistanceTwoSubObjects(self):
-    trueObj=osmData.distanceResult(1.41421356,(1,self.relType),[(1,self.wayType),(2,self.wayType)])
+    trueObj=osmData.distanceResult(157298.23724382,(1,self.relType),[(1,self.wayType),(2,self.wayType)])
     result=self.testOSM8.relations[1].getDistance((8.0,8.0))
     
     self.assertEqual(trueObj.nearestObj, result.nearestObj)
@@ -174,7 +174,7 @@ class TestRelationObject(unittest.TestCase):
     self.assertEqual(trueObj.nearestSubObj, result.nearestSubObj)
     
   def test_getDistance(self):
-    trueObj=osmData.distanceResult(0.72760688,(1,self.relType),[(1,self.wayType)])
+    trueObj=osmData.distanceResult(80869.34315684,(1,self.relType),[(1,self.wayType)])
     result=self.testOSM8.relations[1].getDistance((8.0,6.0))
     
     self.assertEqual(trueObj.nearestObj, result.nearestObj)
@@ -182,7 +182,7 @@ class TestRelationObject(unittest.TestCase):
     self.assertEqual(trueObj.nearestSubObj, result.nearestSubObj)
     
   def test_getDistanceWithSubRelation(self):
-    trueObj=osmData.distanceResult(0.72760688,(2,self.relType),[(1,self.relType)])
+    trueObj=osmData.distanceResult(80869.34315684,(2,self.relType),[(1,self.relType)])
     result=self.testOSM8.relations[2].getDistance((8.0,6.0))
     
     self.assertEqual(trueObj.nearestObj, result.nearestObj)
