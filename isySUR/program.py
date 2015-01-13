@@ -184,7 +184,9 @@ class Pipeline:
               usedStyle = self.certainStyle
               possibleWays.append(tmpWay)
               #Set to None to prevent adding it multiple times
-              tmpWay = None                          
+              tmpWay = None    
+        if tmpWay.tags["landuse"] == "commercial":
+          usedStyle = self.uncertainStyle                   
       
       if tmpWay != None:
         possibleWays.append(tmpWay)
