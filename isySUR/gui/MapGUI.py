@@ -239,18 +239,24 @@ class Menu(DropDown):
     """
     Dismisses the load popup.
     """
+    del self._popup_load.content
+    self._popup_load.content = None
     self._popup_load.dismiss()
   
   def dismiss_save(self):
     """
     Dismisses the save popup.
     """
+    del self._popup_save.content
+    self._popup_save.content = None
     self._popup_save.dismiss()
   
   def dismiss_config(self):
     """
     Dismisses the config popup.
     """
+    del self._popup_config.content
+    self._popup_config.content = None
     self._popup_config.dismiss()
     self.config = None
   
