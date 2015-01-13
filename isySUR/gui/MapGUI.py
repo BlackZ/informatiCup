@@ -183,11 +183,13 @@ class Map(FloatLayout):
     thread.start()
     
     while self.stop.empty() and (not kmlList.empty() or thread.isAlive()):
-      item = kmlList.get()
+      item = kmlList.get()     
       if isinstance(item, IOError):
         toast.remove()
         self.toast("SUR file is incorrect!")
         return
+      elif item == 'stop':
+        break
       elif isinstance(item, kmlData.KMLObject):
         if not item.placemarks == []:
           self.lock.acquire()
@@ -196,11 +198,12 @@ class Map(FloatLayout):
           self.lock.release()
           move_to, moved = self.addPolygon(item, name, first=False)
       else:
-        toast.stayVisible("Calculating " + item + " ...")
+        toast.stayVisible("Calculating " + item + " ...")  
     
     if not moved:
       self.maps.zoom_to_Polygon(move_to, 15)
     toast.remove()
+    return
     
 class Menu(DropDown):
   loadfile = ObjectProperty(None)

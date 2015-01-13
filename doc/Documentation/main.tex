@@ -111,7 +111,7 @@ Published \today
 
 \chapterimage{Kollage.jpg}
 \chapter{Introduction to \ProjectTitle}
-Welcome to isySUR (pronounce isy as ['i:zi]), a tool helping you to find the sphere of influence of a space usage rule. For starting the command line version please see section \ref{sec:QuickstartTerminal}. For using the window version please read section \ref{sec:QuickstartWindow}. You can also run the window version on your android device. This is described in section \ref{sec:android}. For more details about the program see section \ref{sec:whatFor}.
+Welcome to isySUR (pronounce isy as ['i:zi]), a tool helping you to find the sphere of influence of a space usage rule (SUR). For starting the command line version please see section \ref{sec:QuickstartTerminal}. For using the window version please read section \ref{sec:QuickstartWindow}. You can also run the window version on your android device. This is described in section \ref{sec:android}. For more details about the program see section \ref{sec:whatFor}.
 
 \section{Quick start}
 First decide if you like to use the command line version of \pt\ or if you prefer a graphical user interface. Please proceed with section \ref{sec:QuickstartTerminal} or section \ref{sec:QuickstartWindow} depending on your choice.
@@ -121,7 +121,7 @@ For the command line version type
 \begin{verbatim}
 	$ python run_isySUR.py cli {input} {output}
 \end{verbatim}
-where \texttt{input} is the path to the input file containing the SURs which areas of influence should be computed and \texttt{output} is the path for the resulting area(s) of influence. If the path points to a file, only one kml file will be created, containing all calculated areas. If path points to a directory a kml file for each SUR will be created as well as one containing all areas.
+where \texttt{input} is the path to the input file containing the SURs which areas of influence should be computed and \texttt{output} is the path for the resulting area(s) of influence. If the path points to a file, only one kml file will be created, containing all calculated areas. If the path points to a directory a kml file for each SUR will be created as well as one containing all areas.
 
 You can leave out \texttt{python} if you have installed the program before. For installation instructions see section \ref{sec:installation}. For additional parameters see section \ref{sec:cli}.
 
@@ -132,19 +132,24 @@ For the window version just type
 \begin{verbatim}
 	$ python run_isySUR.py
 \end{verbatim}
-In Menu you find the possibility to load an SUR input file. After calculating you can save the area(s) of influence.
+In Menu you find the possibility to load a SUR input file. After calculating you can save the area(s) of influence.
 
 You can leave out \texttt{python} if you have installed the program before. For installation instructions see section \ref{sec:installation}. For additional parameters and more features see section \ref{sec:gui}.
 
 For information about input and output file types see section \ref{sec:io}.
 
 \section{What is \ProjectTitle?}\label{sec:whatFor}
-\todol{add screenshot}
+\begin{figure}
+\centering
+\includegraphics[width=0.75\textwidth]{screenshot.png}
+\caption{\pt\ in gui version}
+\end{figure}
 \pt\ is a program that calculates the sphere of influence of a space usage rule by its coordinates and data from OpenStreetMap. It was developed within the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called isy and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `Intelligent Systems' at Bielefeld University.
 
-Using \pt\ is very easy. You give an input file with the coordinates of the SURs and the sphere of influence is computed. Optionally you can add a configuration file that classifies SURs in those that are applicable only indoor, those that are only outdoor or those that are applicable indoor as well as outdoor (both) to get a better result. The calculated areas are shown on a map (GUI version) and you can choose which ones you want to be displayed. They can be saved into a file to reload them whenever you want to have a look at them.
+Using \pt\ is very easy. You give an input file with the coordinates of the SURs and the sphere of influence is computed. Optionally you can add a configuration file that classifies SURs in those that are applicable only indoor, those that are only outdoor or those that are applicable indoor as well as outdoor (both) to get a better result. In the GUI version the calculated areas are shown on a map and you can choose which ones you want to be displayed. They can be saved into a file to reload them whenever you want to have a look at them.
 
 \section{Content of \ProjectTitle}
+\todol{add pydoc file}
 In the archive you can find the following data (bold printed files will be installed with the install command):
 \begin{itemize}
 	\item data (directory) - examples for space usage rules\footnote{see section \ref{sec:surs}}
@@ -153,15 +158,14 @@ In the archive you can find the following data (bold printed files will be insta
 		\item gui (directory) - source files for gui version
 		\item tests (directory) - \pt\ was developed using test driven development. In this directory you will find the test files.
 	\end{itemize}
-	\item testData (directory) - data for tests and test data set
+	\item testData (directory) - data for tests and test data sets
 	\begin{itemize}
 		\item dataOnlyForTests (directory) - Some of the test files need data that is stored in this directory
 		\item Data.txt - a possible input file
 	\end{itemize}
-	\item kmlComperator.py - comparison tool for comparing our computed .kml-files with the given .truth.kml-files (the areas of the placemarks), used for development
 	\item manual.pdf - this manual
 	\item README.txt
-	\item \textbf{run\_isySUR.py} - the Python script to run the command line version of \pt
+	\item \textbf{run\_isySUR.py} - the Python script to run \pt
 	\item run\_tests.py - script that runs all or some tests in isySUR/tests/, used for development
 	\item setup.py - the setup script to install \pt
 	\item surConfig.cfg - a configuration file that can optionally be used for computation\footnote{see section \ref{sec:usage}}
@@ -178,9 +182,8 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 \section{Requirements and installation}\label{sec:installation}
 \pt\ is written in Python so you get a Python script, which is the main program, and a package with the tools. For running the command line version you need not much more than basic Python. If you prefer to use a graphical user interface you will have to install some more packages.
 \subsection{Requirements}\label{sec:requirements}
-\todol{add credits}
 \begin{enumerate}
-	\item \textbf{requirements for the command line version:}
+	\item \textbf{basic requirements:}
 	\begin{itemize}
 		\item Python 2.7
 		\item requests (HTTP library)
@@ -189,18 +192,21 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 	~\\
 	To run a Python script you need Python. Python comes with most Linux distributions. For the use on Windows machines you will have to install Python manually\footnote{get Python here: \url{https://www.python.org}}. \pt\ uses data from OpenStreetMap\footnote{\url{http://www.openstreetmap.org}} to calculate the sphere of influence. Therefore an internet connection is required. The data transfer in Python is realised with the requests\footnote{\url{http://docs.python-requests.org}\label{fn:requests}} library. You can easily install it using pip\footnote{\url{https://pip.pypa.io}}, a Python installation tool
 	\begin{verbatim}
-	$ pip install requests
+		$ pip install requests
 	\end{verbatim}
 	or see requests web page\footref{fn:requests}.
+	\newpage
 	\item \textbf{additional requirements for the GUI version:}
 	\begin{itemize}
 		\item kivy
 		\item concurrent.futures
 	\end{itemize}
-	For the graphical user interface kivy is used. Kivy\footnote{\url{http://kivy.org}} is a cross-platform Python Framework for NUI Development. For installation on Ubuntu we recommend the installation with apt-get as describe on the web page. For use on Windows and starting kivy applications from the command line we recommend to install kivy and pygame (neede for kivy) with the unofficial precompiled binaries\footnote{kivy: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#kivy}}\footnote{pygame: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#pygame}}. On both OS futures can be installed via pip
-	\begin{verbatim}
+	For the graphical user interface kivy is used. Kivy\footnote{\url{http://kivy.org}} is a cross-platform Python Framework for NUI Development. For installation on Ubuntu we recommend the installation with apt-get as describe on the web page. For use on Windows and starting kivy applications from the command line we recommend to install kivy and pygame (needed for kivy) with the unofficial precompiled binaries\footnote{kivy: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#kivy}}\footnote{pygame: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#pygame}} On MacOSX kivy is a kind of launcher. Therefore installation \pt\ is not possible\footnote{for using kivy on MacOSX see \url{http://kivy.org/docs/installation/installation-macosx.html}}.
+	
+On all OS futures can be installed via pip
+\begin{verbatim}
 	$ pip install futures
-	\end{verbatim}
+\end{verbatim}
 \end{enumerate}
 
 \subsection{Installation}
@@ -223,7 +229,7 @@ Now you are able to start \pt\ anytime through
 The input of the space usage rules was specified in the programming task as well as the output in .kml format. For more information about the decision to add a configuration file please see section \ref{sec:config}.
 
 \subsection{Space usage rules}
-The SUR file is a plain text file. The first line holds the number of space usage rules in the file. Line-serially the SURs follow. Each of this lines starts with the id of the SUR. Then latitude and longitude follow and the last entry is the name or description of the SUR. The entries are comma separated. Decimal separator in latitude and longitude is a point.
+The SUR file is a plain text file. The first line holds the number of space usage rules in the file, that will be used for computation. Line-serially the SURs follow. Each of this lines starts with the id of the SUR. Then latitude and longitude follow and the last entry is the name or description of the SUR. The entries are comma separated. Decimal separator in latitude and longitude is a point.
 \\~\\
 Example file:
 \begin{verbatim}
@@ -253,7 +259,7 @@ Output files are in .kml format where kml stands for Keyhole Markup Language. Fo
 The GUI version provides also the possibility to read in kml files to display the areas. For this kml version 2.1 as well as 2.2 is supported.
 
 \section{Command line and GUI version}\label{sec:usage}
-\pt\ comes with two version: One for command line use and another one for users who prefer to use a graphical user interface.
+\pt\ comes with two versions: One for command line use and another one for users who prefer to use a graphical user interface.
 For using the command line interface type:
 \begin{verbatim}
 	$ run_isySUR.py cli [parameters]
@@ -305,19 +311,18 @@ The parameters of \texttt{run\_isySUR.py gui}:
 \centering
 \includegraphics[width=0.75\textwidth]{GUI.png}
 \caption{GUI with open menu and KML list}
-\todol{update}
 \end{figure}
 On the left side you can find the menu that holds the tools you will use. In the menu you will find the following possibilities:
 \begin{itemize}
 	\item \textbf{Load SUR} - Choose the file with the coordinates of your SURs. See section \ref{sec:io} for more information about the format. The spheres of influence of the SURs will be calculated. An information text will inform you about the ID of the current SUR. When the kml list is open you can see that spheres are added. Calculated spheres are displayed on the map as well as red markers on the position where the SUR is located. After a calculation is finished you can start another one. The new areas will be added to the ones already in kml list.
 	\item \textbf{Load KML} - Choose some kml file you have already saved during the last usage. Or maybe you made your own kml file with another program. See section \ref{sec:io} for more information about the format. The areas contained in your file are displayed on the map and added to those already in kml list.
 	\item \textbf{Save KML} - All kmls that are currently selected in kml list are saved to a kml file you can choose here.
-	\item \textbf{Hide/Show Markers} - The red SUR markers can be hidden and shown with this button.
-	\item \textbf{Config} - With this button you can open the configuration window. If you used the \texttt{--config} parameter there is already a configuration file loaded. You can load another configuration file, add or remove some rules and save your personal configuration file. With your configuration you say if you prefer to find an area for a SUR indoor or outdoor or if you think that kind of rule can be applicable indoor as well as outdoor.
+	\item \textbf{SUR Position} - The red SUR markers can be hidden and shown with this button.
+	\item \textbf{Config} - With this button you can open the configuration window. If you used the \texttt{--config} parameter there is already a configuration file loaded. You can load another configuration file, add or remove some rules and save your personal configuration file. With your configuration you say if you prefer to find an area for a SUR indoor or outdoor or if you think that kind of rule can be applicable indoor as well as outdoor. The next computations will use the new configuration.
 \end{itemize}
 
 \subsubsection{KML list}
-On the right side there is the kml list. This list tells you which areas you have calculated or loaded. You can scroll the list if it is too long for the window with the mouse wheel. When you click on an entry which area is not in viewport the map will jump to that area. When you click on an entry which area is already in viewport you can hide it. Hidden areas are not saved into a kml file. With another click you can make an area visible again.
+On the right side there is the kml list. This list tells you which areas you have calculated or loaded. You can scroll the list if it is too long for the window with the mouse wheel or by dragging it with the mouse. When you click on an entry which area is not in viewport the map will jump to that area. When you click on an entry which area is already in viewport you can hide it. Hidden areas are not saved into a kml file. With another click you can make an area visible again.
 
 \subsection{Using android}\label{sec:android}
 Of course calculating SURs at home is nice but in general you would like to know a sphere of influence of a space usage rule standing in front of it. This is possible on your android device (with internet connection). In the archive you can find the isySUR\todo{name of file correct?}.apk that you can install on your device. Just copy it on the device e.g. via USB and enable the device option to install from unknown sources. Browsing to the .apk and clicking on it starts the installation. After that you will find isySUR in your apps and can use it exactly like the GUI version described in section \ref{sec:gui}.
@@ -332,11 +337,15 @@ In this chapter the implemented algorithm to calculate the spheres of influence 
 \todol{Code documentation -> pydoc?}
 
 \section{Development}
-For this project we decided to use Python. First of all, we all wanted to challenge and expand upon our Python knowledge. Furthermore Python is mostly OS independent and can even be ported to android for tablet usage which seems to be a good feature here.
+For this project we decided to use Python. First of all, we all wanted to challenge and expand upon our Python knowledge. Furthermore Python is mostly OS independent and can even be ported to android for portable usage which seems to be a good feature here.
 
 This project was created using test driven development on the unittest layer. This does not only allow us to keep track of unwanted side effects of new functionality, but also helps assigning work load to the different members, because it can be easier to write a failing unittest with a bit of information, that is assigned to someone, than it is to explain all the requirements for some new functionality.
 
-\pt\ was created in two steps: First the command line version was created and the first versions of the algorithm were implemented. While the algorithm was improved and reworked it was decided to add a GUI because a lightweight tool for displaying the calculated areas was missing. Furthermore it helped in improving the algorithm by enabling rapid testing of changes. On top of that not all people like to use a command line tool. At the beginning of the project the idea of an app came up and with the kivy framework for the GUI the foundations for this was laid. With buildozer\footnote{see \url{https://github.com/kivy/buildozer}} a nice tool for packaging an apk file from our project was found.
+\pt\ was created in two steps: First the command line version was created and the first versions of the algorithm were implemented. While the algorithm was improved and reworked it was decided to add a GUI because a lightweight tool for displaying the calculated areas was missing. Furthermore it helped in improving the algorithm by enabling rapid testing of changes. On top of that not all people like to use a command line tool.
+
+For the GUI the kivy framework is used. We base the display of our map on mapview from kivy garden\footnote{see \url{https://github.com/kivy-garden/garden.mapview}} which we adapted to suit our needs.
+
+At the beginning of the project the idea of an app came up and with the kivy framework for the GUI the foundations for this was laid. With buildozer\footnote{see \url{https://github.com/kivy/buildozer}} a nice tool for packaging an apk file from our project was found.
 
 \subsection{Data usage}\label{sec:config}
 We deliberately do not use the images in our analysis. This is because they do not give us reliable information about the interesting polygons. The variety of possible signs, including totally unknown ones, (and their placement in/on/around the intended area) make it infeasible to perform robust image recognition or classification. Furthermore the only relevant information we think one could extract from images in special cases refers to an inside/outside classification of the rule. However even this classification would not be reliable and robust enough in the general use case.
@@ -353,9 +362,9 @@ Our main focus lies upon the coordinate of the SUR. In a bounding box (currently
 \subsection{Data structure}
 In order to be able to work freely with all the data that we require when computing suitable polygons for SURs we have introduced several data structures.
 \begin{itemize}
-	\item sur: A wrapper object for the SURs. We have them so that we need to handle the file only once at the beginning.
+	\item sur: A wrapper object for the SURs. It enables us to handle the file only once at the beginning.
 	\item osmData: Wrapper for the OSM elements Node, Way and Relation. We convert the xml data we receive from OSM to these objects, so that we do not have to work on a xml for computation.
-	\item kmlData: Wrapper objects for a kml and placemarks. These will be created by our algorithm and can be saved as a kml-xml to a file.
+	\item kmlData: Wrapper objects for a kml and included placemarks. These will be created by our algorithm and can be saved as a kml-xml to a file.
 \end{itemize}
 
 Furthermore, our data structure splits our program into nice modular chunks that can be reused independently in other project if desired.
@@ -430,4 +439,4 @@ For the competition at least ten new space usage rules should be found. Here our
 
 \listoftodos  %to be deleated in the end
 
-\end{document}                                                                                                     
+\end{document}

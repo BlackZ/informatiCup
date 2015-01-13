@@ -109,6 +109,8 @@ class KMLCalculator:
       kmlObj = self.calcKML(s)
       if kmlObj != None:
         kmlList.put(kmlObj)
+    kmlList.put('stop')
+    return False
   
   def calcKML(self, surObj):
     """
