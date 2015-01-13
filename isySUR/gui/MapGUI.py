@@ -499,7 +499,8 @@ class CustomFileChooser(FileChooserListView):
     if os.path.isdir(newPath):
       self.path = newPath 
       self.selection = []
-    self._update_files()
+      self._update_files()
+    
 
 class KMLList(DropDown):
   def __init__(self, mapview, app):
