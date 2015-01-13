@@ -14,7 +14,7 @@ import sys
 
 from Queue import Queue
 
-class Pipeline:
+class KMLCalculator:
   def __init__(self):
     """
       Constructor for the pipeline. Sets up the osmAPI as well as the desired bounding box, 

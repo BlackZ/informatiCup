@@ -13,11 +13,11 @@ from isySUR import kmlData
 from isySUR import osmData
 import os
 
-class TestProgrammPipeline(unittest.TestCase):
+class TestKMLCalculator(unittest.TestCase):
   
   def setUp(self):
     self.kmlObject = None
-    self.pipeObj = program.Pipeline()
+    self.kmlCalcObj = program.KMLCalculator()
     self.SUR_with_one = sur.SUR.fromString('0001, 50.9262, 5.39680, smoking="no"')
     
     self.SUR_with_two = sur.SUR.fromString('0002, 50.9304, 5.33901, access:dog="no"')
@@ -25,14 +25,14 @@ class TestProgrammPipeline(unittest.TestCase):
     
   
   def test_calcKML_simpleSUR(self):
-    kml = self.pipeObj.calcKML(self.SUR_with_one)
+    kml = self.kmlCalcObj.calcKML(self.SUR_with_one)
     self.assertEqual(kml.__class__, kmlData.KMLObject)
     self.assertTrue(len(kml.placemarks)>0)
     for pl in kml.placemarks:
       self.assertTrue(pl.hasPolygon())
   
   def test_calcKML_tupleSUR(self):
-    kml = self.pipeObj.calcKML(self.SUR_with_two)
+    kml = self.kmlCalcObj.calcKML(self.SUR_with_two)
     self.assertEqual(kml.__class__, kmlData.KMLObject)
     self.assertTrue(len(kml.placemarks)>0)
     for pl in kml.placemarks:
@@ -46,8 +46,8 @@ class TestProgrammPipeline(unittest.TestCase):
 
     self.testWay = osmData.Way(1, [1,2,3,1], {"highway":"residential","name":"Clipstone Street"},self.testOSM)
     self.testOSM.addWay(self.testWay)
-    self.pipeObj.osm = self.testOSM
-    polyString = self.pipeObj._createPolyString(self.testWay)
+    self.kmlCalcObj.osm = self.testOSM
+    polyString = self.kmlCalcObj._createPolyString(self.testWay)
     self.assertEqual(polyString, '52.12 4.12 52.13 4.12 52.12 4.13 ')
   
   def test_createBBox(self):
@@ -55,14 +55,14 @@ class TestProgrammPipeline(unittest.TestCase):
     upperRight = (53.8636, 8.658312)
     lowerLeft =  (53.86342, 8.658008)
     
-    bBox = self.pipeObj._createBBox(centralPoint)
+    bBox = self.kmlCalcObj._createBBox(centralPoint)
     
     self.assertEqual([lowerLeft[0], lowerLeft[1], upperRight[0], upperRight[1]], bBox)
     
   def test_computeKMLs_OutputFile(self):
     surFilePath="testData/dataOnlyForTests/TestData3.txt"
     kmlFilePath="testData/dataOnlyForTests/Output.kml"
-    self.pipeObj.computeKMLsAndStore(surFilePath, kmlFilePath)
+    self.kmlCalcObj.computeKMLsAndStore(surFilePath, kmlFilePath)
     resultKML = kmlData.KMLObject.parseKML(kmlFilePath)
     self.assertIsNotNone(resultKML)
     
@@ -70,7 +70,7 @@ class TestProgrammPipeline(unittest.TestCase):
     #result should be 3 KMLs (2 individual + 1 containing all placemarks)
     surFilePath="testData/dataOnlyForTests/TestData.txt"
     kmlDirectoryPath="testData/dataOnlyForTests/"
-    self.pipeObj.computeKMLsAndStore(surFilePath, kmlDirectoryPath, '')
+    self.kmlCalcObj.computeKMLsAndStore(surFilePath, kmlDirectoryPath, '')
     kmlFile1Path = "testData/dataOnlyForTests/0001.kml"
     kmlFile2Path = "testData/dataOnlyForTests/0002.kml"
     kmlFile3Path = "testData/dataOnlyForTests/complete.kml"    
@@ -85,7 +85,7 @@ class TestProgrammPipeline(unittest.TestCase):
     surFilePath = "testData/dataOnlyForTests/TestData.txt"
     kmlList = Queue()
     stop = Queue()
-    self.pipeObj._computeKMLs(surFilePath, kmlList, stop)
+    self.kmlCalcObj._computeKMLs(surFilePath, kmlList, stop)
     self.assertIsNotNone(kmlList)
     self.assertEqual(kmlList.qsize(), 4)
   

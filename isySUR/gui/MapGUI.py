@@ -179,7 +179,7 @@ class Map(FloatLayout):
     toast.stayVisible("Calculating ... ")
     
     kmlList = Queue()
-    thread = Thread(target=self.app.pipe._computeKMLs, args=(path, kmlList, self.stop, self.app.configPath))
+    thread = Thread(target=self.app.kmlCalc._computeKMLs, args=(path, kmlList, self.stop, self.app.configPath))
     thread.start()
     
     while self.stop.empty() and (not kmlList.empty() or thread.isAlive()):
@@ -915,7 +915,7 @@ class MapApp(App):
     
     self.error = ""
     
-    self.pipe = program.Pipeline()
+    self.kmlCalc = program.KMLCalculator()
     self.loaded_kmls = {}
 
   def on_stop(self):
