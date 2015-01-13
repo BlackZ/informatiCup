@@ -51,6 +51,9 @@ class TestKMLCalculator(unittest.TestCase):
     self.assertEqual(polyString, '52.12 4.12 52.13 4.12 52.12 4.13 ')
   
   def test_createBBox(self):
+    
+    self.kmlCalcObj.heightBBox = 20
+    self.kmlCalcObj.widthBBox = 20
     centralPoint = (53.86351, 8.65816)
     upperRight = (53.8636, 8.658312)
     lowerLeft =  (53.86342, 8.658008)

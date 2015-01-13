@@ -218,13 +218,14 @@ class KMLObject():
       @return: List of points (lon,lat). Points are still strings.
       @rtype: [str,]
     """
+
     pointList = []
     coords = coordstring.lstrip().rstrip().split(" ")
     if coords[0] != coords[-1]:
       raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
-      
-    pointList = [coord[:coord.rfind(',')] for coord in coords[:-1] ]
-    
+
+    pointList = [coord[:coord.rfind(',')] for ind, coord in enumerate(coords)
+        if (ind == 0 or (ind> 0 and not coords[ind-1] == coord)) ][:-1]
     return pointList
     
     
@@ -240,38 +241,14 @@ class KMLObject():
       @rtype: [str,]
     """
     pointList = []
-    startlat=None
-    startlon=None
-    lastlat=None
-    lastlon=None
     coordstring = coordstring.replace(" ", "")
     nodes = filter(None, coordstring.split('\n'))
-    numberOfNodes=len(nodes)
-    nodeNr=0
-    for node in nodes:
-      nodeNr+=1
-      if node.lstrip()!='':#leaves out the first and last entry because
-                           #they don't hold coordinates
-        pos = node.split(',')
-        lon=pos[0]
-        lat=pos[1]
-        if startlat==None:
-          #store first lat/lon
-          startlat=lat
-          startlon=lon
-        else:
-          #store last lat/lon
-          lastlat=lat
-          lastlon=lon
-        if nodeNr!=numberOfNodes:
-          #if it's not the last node - save it
-          pointList.append(node)
-        elif startlat!=lastlat or startlon!=lastlon:
-          #if it's the last node: check equality of first and last node
-          raise IOError("Invalid kml-file: Placemark does not start and end "\
-          "with the same coordinates.")
-          
-    return pointList
+    if nodes[0] != nodes[-1]:
+      raise IOError("Invalid kml-file: Placemark does not start and end with the same coordinates.")
+    
+    pointList = [coord for ind, coord in enumerate(nodes) if (ind == 0 or (ind> 0 and nodes[ind-1] != coord))]
+
+    return pointList[:-1]
 
   def saveAsXML(self, filename):
     """

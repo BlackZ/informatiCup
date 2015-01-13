@@ -729,11 +729,16 @@ class MapView(Widget):
           print "Triangulation failed (no triangles). Will just visualise the border."
           return
         triIdx = []
+        #Allow threshold for numerical stability
+        threshold = 0.00000001
         for tri in triangles:
           for point in tri:
             #Revert the lat,lon modification to find appropriate indices
-            point = (round(point[0]*0.01,8), round(point[1]*0.01,8))
-            triIdx.append(polygon.index(point))   
+            point = (point[0]*0.01, point[1]*0.01,16)
+            
+            for i in range(len(polygon)):
+              if abs(polygon[i][0]-point[0]) < threshold and abs(polygon[i][1]-point[1]) < threshold:                
+                triIdx.append(i)   
             
         self.placemarks[name]["triangles"] = triIdx
         self.drawPolygon()

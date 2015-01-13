@@ -22,8 +22,8 @@ class KMLCalculator:
     """
     self.osmAPI = api.osmAPI()
     self.osm = None
-    self.heightBBox = 20
-    self.widthBBox = 20
+    self.heightBBox = 60
+    self.widthBBox = 60
     self.allObjects = {}
     self.certainStyle = {"Style":{"polyColour":"9900ff00"}}
     self.uncertainStyle = {"StyleUncertain":{"polyColour":"99ff0000"}}
@@ -70,7 +70,7 @@ class KMLCalculator:
       if resKML != None:
         if isOutputDir:
           resKML.saveAsXML(outPath + os.path.sep + s.id + '.kml')
-      #TODO give kml the option to merge to kmls and change this -> Jan
+      #TODO give kml the option to merge to kmls and change this
         completeKML.placemarks.extend(resKML.placemarks)
         completeKML.addStyles(resKML.styles)
       
@@ -102,8 +102,6 @@ class KMLCalculator:
       kmlList.put(IOError("SUR file incorrect"))
       return
     
-    #kmlList = []
-    
     for s in surs:
       if not stopCalc.empty():
         break
@@ -111,8 +109,6 @@ class KMLCalculator:
       kmlObj = self.calcKML(s)
       if kmlObj != None:
         kmlList.put(kmlObj)
-    
-    #return kmlList
   
   def calcKML(self, surObj):
     """
@@ -139,7 +135,7 @@ class KMLCalculator:
 #      print "searching buildings"
       nearObjs = self._getNearestObj(coords, {"building":"*"})
     else:
-#      print "searching everything"
+      print "searching everything"
       nearObjs = self._getNearestObj(coords)
     
 
@@ -148,6 +144,7 @@ class KMLCalculator:
     possibleWays = []
     for obj in nearObjs:
       tmpObj = obj.nearestObj
+      print "distance to nearestObj", obj.distance
       tmpWay = None
       if tmpObj[1] == osmData.Relation:
         tmpRel = self.osm.relations[tmpObj[0]]
@@ -190,7 +187,7 @@ class KMLCalculator:
               tmpWay = None    
                        
       
-      if tmpWay != None:
+      if tmpWay != None and not tmpWay in possibleWays:
         possibleWays.append(tmpWay)
 
 
