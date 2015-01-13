@@ -689,6 +689,7 @@ class Relation(object):
       ==========      
       
       @param identifier: The id of the relation.
+      @type identifier: any type      
       
       @param members: The members of this relation.
       @type members: A list of tripel [membertype(e.g.  way), id of the member, addition tags (e.g. outer)]

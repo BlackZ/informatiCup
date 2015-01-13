@@ -242,6 +242,7 @@ class Menu(DropDown):
     Dismisses the load popup.
     """
     self._load_diag.dismiss()
+    self._popup_load.dismiss()
   
   def dismiss_save(self):
     """
