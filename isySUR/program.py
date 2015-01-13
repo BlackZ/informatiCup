@@ -160,7 +160,10 @@ class Pipeline:
         print "using way", tmpObj[0]
         
       if tmpWay != None and tmpWay.tags.has_key("landuse"):
-        
+
+        if tmpWay.tags["landuse"] == "commercial":
+          usedStyle = self.uncertainStyle    
+          
         if tmpWay.tags["landuse"] == "residential":
           print "is residential landuse, searching for buildings"
           
@@ -185,8 +188,7 @@ class Pipeline:
               possibleWays.append(tmpWay)
               #Set to None to prevent adding it multiple times
               tmpWay = None    
-        if tmpWay.tags["landuse"] == "commercial":
-          usedStyle = self.uncertainStyle                   
+                       
       
       if tmpWay != None:
         possibleWays.append(tmpWay)
