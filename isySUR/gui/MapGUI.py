@@ -229,10 +229,6 @@ class Menu(DropDown):
 
     self.map_view =mapview
     self.app = app
-
-    self.config = ConfigDialog(self.app, save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
-    self.load = LoadDialog(load=None, cancel=self.dismiss_load)
-    self.save = SaveDialog(save=None, cancel=self.dismiss_save)
     
     self.queue = Queue()
     self._SURThread=None
@@ -243,8 +239,8 @@ class Menu(DropDown):
     """
     tmp = self._popup_load.content
     
-    #del tmp
-    #self._popup_load.content = None
+    del tmp
+    self._popup_load.content = None
     self._popup_load.dismiss()
   
   def dismiss_save(self):
@@ -270,21 +266,16 @@ class Menu(DropDown):
     """
     self.isOpen = False
     self.dismiss()
-    content = self.load
     if 'KML' in obj.text:
-      #content = LoadDialog(load=self.load_kml, cancel=self.dismiss_load)
-      #content = self.load
-      content.load = self.load_kml
+      content = LoadDialog(load=self.load_kml, cancel=self.dismiss_load)
     elif 'SUR' in obj.text:
       if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
-        #content = LoadDialog(load=self.load_sur, cancel=self.dismiss_load)
-        content.load = self.load_sur
+        content = LoadDialog(load=self.load_sur, cancel=self.dismiss_load)
       elif self._SURThread != None or self._SURThread.isAlive():
           self.map_view.toast('Already calculating!')
           return      
     else:
-      #content = LoadDialog(load=self.load_cfg, cancel=self.dismiss_load)
-      content.load = self.load_cfg
+      content = LoadDialog(load=self.load_cfg, cancel=self.dismiss_load)
     content.ids.filechooser.path = self.path    
     self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
     self._popup_load.open()
@@ -299,13 +290,10 @@ class Menu(DropDown):
     """
     self.isOpen = False
     self.dismiss()
-    content = self.save    
     if isConfig:
-      #content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
-      content.save = self.saveConfig
+      content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
     else:
-      #content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
-      content.save = self.saveKML      
+      content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
       selection = self.app.getSelectedPolygons()
       if len(selection) == 0:
         self.map_view.toast("No files to save!")
@@ -321,7 +309,7 @@ class Menu(DropDown):
     self.isOpen = False
     self.dismiss()
     
-    #self.config = 
+    self.config = 
     self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.9))
 
     self._popup_config.open()
