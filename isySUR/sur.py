@@ -112,5 +112,8 @@ class SUR():
         sur = cls(line[0], ruleString, float(line[1]), float(line[2]), classification)
         surs.append(sur)
         lastID = line[0]
+        
+    if (f.readline()!=""):
+      print "File contains more lines than stated at the beginning. Everything after "+str(num)+" lines will be ignored."
       
     return surs
