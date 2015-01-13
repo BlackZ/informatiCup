@@ -243,8 +243,8 @@ class Menu(DropDown):
     """
     tmp = self._popup_load.content
     
-    del tmp
-    self._popup_load.content = None
+    #del tmp
+    #self._popup_load.content = None
     self._popup_load.dismiss()
   
   def dismiss_save(self):
@@ -274,17 +274,17 @@ class Menu(DropDown):
     if 'KML' in obj.text:
       #content = LoadDialog(load=self.load_kml, cancel=self.dismiss_load)
       #content = self.load
-      content.load = self.load_kml()
+      content.load = self.load_kml
     elif 'SUR' in obj.text:
       if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
         #content = LoadDialog(load=self.load_sur, cancel=self.dismiss_load)
-        content.load = self.load_sur()
+        content.load = self.load_sur
       elif self._SURThread != None or self._SURThread.isAlive():
           self.map_view.toast('Already calculating!')
           return      
     else:
       #content = LoadDialog(load=self.load_cfg, cancel=self.dismiss_load)
-      content.load = self.load_cfg()
+      content.load = self.load_cfg
     content.ids.filechooser.path = self.path    
     self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
     self._popup_load.open()
@@ -302,10 +302,10 @@ class Menu(DropDown):
     content = self.save    
     if isConfig:
       #content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
-      content.save = self.saveConfig()
+      content.save = self.saveConfig
     else:
       #content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
-      content.save = self.saveKML()      
+      content.save = self.saveKML      
       selection = self.app.getSelectedPolygons()
       if len(selection) == 0:
         self.map_view.toast("No files to save!")
