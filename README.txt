@@ -19,7 +19,7 @@ For the gui version type:
  
 When just tiping
  $ python run_isySUR.py
-the gui version as default is used.
+the gui version is used as default.
 
 For more information about optional and required parameters (cli/gui, inPath,
 outPath) check the help parameter (-h) or the manual.
