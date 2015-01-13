@@ -37,6 +37,9 @@ def parseArguments():
 def gui(args=None):
   mapApp = None
   try: 
+    
+    import pusemuckel     
+    
     sys.argv = ['']
     import isySUR.gui.MapGUI as gui
     if hasattr(args, 'config'):
@@ -65,13 +68,19 @@ def dealWithImportError():
   pathout = raw_input("Path for output: ")
   if (pathout=="exit"):
     sys.exit()
-  isySUR.program.KMLCalculator().computeKMLsAndStore(pathin, pathout)
+  if pathout[-1]!=os.sep or os.path.isdir(pathout):
+    isySUR.program.KMLCalculator().computeKMLsAndStore(pathin, pathout)
+  else:
+    print "output directory does not exist." 
   
 def cli(args):
   if os.path.isfile(args.input):
-    isySUR.program.KMLCalculator().computeKMLsAndStore(args.input, args.output, args.config)
+    if args.output[-1]!=os.sep or os.path.isdir(args.output):
+      isySUR.program.KMLCalculator().computeKMLsAndStore(args.input, args.output, args.config)
+    else:
+      print "output directory does not exist."
   else:
-    print "input file does not exist"
+    print "input file does not exist."
 
 if __name__ == '__main__':
   if (('cli' not in sys.argv) and ('gui' not in sys.argv)):
