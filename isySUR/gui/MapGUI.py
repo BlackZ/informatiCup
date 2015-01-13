@@ -229,6 +229,8 @@ class Menu(DropDown):
 
     self.map_view =mapview
     self.app = app
+
+    self.config = None
     
     self.queue = Queue()
     self._SURThread=None
@@ -237,16 +239,14 @@ class Menu(DropDown):
     """
     Dismisses the load popup.
     """
-    tmp = self._popup_load.content
-    
-    del tmp
-    self._popup_load.content = None
     self._popup_load.dismiss()
+    self._popup_load.content = None
   
   def dismiss_save(self):
     """
     Dismisses the save popup.
     """
+
     self._popup_save.dismiss()
   
   def dismiss_config(self):
@@ -309,7 +309,7 @@ class Menu(DropDown):
     self.isOpen = False
     self.dismiss()
     
-    self.config = 
+    self.config = ConfigDialog(self.app, save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
     self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.9))
 
     self._popup_config.open()
