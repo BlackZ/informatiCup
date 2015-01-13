@@ -625,7 +625,6 @@ class Way(object):
     """
     if len(vertices)==0:  
         vertices=self._vertices()
-        print self.isPolygon()
         if not self.isPolygon():
             return False
     else:
@@ -690,6 +689,7 @@ class Relation(object):
       ==========      
       
       @param identifier: The id of the relation.
+      @type identifier: any type      
       
       @param members: The members of this relation.
       @type members: A list of tripel [membertype(e.g.  way), id of the member, addition tags (e.g. outer)]

@@ -623,7 +623,6 @@ class MapView(Widget):
     for k,v in self.placemarks.items():
       if v["show"] and self.isPolyInView(k):
         r,g,b,a = v["color"]
-        #print color
         vertices = []
         indices = []
         i = 0
@@ -636,8 +635,6 @@ class MapView(Widget):
         with self.polyLayer.canvas:
           Color(r,g,b,a, mode='rgba')
           if v["triangles"] != None:
-#            print "drawing triangles"
-#            print v["triangles"]
             Mesh(vertices=vertices, indices=v["triangles"], mode="triangles")
           else:
             Mesh(vertices=vertices, indices=indices, mode="line_loop")
@@ -688,14 +685,7 @@ class MapView(Widget):
       @param markerCoords: Coordinates of the SUR.
       @type markerCoords: Tuple(float, float)
     """
-    
-#      print marker.source
-#      print marker.parent
-      
-#    print color    
 
-#    lineColor = self.convertKMLColor(color['lineColour'])
-#    lineWidth = color ['lineWidth']
     polyColor = self.convertKMLColor(color['polyColour'])
     
     if not self.placemarks.has_key(name):
@@ -715,16 +705,12 @@ class MapView(Widget):
         "bBox": self.getBBoxOfPolygon(polygon)}
       
       try:
-        
-#        polygon = [p*1000 for p in polygon]     
-        # Modify lat,lon values for more numerical stability
         newPoly = []
         for p in polygon:
           newPoly.append((p[0]*100, p[1]*100))
                 
         triangles = Triangulator().triangulate(newPoly)
 
-#        print "#triangles", len(triangles)
         if len(triangles) == 0:
           print "Triangulation failed (no triangles). Will just visualise the border."
           return
@@ -739,6 +725,7 @@ class MapView(Widget):
             for i in range(len(polygon)):
               if abs(polygon[i][0]-point[0]) < threshold and abs(polygon[i][1]-point[1]) < threshold:                
                 triIdx.append(i)   
+
             
         self.placemarks[name]["triangles"] = triIdx
         self.drawPolygon()

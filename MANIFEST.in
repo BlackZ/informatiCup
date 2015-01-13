@@ -1,6 +1,5 @@
 recursive-include isySUR/tests test_*.py
 include run_tests.py
-include kmlComperator.py
 include surConfig.cfg
 
 # TODO chance this to manual.pdf in main directory when finished

@@ -229,30 +229,32 @@ class Menu(DropDown):
 
     self.map_view =mapview
     self.app = app
-
-    self.config = None
     
     self.queue = Queue()
     self._SURThread=None
-  
+    
+    self._load_diag=Popup(title="Load file", content=LoadDialog(load=None, cancel=self.dismiss_load), size_hint=(0.9, 0.9))
+    self._save_diag=Popup(title="Save file", content=SaveDialog(save=None, cancel=self.dismiss_save), size_hint=(0.9, 0.9))
+    self._cfg_diag=Popup(title="Configurate SUR-Rules", content=ConfigDialog(self.app, save=self.show_save, load=self.show_load, cancel=self.dismiss_config), size_hint=(0.9, 0.9))
+
   def dismiss_load(self):
     """
     Dismisses the load popup.
     """
-    self._popup_load.dismiss()
+    self._load_diag.dismiss()
   
   def dismiss_save(self):
     """
     Dismisses the save popup.
     """
-    self._popup_save.dismiss()
+    self._save_diag.dismiss()
   
   def dismiss_config(self):
     """
     Dismisses the config popup.
     """
-    self._popup_config.dismiss()
-    self.config = None
+    self._cfg_diag.dismiss()    
+
   
   def show_load(self, obj):
     """
@@ -264,19 +266,18 @@ class Menu(DropDown):
     """
     self.isOpen = False
     self.dismiss()
+    self._load_diag.content.ids.filechooser.path=self.path
     if 'KML' in obj.text:
-      content = LoadDialog(load=self.load_kml, cancel=self.dismiss_load)
+      self._load_diag.content.load=self.load_kml
     elif 'SUR' in obj.text:
       if self._SURThread == None or (self._SURThread != None and not self._SURThread.isAlive()):
-        content = LoadDialog(load=self.load_sur, cancel=self.dismiss_load)
+        self._load_diag.content.load=self.load_sur
       elif self._SURThread != None or self._SURThread.isAlive():
           self.map_view.toast('Already calculating!')
           return      
     else:
-      content = LoadDialog(load=self.load_cfg, cancel=self.dismiss_load)
-    content.ids.filechooser.path = self.path    
-    self._popup_load = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
-    self._popup_load.open()
+      self._load_diag.content.load=self.load_cfg
+    self._load_diag.open()
   
   def show_save(self, isConfig=False):
     """
@@ -289,16 +290,16 @@ class Menu(DropDown):
     self.isOpen = False
     self.dismiss()
     if isConfig:
-      content = SaveDialog(save=self.saveConfig, cancel=self.dismiss_save)
+      self._save_diag.content.save = self.saveConfig      
     else:
-      content = SaveDialog(save=self.saveKML, cancel=self.dismiss_save)
+      self._save_diag.content.save = self.saveKML      
       selection = self.app.getSelectedPolygons()
       if len(selection) == 0:
         self.map_view.toast("No files to save!")
         return
-    content.ids.filechooser.path = self.path
-    self._popup_save = Popup(title="Save file", content=content, size_hint=(0.9, 0.9))
-    self._popup_save.open()
+        
+    self._save_diag.content.ids.filechooser.path = self.path
+    self._save_diag.open()
   
   def show_config(self):
     """
@@ -307,10 +308,7 @@ class Menu(DropDown):
     self.isOpen = False
     self.dismiss()
     
-    self.config = ConfigDialog(self.app, save=self.show_save, load=self.show_load, cancel=self.dismiss_config)
-    self._popup_config = Popup(title="Configurate SUR-Rules", content=self.config, size_hint=(0.9, 0.9))
-
-    self._popup_config.open()
+    self._cfg_diag.open()
   
   def load_kml(self, path, filename):
     """
@@ -366,7 +364,7 @@ class Menu(DropDown):
     if filename != []:
       path = filename[0]
       self.app.loadConfig(path)
-      self.config.addConfigContent()
+      self._cfg_diag.content.addConfigContent()
     self.dismiss_load()
       
   def saveConfig(self, path, filename):
@@ -383,7 +381,7 @@ class Menu(DropDown):
     
       config = {'[Indoor]':[], '[Outdoor]':[], '[Both]':[]}
     
-      for layout in self.config.ids.view.children:
+      for layout in self._cfg_diag.content.ids.view.children:
         if isinstance(layout, GridLayout):
           i = 0
           while i < (len(layout.children) - 5)/5:
@@ -433,7 +431,6 @@ class Menu(DropDown):
       for elem in selection:         
         if isDir:  
           try:
-            print elem
             selection[elem].saveAsXML(path + os.path.sep + elem)
           except:
             self.map_view.toast(elem + " could not be saved!")
@@ -931,6 +928,7 @@ class MapApp(App):
     """
     Sets the icon and title of the program on start up.
     """
+    self.map.cleanUpCache()
     self.icon = 'logo.png'
     self.title = 'isySUR'
     
@@ -965,7 +963,6 @@ class MapApp(App):
           else:
             self.error = ""
             self.configContent[key].append(line)
-    print self.configContent
   
   def clearConfig(self):
     """
