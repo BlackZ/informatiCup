@@ -296,6 +296,15 @@ class KMLObject():
     return ('<?xml version="1.0" encoding="UTF-8"?>\n' + xmlUtils.unescape(ET.tostring(root, encoding='utf-8'))).rstrip("\n")
     
 def indent(elem, level=0):
+  """
+    Recursive function used to indent xml elements according to their level to allow pretty print.
+    
+    @param elem: The element to be indented
+    @type elem: ET.Element
+    
+    @param level: Optional parameter representing the current level in the tree of the element
+    @type level: Int
+  """
   if elem.tag=='coordinates':
     elem.text=elem.text.replace('\n', '\n'+ (level+1)*"  ")
   i = "\n" + level*"  "

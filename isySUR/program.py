@@ -24,6 +24,7 @@ class KMLCalculator:
     self.osm = None
     self.heightBBox = 60
     self.widthBBox = 60
+    self.maxDistance = 0.00010
     self.allObjects = {}
     self.certainStyle = {"Style":{"polyColour":"9900ff00"}}
     self.uncertainStyle = {"StyleUncertain":{"polyColour":"99ff0000"}}
@@ -151,7 +152,7 @@ class KMLCalculator:
         for mem in tmpRel.members:
           if mem[2] == "outer":
             tmpWay = self.osm.ways[mem[1]]
-            print "using way from relation", mem[1]
+            print "using way from relation", tmpRel.id, mem[1]
       if tmpObj[1] == osmData.Way:
         tmpWay = self.osm.ways[tmpObj[0]]
         print "using way", tmpObj[0]
@@ -179,15 +180,23 @@ class KMLCalculator:
           usedStyle = self.uncertainStyle
           for build in buildings:
             tmpBuild = build.nearestObj
-            if self.osm.ways.has_key(tmpBuild[0]):
+            print "tempBuild:", tmpBuild[0]
+            if build.distance < self.maxDistance:
+#            if self.osm.ways.has_key(tmpBuild[0]):
+              print "distance below threshold, adding building:", tmpBuild[0]
               tmpWay = self.osm.ways[tmpBuild[0]]
               usedStyle = self.certainStyle
               possibleWays.append(tmpWay)
               #Set to None to prevent adding it multiple times
               tmpWay = None    
-                       
+        
+      print "tmpway:", tmpWay
+      if tmpWay != None:
+        print "tmpWay id:", tmpWay.id
+                     
       
       if tmpWay != None and not tmpWay in possibleWays:
+        print "adding way:", tmpWay.id
         possibleWays.append(tmpWay)
 
 
@@ -202,11 +211,11 @@ class KMLCalculator:
         buildingsIncluded = True
         break
     
-    # Prever buildings if rule is applicable indoor
+    # Prefer buildings if rule is applicable indoor
     if buildingsIncluded and surObj.classification in ["I","IO"]:
-      possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop"}]
+      possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop", "landuse"}]
       
-    print possibleWays
+    print "number possible ways:", len(possibleWays)
     bestWay = None
     closestDist = sys.float_info.max
     for way in possibleWays:
@@ -270,10 +279,12 @@ class KMLCalculator:
     storeHeight = self.heightBBox
     rules = [('node',['"building"','"type"!~"^route"','"type"!~"TMC"']),
              ('way',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"TMC"', '"building:part"!~"."']),
-              ('relation',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"','"type"!~"TMC"', '"building:part"!~"."'])]
+              ('relation',['"building"','"type"!~"^route"', '"type"!~"boundary"', '"boundary"!~"."','"highway"!~"."',
+              '"type"!~"associatedStreet"','"type"!~"TMC"', '"building:part"!~"."'])]
     defaultRulesNoRoutes = [('node',['"type"!~"^route"','"type"!~"TMC"']),
                             ('way',['"type"!~"^route"','"highway"!~"."', '"type"!~"associatedStreet"','"type"!~"TMC"', '"building:part"!~"."']),
-                ('relation',['"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"','"type"!~"TMC"', '"building:part"!~"."'])]
+                ('relation',['"type"!~"^route"','"highway"!~"."','"type"!~"associatedStreet"',
+                '"type"!~"TMC"','"type"!~"boundary"', '"boundary"!~"."', '"building:part"!~"."'])]
     osm = None
     if surObj.classification == "I":
       osm = self.osmAPI.performRequest(bBox, rules)
@@ -308,7 +319,7 @@ class KMLCalculator:
       
       @return: A list of nearstObjects (see osmData.getNearestX for more details)
     """
-    nearRelations = self.osm.getNearestRelation(coords, tags=tags)
+#    nearRelations = self.osm.getNearestRelation(coords, tags=tags)
     nearWays = self.osm.getNearestWay(coords, True, tags=tags)
     if len(nearWays) == 0:
 #      print "no polygons with tags"
@@ -319,7 +330,7 @@ class KMLCalculator:
 #    if nearObj.distance == "-1":    
 #      nearObj = self.osm.getNearestNode(coords)
 #      
-    return nearRelations + nearWays
+    return nearWays
   
   def _createDictionary(self):
     self.allObjects.update({self.osm.relations.__class__:self.osm.relations})

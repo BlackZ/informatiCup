@@ -9,6 +9,8 @@ import unittest
 from isySUR import osmAPI
 from isySUR import osmData
 import xml.dom.minidom as dom
+import xml.etree.cElementTree as ET
+import os
 
 class TestOsmAPI(unittest.TestCase):
   def setUp(self):
@@ -24,7 +26,7 @@ class TestOsmAPI(unittest.TestCase):
                          "<tag k='leisure' v='pitch'/>"\
                          "<tag k='type' v='multipolygon'/>"\
                          "</relation>"
-    self.testNode = dom.parseString(self.testXMLString)
+    self.testNode = ET.fromstring(self.testXMLString)
     
     self.testOsmObj = osmData.OSM()
     self.testOsmObj.addNode(osmData.Node("146891366", 52.0364239, 8.4867570,
@@ -100,43 +102,6 @@ class TestOsmAPI(unittest.TestCase):
                      'relation["building"](52.032736,8.486593,52.042113,8.501194);'\
                      ');(._;>;); out body qt;')
    
-  def test_parseDataET(self):
-    
-    testFile = open(self.osmDataFilename, "r").read()
-    
-    testDataObj = self.osmAPIobj._parseData(testFile)
-    
-    self.assertIsNotNone(testDataObj)
-    self.assertIsNotNone(testDataObj.nodes)
-    self.assertIsNotNone(testDataObj.ways)
-    self.assertIsNotNone(testDataObj.relations)    
-
-    self.assertEqual(self.testOsmObj, testDataObj)
-   
-  def test_getTagsET(self):
-    tags = {"leisure":"pitch", "type":"multipolygon"}
-    
-    testTags = self.osmAPIobj._getTags(self.testNode)
-    
-    self.assertIsNotNone(testTags)
-    self.assertEqual(tags, testTags)
-  
-  def test_getRefsET(self):
-    refs = ["43682400","260441217"]
-    
-    testRefs = self.osmAPIobj._getRefs(self.testNode)
-    
-    self.assertIsNotNone(testRefs)
-    self.assertEqual(refs, testRefs)
-  
-  def test_getMembersET(self):
-    members = [("way", "17958713","inner"),("way","17958715", "outer")]
-    
-    testMembers = self.osmAPIobj._getMembers(self.testNode)
-    
-    self.assertIsNotNone(testMembers)
-    self.assertEqual(members, testMembers)
-  
   def test_parseData(self):
     
     testFile = open(self.osmDataFilename, "r").read()
@@ -174,5 +139,7 @@ class TestOsmAPI(unittest.TestCase):
     self.assertIsNotNone(testMembers)
     self.assertEqual(members, testMembers)
 
+
 if __name__ == '__main__':
+  os.chdir("../..")
   unittest.main()
