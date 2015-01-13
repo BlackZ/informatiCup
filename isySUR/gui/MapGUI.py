@@ -433,7 +433,6 @@ class Menu(DropDown):
       for elem in selection:         
         if isDir:  
           try:
-            print elem
             selection[elem].saveAsXML(path + os.path.sep + elem)
           except:
             self.map_view.toast(elem + " could not be saved!")
@@ -965,7 +964,6 @@ class MapApp(App):
           else:
             self.error = ""
             self.configContent[key].append(line)
-    print self.configContent
   
   def clearConfig(self):
     """

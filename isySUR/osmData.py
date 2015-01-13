@@ -625,7 +625,6 @@ class Way(object):
     """
     if len(vertices)==0:  
         vertices=self._vertices()
-        print self.isPolygon()
         if not self.isPolygon():
             return False
     else:
