@@ -23,14 +23,22 @@ if __name__ == "__main__":
     refKML = kml.KMLObject.parseKML(refDir + os.sep + f)
     
     testKML = kml.KMLObject.parseKML(testDir + os.sep + f)
-    broken = False
-    for i in range(len(refKML.placemarks)):
-      if not broken:
-        for j in range(len(refKML.placemarks[i].polygon)):
-          
-          if refKML.placemarks[i].polygon[j] != testKML.placemarks[i].polygon[j]:
-            incorrectFiles.append(f)
-            broken = True
-            break
+    different = False
+    
+    if len(refKML.placemarks) != len(testKML.placemarks):
+      different = True
+    else:
+      for i in range(len(refKML.placemarks)):
+        if not different:
+          if len(refKML.placemarks[i].polygon) != len(testKML.placemarks[i].polygon):
+            different = True
+          else:
+            for j in range(len(refKML.placemarks[i].polygon)):
+              if refKML.placemarks[i].polygon[j] != testKML.placemarks[i].polygon[j]:
+                different = True
+                break
+    
+    if different:      
+      incorrectFiles.append(f)
       
   print "Unequal files: ", incorrectFiles
