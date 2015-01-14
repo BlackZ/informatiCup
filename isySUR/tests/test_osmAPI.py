@@ -65,10 +65,10 @@ class TestOsmAPI(unittest.TestCase):
                                               [])
     self.assertIsNotNone(testObj)
     self.assertEqual(testObj.has_key('data'),True)
-    self.assertEqual(testObj['data'],'[out:xml][timeout:25];'\
+    self.assertEqual(testObj['data'],'[out:xml][timeout:35];'\
                      '(node[""=""](52.032736,8.486593,52.042113,8.501194);'\
                      'way[""=""](52.032736,8.486593,52.042113,8.501194);'\
-                     'relation[""=""](52.032736,8.486593,52.042113,8.501194););(._;>;); out body qt;')
+                     'relation[""=""](52.032736,8.486593,52.042113,8.501194););(._;>>;); out body qt;')
     
     testObj2 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
                                                  self.boundingBox[1],
@@ -80,11 +80,11 @@ class TestOsmAPI(unittest.TestCase):
                                                   ['"amenity"="university"','"building"!="true"'])])
     self.assertIsNotNone(testObj2)
     self.assertEqual(testObj2.has_key('data'),True)
-    self.assertEqual(testObj2['data'],'[out:xml][timeout:25];'\
+    self.assertEqual(testObj2['data'],'[out:xml][timeout:35];'\
                      '(node["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
                      'way["amenity"="university"](52.032736,8.486593,52.042113,8.501194);'\
                      'relation["amenity"="university"]["building"!="true"](52.032736,8.486593,52.042113,8.501194);'\
-                     ');(._;>;); out body qt;')
+                     ');(._;>>;); out body qt;')
                      
     testObj3 = self.osmAPIobj._getOsmRequestData(self.boundingBox[0],
                                                  self.boundingBox[1],
@@ -96,11 +96,11 @@ class TestOsmAPI(unittest.TestCase):
                                                   ['"building"'])])
     self.assertIsNotNone(testObj3)
     self.assertEqual(testObj3.has_key('data'),True)
-    self.assertEqual(testObj3['data'],'[out:xml][timeout:25];'\
+    self.assertEqual(testObj3['data'],'[out:xml][timeout:35];'\
                      '(node["building"](52.032736,8.486593,52.042113,8.501194);'\
                      'way["building"](52.032736,8.486593,52.042113,8.501194);'\
                      'relation["building"](52.032736,8.486593,52.042113,8.501194);'\
-                     ');(._;>;); out body qt;')
+                     ');(._;>>;); out body qt;')
    
   def test_parseData(self):
     
