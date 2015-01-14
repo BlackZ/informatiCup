@@ -25,7 +25,7 @@ class KMLCalculator:
     self.osm = None
     self.heightBBox = 60
     self.widthBBox = 60
-    self.maxDistance = 6.0
+    self.maxDistance = 8.0
     self.allObjects = {}
     self.certainStyle = {"Style":{"polyColour":"9900ff00"}}
     self.uncertainStyle = {"StyleUncertain":{"polyColour":"99ff0000"}}
