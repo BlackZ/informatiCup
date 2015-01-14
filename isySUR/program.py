@@ -117,8 +117,7 @@ class KMLCalculator:
         kmlObj = self.calcKML(s)
       except Exception, e:
         kmlList.put(e)
-        kmlList.put('stop')
-        return False
+        break
       if kmlObj != None:
         kmlList.put(kmlObj)
     kmlList.put('stop')

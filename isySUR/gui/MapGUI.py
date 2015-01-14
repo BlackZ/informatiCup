@@ -189,15 +189,14 @@ class Map(FloatLayout):
     thread.start()
     
     while self.stop.empty() and (not kmlList.empty() or thread.isAlive()):
-      item = kmlList.get()     
-      if isinstance(item, IOError):
+      item = kmlList.get()    
+      if isinstance(item, requests.ConnectionError):
+        toast.remove()
+        self.toast("Could not perform request.\n Internet connection ok?")
+        return
+      elif isinstance(item, IOError):
         toast.remove()
         self.toast("SUR file is incorrect!")
-        return
-      elif isinstance(item, requests.ConnectionError):
-        toast.remove()
-        print item
-        self.toast("No internet connection!")
         return
       elif item == 'stop':
         break
@@ -631,12 +630,12 @@ class Toast(Label):
                         it is only visible for a short duration.
     @type length_long: Boolean
     """
-    duration = 5000 if length_long else 2000
+    duration = 5000 if length_long else 2500
     rampdown = duration * 0.1
     if rampdown > 500:
       rampdown = 500
-    if rampdown < 200:
-      rampdown = 200
+    if rampdown < 250:
+      rampdown = 250
     
     self._rampdown = rampdown
     self._duration = duration - rampdown
