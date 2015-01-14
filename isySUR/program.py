@@ -68,8 +68,11 @@ class KMLCalculator:
     
     
     for s in surs:
-      
-      resKML = self.calcKML(s)
+      resKML = None
+      try:
+        resKML = self.calcKML(s)
+      except Exception, e:
+        print e.message
       if resKML != None:
         if isOutputDir:
           resKML.saveAsXML(outPath + os.path.sep + s.id + '.kml')
@@ -151,7 +154,7 @@ class KMLCalculator:
     
 
     print "number nearObjs", len(nearObjs)
-#    usedStyle = self.certainStyle
+
     usedStyle = {}
     possibleWays = []
     for obj in nearObjs:
@@ -321,7 +324,7 @@ class KMLCalculator:
       osm = self.osmAPI.performRequest(bBox, defaultRulesNoRoutes)
       
     #Increase boundingBox until we actually find SOMETHING
-    while len(osm.nodes) < 3:
+    while len(osm.ways) < 1:
       self.widthBBox *= 2
       self.heightBBox *= 2
       bBox = self._createBBox(coords)
