@@ -12,8 +12,6 @@ import sur
 import os
 import sys
 
-from Queue import Queue
-
 class KMLCalculator:
   def __init__(self):
     """
