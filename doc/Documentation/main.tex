@@ -291,7 +291,6 @@ The parameters of \texttt{run\_isySUR.py cli} (bold arguments are required):
 \end{itemize}
 
 \subsection{GUI version}\label{sec:gui}
-\todol{add information with config - first safe, afterwards it will be applied}
 Usage of the GUI version:
 \begin{verbatim}
 	$ run_isySUR.py gui [-h] [-c CONFIG]
@@ -380,12 +379,25 @@ Our main focus lies upon the coordinate of the SUR. In a bounding box (currently
 \todol{Berechnen Sie nun die Geltungsbereiche der Space Usage Rules aus Ihrer Umgebung mit Ihrer Implementierung aus der ersten Runde.
 Diskutieren Sie die Korrektheit und die Präzision der von Ihnen berechneten Lösungen für die Space
 Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie dazu die berechneten mit den intuitiv beabsichtigten Geltungsbereichen.}
+The quality of our results greatly depends on how detailed the OSM data is for the requested area. As mentioned in the sections \ref{sec:data_usage} and \ref{sec:algorithm} we mainly focus on the coordinates of a given SUR to compute it's intended area of application. Therefore, our results are good for areas where the OSM data is detailed and less optimal when the OSM data is sparse. 
+A good example for this is the number \todol{nummer einfügen} of the provided test dataset: The intended area is a building which is however not mapped in OpenStreetMap yet. Since there is no information about the intended polygon area in the OSM date, we cannot build the polygon. In this case we find the entire residential block and mark it with a different colour to show our uncertainty. Once the OSM data gets updated further we would identify the correct area as well.
+In other cases (e.g. number \todol{nummer einfügen}) the provided coordinate positions would indicate completely different areas than the ones that were intended. When just judging by the OSM data and the coordinates, we would usually rate our results to be more accurate then the provided truth areas in such cases. We therefore would not usually rate these results poorly. 
+In a few cases (e.g. \todol{nummer einfügen}, the test data intends a combination of multiple connected buildings where we apply the rule only to one building. Since in these cases, the buildings are different, we do not think it is justified to extend the area of application to the other buildings as well. 
+
+
+
+Of course there are some cases, where we compute areas, that we do not deem to be intuitive areas of application of the given rules. One example would be the number 56 from the test dataset. The intended area is not present in the osm data and the residential area spans such a big area (covering several blocks) that we find a different building on the other side of the road. 
+A more detailed analysis of our actual results when comparing with our SURs and the ones provided by the test data can be found below:
+\todol{Daten einfügen}
+
+
+Overall we are quite pleased with our results in most cases. Although the organizers of the competition did not want us to find suitable OSM elements that would represent the intended areas, we found that most space usage rules are intended to be applicable to certain meaningful areas, such as buildings, parks, forests, courtyards etc. Such meaningful areas are often explicitly included and labelled in OSM and the community intends to improve the level of detail even further in the future. It is for that reason, that we believe our approach of finding suitable OSM elements around the given coordinates is justified and already provides useful results. 
 
 \section{Further Work}
 Our major focus of future work will be the development of the GUI. Most of all we like to implement a possibility to list up all placemarks of one KML similar to Google Earth, so that the user can jump to every placemark on the map he or she likes and not only to the last one of each KML. Furthermore the user should be able to display the rules that are applied in any polygon when clicking on it.
 Another improvement of the GUI should be the opportunity to load several KMLs at once, because currently the user can only load one KML file at a time.
 
-For a better usability on mobile devices it should be implemented that a click anywhere on the map adds a new SUR and the program calculates the corresponding area. Also the use on mobile devices shows that the memory requirements should be improved.
+For a better usability on mobile devices it should be implemented that a click anywhere on the map adds a new SUR and the program calculates the corresponding area. 
 
 To improve the calculation of our KMLs we think about using multiple data sources because OpenStreetMap sometimes has a lack of data information.
 
