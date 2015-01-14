@@ -146,7 +146,7 @@ class osmAPI():
       @return: The parsed osm data in the OSM data structur
       @rtype: osmData.OSM
     """
-#    print obj
+    print "length data", len(obj)
     osmObj = osmData.OSM()
     
     root=ET.fromstring(obj)
@@ -188,105 +188,4 @@ class osmAPI():
         osmObj.addRelation(relationObj)
 
     return osmObj    
-#  
-#
-#  def _parseData(self, obj):
-#    """
-#      Splits the incoming OSM Date into Nodes, Ways and Relations
-#      and stores it into an OSMObject for further calculations.
-#      
-#      @param obj: result object of request to openStreetMap
-#    """
-#
-#    osmObj=osmData.OSM()
-#    
-#    data = dom.parseString(obj)
-#    
-#    pass
-#    for node in data.getElementsByTagName('node'):      
-#      node_id = node.getAttribute('id').encode('utf-8')
-#      
-#      if (osmObj.nodes.has_key(node_id)):
-#        if len(osmObj.nodes[node_id].tags) == 0:
-#          osmObj.nodes[node_id].tags = self._getTags(node)
-#      else:
-#        node_tags = self._getTags(node)
-#        
-#        nodeObj=osmData.Node(node_id,
-#                             float(node.getAttribute('lat')),
-#                             float(node.getAttribute('lon')),
-#                             node_tags)
-#        osmObj.addNode(nodeObj)
-#      node.unlink()
-#      
-#    for way in data.getElementsByTagName('way'):
-#      way_id = way.getAttribute('id').encode('utf-8')
-#      
-#      if (osmObj.ways.has_key(way_id)):
-#        if len(osmObj.ways[way_id].refs) == 0:
-#          osmObj.ways[way_id].refs = self._getRefs(way)
-#        if len(osmObj.ways[way_id].tags) == 0:
-#          osmObj.ways[way_id].tags = self._getTags(way)
-#      
-#      else:
-#        if way.hasChildNodes():
-#          way_refs = self._getRefs(way)
-#          way_tags = self._getTags(way)
-#        
-#          wayObj = osmData.Way(way_id, way_refs, way_tags, osmObj)  
-#          osmObj.addWay(wayObj)
-#      way.unlink()
-#      
-#    for relation in data.getElementsByTagName('relation'):
-#      rel_id = relation.getAttribute('id').encode('utf-8')
-#      
-#      if (osmObj.relations.has_key(rel_id)):
-#        if len(osmObj.relations[rel_id].members) == 0:
-#          osmObj.relations[rel_id].refs = self._getMembers(relation)
-#        if len(osmObj.relations[rel_id].tags) == 0:
-#          osmObj.relations[rel_id].tags = self._getTags(relation)
-#
-#      else:
-#        if relation.hasChildNodes() :
-#          rel_members = self._getMembers(relation)
-#          rel_tags = self._getTags(relation) 
-#
-#          relObj = osmData.Relation(rel_id, rel_members, rel_tags, osmObj)
-#          osmObj.addRelation(relObj)
-#      relation.unlink()
-#
-#    del data
-#    return osmObj
-#
-#  def _getTags(self, elem):
-#    """
-#      Returns a dictionary of tags for a given element.   
-#    """
-#    tags = {}
-#    for element in elem.getElementsByTagName('tag'):
-#        tags[element.getAttribute('k').encode('utf-8')] = element.getAttribute('v').encode('utf-8')
-#    
-#    return tags
-#  
-#  def _getRefs(self, node):
-#    """
-#      Returns a list of refereences for a given element.
-#    """
-#    refs = []
-#    for element in node.getElementsByTagName('nd'):
-#      refs.append(element.getAttribute('ref').encode( "utf-8" ))
-#      
-#    return refs
-#
-#  def _getMembers(self, rel):
-#    """
-#      Returns a list of members for a given relation. 
-#    """
-#    members = []
-#    for element in rel.getElementsByTagName('member'):
-#      type = element.getAttribute('type').encode("utf-8")
-#      ref = element.getAttribute('ref').encode("utf-8")
-#      role = element.getAttribute('role').encode("utf-8")
-#      members.append((type, ref, role))
-#      
-#    return members
+
