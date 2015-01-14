@@ -61,10 +61,7 @@ class KMLCalculator:
       surFile.close()
       sys.exit()
     surFile.close()
-    
     completeKML = kml.KMLObject("complete.kml")
-    
-    
     for s in surs:
       resKML = None
       try:

@@ -267,6 +267,7 @@ class OSM():
         continue
       try:
         distObj=way.getDistance(point)       # calculate distance
+        print "way distance:", way.id, way.getDistance(point).distance
         
         # proove if current way is the current nearest way
         if len(nearestWays)==0 or distObj.distance<nearestWays[0].distance:

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Module containing util functions.
+Module containing utility functions. We provide a function to convert a point in latitude, longitude
+to equidistant X,Y coordinates given a relative null point.
 """
 
 #@author: tschodde

@@ -86,13 +86,17 @@ class osmAPI():
     """
     if not isinstance(filterList,types.ListType):
       raise TypeError('performRequest only accepts a list of filterrules')
-    return self._parseData(
-      requests.get(self.osmurl,
+    osmResponse = ""
+    try:  
+      osmResponse = requests.get(self.osmurl,
                     params=self._getOsmRequestData(boundingBox[0],
                                                    boundingBox[1],
                                                    boundingBox[2],
                                                    boundingBox[3],
-                                                   filterList)).content)
+                                                   filterList)).content
+    except requests.ConnectionError:
+      raise requests.ConnectionError("ConnectionError: Could not perform request. Internet connection ok?")
+    return self._parseData(osmResponse)
 
 
   def _getTags(self, elem):
@@ -152,7 +156,7 @@ class osmAPI():
       @rtype: osmData.OSM
     """
     print "length data", len(obj)
-#    print obj
+    print obj
     osmObj = osmData.OSM()
     
     root=ET.fromstring(obj)
