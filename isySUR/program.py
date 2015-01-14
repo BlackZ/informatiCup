@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Module containing the KMLCalculator, the main class handeling the calculation of kmls based on SUR
+Module containing the KMLCalculator, the main class handling the calculation of kmls based on SUR
 files. 
 """
 #@author: jpoeppel 

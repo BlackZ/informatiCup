@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 #!/usr/bin/kivy
 """
-Module containg the base classes for the GUI.
+Module containing the base classes for the GUI.
 """
-#@author: jhemming
+#@author: jhemming, jpoeppel
 
 from kivy.config import Config
 Config.set('graphics','resizable',0)
