@@ -51,7 +51,7 @@ Further information
 -------------------------------------------------------------------------------
 
 For information about the requirements, the installation and usage of the GUI
-version and implementation details see the manual.
+version and implementation details see manual in doc/manual.pdf.
 
 ===============================================================================
 Authors
