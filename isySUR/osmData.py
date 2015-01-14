@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-#Basic class that holds the osm-data (consisting of basing elements)
+Module containing the osm-data classes OSM, Node, Way and Relation.  
+Furthermore provides query functionality for closest elements.
 """
 #@author: adreyer
 
@@ -9,7 +10,7 @@ import sys
 import math
 import types
 import copy
-from isySUR import isyUtils
+import isySUR.isyUtils as isyUtils
 
 class OSM():
   
@@ -267,7 +268,6 @@ class OSM():
         continue
       try:
         distObj=way.getDistance(point)       # calculate distance
-        print "way distance:", way.id, way.getDistance(point).distance
         
         # proove if current way is the current nearest way
         if len(nearestWays)==0 or distObj.distance<nearestWays[0].distance:

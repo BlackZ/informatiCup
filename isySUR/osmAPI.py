@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Base class that builds a connection to the Openstreetmap API.
+Module containing the osmAPI class, used to perform requests to the OpenStreetMap API and
+parse the returned xml data to osmData.
 """
 #@author: jhemming & tschodde
 
@@ -155,8 +156,6 @@ class osmAPI():
       @return: The parsed osm data in the OSM data structur
       @rtype: osmData.OSM
     """
-    print "length data", len(obj)
-    print obj
     osmObj = osmData.OSM()
     
     root=ET.fromstring(obj)
@@ -167,8 +166,6 @@ class osmAPI():
                              float(node.attrib["lat"]), 
                              float(node.attrib["lon"]), 
                              self._getTags(node))
-      if nodeObj.id == "1246147":
-        print "node present!"
       if osmObj.nodes.has_key(nodeObj.id):
         osmObj.nodes[nodeObj.id].tags = nodeObj.tags
       else:

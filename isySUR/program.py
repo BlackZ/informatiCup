@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Main pipeline to compute kml from a given SUR(file).
+Module containing the KMLCalculator, the main class handeling the calculation of kmls based on SUR
+files. 
 """
 #@author: jpoeppel 
 
@@ -12,7 +13,7 @@ import kmlData as kml
 import sur
 import os
 import sys
-from isySUR import isyUtils
+import isySUR.isyUtils as isyUtils
 
 class KMLCalculator:
   def __init__(self):
@@ -24,7 +25,7 @@ class KMLCalculator:
     self.osm = None
     self.heightBBox = 60
     self.widthBBox = 60
-    self.maxDistance = 10.0
+    self.maxDistance = 6.0
     self.allObjects = {}
     self.certainStyle = {"Style":{"polyColour":"9900ff00"}}
     self.uncertainStyle = {"StyleUncertain":{"polyColour":"99ff0000"}}
@@ -33,7 +34,7 @@ class KMLCalculator:
   def computeKMLsAndStore(self, inPath, outPath, configPath=''):
     """
       Function to compute kmls from a given file of SURs. Stores them either in one kml or in 
-      individual kmls plus one containing all of them. W
+      individual kmls plus one containing all of them.
       
       @param inPath: Path to the file containing the SURs which areas are to be computed.
       @type inPath: String
@@ -139,17 +140,16 @@ class KMLCalculator:
     print "working on sur: ", surObj.id
     coords = (surObj.latitude, surObj.longitude)
     
+    #Set relativeNullPoint for lat, lon conversion
     isyUtils._relativeNullPoint = (surObj.latitude, surObj.longitude)
     
     kmlObj = kml.KMLObject(surObj.id+".kml")
     
     self.osm = self._getOSMData(surObj, coords)  
 
-    if surObj.classification in ["I"]:#,"IO"]:
-#      print "searching buildings"
+    if surObj.classification in ["I"]:
       nearObjs = self._getNearestObj(coords, {"building":"*"})
     else:
-      print "searching everything"
       nearObjs = self._getNearestObj(coords)
     
 
@@ -159,7 +159,6 @@ class KMLCalculator:
     possibleWays = []
     for obj in nearObjs:
       tmpObj = obj.nearestObj
-      print "distance to nearestObj", obj.distance
       tmpWay = None
       if tmpObj[1] == osmData.Relation:
         tmpRel = self.osm.relations[tmpObj[0]]
@@ -167,9 +166,9 @@ class KMLCalculator:
           if mem[2] == "outer":
             tmpWay = self.osm.ways[mem[1]]
             usedStyle[tmpWay.id] = self.certainStyle
-            print "using way from relation", tmpRel.id, mem[1]
       if tmpObj[1] == osmData.Way:
         tmpWay = self.osm.ways[tmpObj[0]]
+        
         usedStyle[tmpWay.id] = self.certainStyle
         print "using way", tmpObj[0]
         
@@ -179,7 +178,6 @@ class KMLCalculator:
           usedStyle[tmpWay.id] = self.uncertainStyle    
           
         if tmpWay.tags["landuse"] == "residential":
-          print "is residential landuse, searching for buildings"
           usedStyle[tmpWay.id] = self.uncertainStyle
           polyString = self._createPolyString(tmpWay)
 #          print polyString
@@ -198,23 +196,15 @@ class KMLCalculator:
           
           for build in buildings:
             tmpBuild = build.nearestObj
-#            print "tempBuild:", tmpBuild[0]
             if build.distance < self.maxDistance:
-#            if self.osm.ways.has_key(tmpBuild[0]):
-#              print "distance below threshold, adding building:", tmpBuild[0]
               tmpWay = self.osm.ways[tmpBuild[0]]
               usedStyle[tmpWay.id] = self.certainStyle
               possibleWays.append(tmpWay)
               #Set to None to prevent adding it multiple times
               tmpWay = None    
         
-
-#      if tmpWay != None:
-#        print "tmpWay id:", tmpWay.id
-                     
       
       if tmpWay != None and not tmpWay in possibleWays:
-#        print "adding way:", tmpWay.id
         possibleWays.append(tmpWay)
 
 
@@ -232,10 +222,7 @@ class KMLCalculator:
     # Prefer buildings if rule is applicable indoor
     if buildingsIncluded and surObj.classification in ["I","IO"]:
 #      print "reducing possible ways"
-      possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop", "landuse"}]
-      
- 
-          
+      possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop"}]
       
 #    print "number possible ways:", len(possibleWays)
     if len(possibleWays) > 1:
@@ -312,7 +299,7 @@ class KMLCalculator:
     bBox = self._createBBox(coords)
     storeWidth = self.widthBBox
     storeHeight = self.heightBBox
-    rules = [('node',['"building"','"type"!~"^route"','"type"!~"TMC"']),
+    buildingRules = [('node',['"building"','"type"!~"^route"','"type"!~"TMC"']),
              ('way',['"building"','"type"!~"^route"','"highway"!~"."','"type"!~"TMC"', '"building:part"!~"."']),
               ('relation',['"building"','"type"!~"^route"', '"type"!~"boundary"', '"boundary"!~"."','"highway"!~"."',
               '"type"!~"associatedStreet"','"type"!~"TMC"', '"building:part"!~"."'])]
@@ -322,7 +309,7 @@ class KMLCalculator:
                 '"type"!~"TMC"','"type"!~"boundary"', '"boundary"!~"."', '"building:part"!~"."'])]
     osm = None
     if surObj.classification == "I":
-      osm = self.osmAPI.performRequest(bBox, rules)
+      osm = self.osmAPI.performRequest(bBox, buildingRules)
     else:
       osm = self.osmAPI.performRequest(bBox, defaultRulesNoRoutes)
       
@@ -332,7 +319,7 @@ class KMLCalculator:
       self.heightBBox *= 2
       bBox = self._createBBox(coords)
       if surObj.classification == "I":
-        osm = self.osmAPI.performRequest(bBox, rules)
+        osm = self.osmAPI.performRequest(bBox, buildingRules)
       else:
         osm = self.osmAPI.performRequest(bBox, defaultRulesNoRoutes)
         
@@ -364,7 +351,7 @@ class KMLCalculator:
 
     nearObjs = nearWays[:]
     
-    if len(nearRelations) > 0 and len(nearWays) >0:
+    if len(nearRelations) > 0 and len(nearWays) > 0:
       if nearRelations[0].distance == nearWays[0].distance:
         nearObjs += nearRelations
         

@@ -8,6 +8,7 @@ to equidistant X,Y coordinates given a relative null point.
 
 
 from math import cos
+from math import pi
 
 _relativeNullPoint=(0.0,0.0)
 
@@ -26,7 +27,7 @@ def getXYpos(relativeNullPoint,p):
   """    
   deltaLatitude = p[0] - relativeNullPoint[0]
   deltaLongitude = p[1] - relativeNullPoint[1]
-  latitudeCircumference = 40075160 * cos(relativeNullPoint[0])
+  latitudeCircumference = 40075160 * cos(relativeNullPoint[0] * pi / 180)
   resultX = deltaLongitude * latitudeCircumference / 360
   resultY = deltaLatitude * 40008000 / 360
   return (resultX, resultY)
