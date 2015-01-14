@@ -291,6 +291,7 @@ The parameters of \texttt{run\_isySUR.py cli} (bold arguments are required):
 \end{itemize}
 
 \subsection{GUI version}\label{sec:gui}
+\todol{add information with config - first safe, afterwards it will be applied}
 Usage of the GUI version:
 \begin{verbatim}
 	$ run_isySUR.py gui [-h] [-c CONFIG]
@@ -376,17 +377,42 @@ Furthermore, our data structure splits our program into nice modular chunks that
 Our main focus lies upon the coordinate of the SUR. In a bounding box (currently 100m\todo{this is not up to date is it?} might be reduced further) around the given coordinates, we start by searching for the closest OSM relations and ways (we omit nodes for now, since they hardly provide any connectivity information, necessary to be able to construct reasonable polygons). We use a bounding box of limited size because we want to reduce the amount of data that we need to request from OSM and we work on the assumption that these coordinates should always relatively close to the intended area. Unfortunately some coordinates (at least in the test data) are quite far away from the intended area, which can lead to finding unintended polygons that are closer to the coordinates. Furthermore the OSM data is not complete and even some elements from the test data are not present in OSM, which means, that we have no way of ever finding the intended polygon.
 
 \section{Evaluation}\label{sec:evaluation}
-\todol{Berechnen Sie nun die Geltungsbereiche der Space Usage Rules aus Ihrer Umgebung mit Ihrer Implementierung aus der ersten Runde.
-Diskutieren Sie die Korrektheit und die Präzision der von Ihnen berechneten Lösungen für die Space
-Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie dazu die berechneten mit den intuitiv beabsichtigten Geltungsbereichen.}
-The quality of our results greatly depends on how detailed the OSM data is for the requested area. As mentioned in the sections \ref{sec:data_usage} and \ref{sec:algorithm} we mainly focus on the coordinates of a given SUR to compute it's intended area of application. Therefore, our results are good for areas where the OSM data is detailed and less optimal when the OSM data is sparse. 
-A good example for this is the number \todol{nummer einfügen} of the provided test dataset: The intended area is a building which is however not mapped in OpenStreetMap yet. Since there is no information about the intended polygon area in the OSM date, we cannot build the polygon. In this case we find the entire residential block and mark it with a different colour to show our uncertainty. Once the OSM data gets updated further we would identify the correct area as well.
-In other cases (e.g. number \todol{nummer einfügen}) the provided coordinate positions would indicate completely different areas than the ones that were intended. When just judging by the OSM data and the coordinates, we would usually rate our results to be more accurate then the provided truth areas in such cases. We therefore would not usually rate these results poorly. 
-In a few cases (e.g. \todol{nummer einfügen}, the test data intends a combination of multiple connected buildings where we apply the rule only to one building. Since in these cases, the buildings are different, we do not think it is justified to extend the area of application to the other buildings as well. 
+\begin{figure}[h]
+\includegraphics[width=0.5\textwidth]{38.png}
+\includegraphics[width=0.5\textwidth]{38truth.png}
+\caption{Left: found area for example SUR 0038; Right: given truth file of SUR 0038}
+\label{fic:38}
+\end{figure}
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{23.png}
+\includegraphics[width=0.5\textwidth]{23truth.png}
+\caption{Left: found area for example SUR 0023; Right: given truth file of SUR 0023}
+\label{fic:23}
+\end{figure}
 
+%\todol{Berechnen Sie nun die Geltungsbereiche der Space Usage Rules aus Ihrer Umgebung mit Ihrer Implementierung aus der ersten Runde. Diskutieren Sie die Korrektheit und die Präzision der von Ihnen berechneten Lösungen für die Space Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie dazu die berechneten mit den intuitiv beabsichtigten Geltungsbereichen.}
+The quality of our results greatly depends on how detailed the OSM data is for the requested area. As mentioned in the sections \ref{sec:data_usage} and \ref{sec:algorithm} we mainly focus on the coordinates of a given SUR to compute its intended area of application. Therefore, our results are good for areas where the OSM data is detailed and less optimal when the OSM data is sparse. 
 
+A good example for this is the number 0038 of the provided test dataset, that is shown in figure \ref{fic:38}: The intended area is a building which is however not mapped in OpenStreetMap yet. Since there is no information about the intended polygon area in the OSM data, we cannot build the polygon. In this case we find the entire residential block and mark it with a different colour to show our uncertainty. Once the OSM data gets updated further we would identify the correct area as well.
 
-Of course there are some cases, where we compute areas, that we do not deem to be intuitive areas of application of the given rules. One example would be the number 56 from the test dataset. The intended area is not present in the osm data and the residential area spans such a big area (covering several blocks) that we find a different building on the other side of the road. 
+In other cases (e.g. figure \ref{fic:23}) the provided coordinate positions would indicate completely different areas than the ones that were intended. When just judging by the OSM data and the coordinates, we would usually rate our results to be more accurate then the provided truth areas in such cases. We therefore would not usually rate these results poorly. 
+
+In a few cases (e.g. figure \ref{fic:16}, the test data intends a combination of multiple connected buildings where we apply the rule only to one building. Since in these cases, the buildings are different, we do not think it is justified to extend the area of application to the other buildings as well. 
+
+\begin{figure}[h]
+\includegraphics[width=0.5\textwidth]{16.png}
+\includegraphics[width=0.5\textwidth]{16truth.png}
+\caption{Left: found area for example SUR 0016; Right: given truth file of SUR 0016}
+\label{fic:16}
+\end{figure}
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{56.png}
+\includegraphics[width=0.5\textwidth]{56truth.png}
+\caption{Left: found area for example SUR 0056; Right: given truth file of SUR 0056}
+\label{fic:56}
+\end{figure}
+
+Of course there are some cases, where we compute areas, that we do not deem to be intuitive areas of application of the given rules. One example would be the number 0056 in figure \ref{fic:56} from the test dataset. The intended area is not present in the osm data and the residential area spans such a big area (covering several blocks) that we find a different building on the other side of the road. 
 A more detailed analysis of our actual results when comparing with our SURs and the ones provided by the test data can be found below:
 \todol{Daten einfügen}
 
