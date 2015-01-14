@@ -420,7 +420,7 @@ class Menu(DropDown):
           stream.write(ruleArea + '\n')
           for rule in config[ruleArea]:
             stream.write(rule + '\n')
-      
+      self.app.configPath=os.path.join(path, filename)
       self.dismiss_save()
   
   def saveKML(self, path, filename):
