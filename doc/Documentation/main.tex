@@ -116,58 +116,53 @@ Welcome to isySUR (pronounce isy as ['i:zi]), a tool helping you to find the are
 \section{Quick start}
 First decide if you like to use the command line version of \pt\ or if you prefer a graphical user interface. Please proceed with section \ref{sec:QuickstartTerminal} or section \ref{sec:QuickstartWindow} depending on your choice.
 
-\subsection{\ProjectTitle\ in command line version}\label{sec:QuickstartTerminal}
-For the command line version type
-\begin{verbatim}
-	$ python run_isySUR.py cli {input} {output}
-\end{verbatim}
-where \texttt{input} is the path to the input file containing the SURs which areas of influence should be computed and \texttt{output} is the path for the resulting area(s) of influence. If the path points to a file, only one kml file will be created, containing all calculated areas. If the path points to a directory a kml file for each SUR will be created as well as one containing all areas.
-
 You can leave out \texttt{python} if you have installed the program before. For installation instructions see section \ref{sec:installation}. For additional parameters see section \ref{sec:cli}.
 
 For information about input and output file types see section \ref{sec:io}.
 
+\subsection{\ProjectTitle\ in command line version}\label{sec:QuickstartTerminal}
+For the command line version type
+\begin{verbatim}
+	$ python run_isySUR.py cli [-h] [-c CONFIG] input output
+\end{verbatim}
+where \texttt{input} is the path to the input file containing the SURs which areas of influence should be computed and \texttt{output} is the path for the resulting area(s) of influence. If the path points to a file, only one KML file will be created, containing all calculated areas. If the path points to a directory a KML file for each SUR will be created as well as one containing all areas.
+
 \subsection{\ProjectTitle\ in window version}\label{sec:QuickstartWindow}
 For the window version just type
 \begin{verbatim}
-	$ python run_isySUR.py
+	$ python run_isySUR.py gui [-h] [-c CONFIG]
 \end{verbatim}
 In Menu you find the possibility to load a SUR input file. After calculating you can save the area(s) of application.
-
-%TODO Dieser Abschnitt ist doppelt hier und bei cli. Außerdem sollten wir bei gui schon den GUI parameter angeben und die version ohne gui/cli einzeln behandeln. Auch dass dann versucht wird gui zu starten, und dann aber ein prompt kommt. Auch fehlt der config Parameter!
-You can leave out \texttt{python} if you have installed the program before. For installation instructions see section \ref{sec:installation}. For additional parameters and more features see section \ref{sec:gui}.
-
-For information about input and output file types see section \ref{sec:io}.
 
 \section{What is \ProjectTitle?}\label{sec:whatFor}
 \begin{figure}
 \centering
 \includegraphics[width=0.75\textwidth]{screenshot.png}
-\caption{\pt\ in gui version}
+\caption{\pt\ in GUI version}
 \end{figure}
-\pt\ is a program that tries to calculate the intuitive area of application of a space usage rule by its coordinates and data from OpenStreetMap. %TODO make footnote to their website
-It was developed as part of the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called ISY and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `Intelligent Systems' at Bielefeld University.
+\pt\ is a program that tries to calculate the intuitive area of application of a space usage rule by its coordinates and data from OpenStreetMap\footnote{\url{http://www.openstreetmap.org}}. It was developed as part of the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called ISY and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `Intelligent Systems' at Bielefeld University.
 
 Using \pt\ is very easy. You give an input file with the coordinates of the SURs and the intended area of application is computed. Optionally, you can add a configuration file that classifies SURs in those that are applicable only indoor, those that are applicable only outdoor or those that are applicable indoor as well as outdoor (both) to get a better result. In the GUI version the calculated areas are shown on a map and you can choose which ones you want to be displayed. They can be saved into a file to reload them whenever you want to have a look at them.
 
 \section{Content of \ProjectTitle}
-\todol{add pydoc file}
 In the archive you can find the following data (bold printed files will be installed with the install command):
 \begin{itemize}
 	\item data (directory) - examples for space usage rules\footnote{see section \ref{sec:surs}}
+	\item doc (directory) - documentation directory
+	\begin{itemize}
+		\item manual.pdf - this manual
+		\todol{add pydoc}
+	\end{itemize}
 	\item \textbf{isySUR} (directory) - the source files for the isySUR Python package
 	\begin{itemize}
-		\item gui (directory) - source files for gui version
+		\item \textbf{gui} (directory) - source files for GUI version
 		\item tests (directory) - \pt\ was developed using test driven development. In this directory you will find the test files.
-		%TODO Tests werden doch gar nicht mit installiert oder? Sollte klar sein mit dem Dickgetruckten
 	\end{itemize}
 	\item testData (directory) - data for tests and test data sets
 	\begin{itemize}
 		\item dataOnlyForTests (directory) - Some of the test files need data that is stored in this directory
 		\item Data.txt - a possible input file
 	\end{itemize}
-	\item manual.pdf - this manual
-	%TODO Dies ist doch in einem unterorder docs oder nicht?
 	\item README.txt
 	\item \textbf{run\_isySUR.py} - the Python script to run \pt
 	\item run\_tests.py - script that runs all or some tests in isySUR/tests/, used for development
@@ -202,10 +197,10 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 	\newpage
 	\item \textbf{additional requirements for the GUI version:}
 	\begin{itemize}
-		\item kivy
+		\item Kivy
 		\item concurrent.futures
 	\end{itemize}
-	For the graphical user interface Kivy is used. Kivy\footnote{\url{http://kivy.org}} is a cross-platform Python Framework for NUI Development. For installation on Ubuntu we recommend the installation with apt-get as described on their web page. For use on Windows and starting Kivy applications from the command line we recommend to install Kivy and pygame (needed for Kivy) with the unofficial precompiled binaries\footnote{kivy: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#kivy}}\footnote{pygame: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#pygame}} On MacOSX kivy is a kind of launcher. Therefore installation \pt\ is not possible\footnote{for using kivy on MacOSX see \url{http://kivy.org/docs/installation/installation-macosx.html}}. %TODO not entirely true. Es ist bestimmt möglich das auch da global zu installieren, allerdings mit mehr Arbeit.
+	For the graphical user interface Kivy is used. Kivy\footnote{\url{http://kivy.org}} is a cross-platform Python Framework for NUI Development. For installation on Ubuntu we recommend the installation with apt-get as described on their web page. For use on Windows and starting Kivy applications from the command line we recommend to install Kivy and pygame (needed for Kivy) with the unofficial precompiled binaries\footnote{Kivy: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#kivy}}\footnote{pygame: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#pygame}} On MacOSX the easiest way to run Kivy is as Launcher as mentioned on the Kivy web site\footnote{\url{http://kivy.org/docs/installation/installation-macosx.html}}.
 	
 On all OS futures can be installed via pip
 \begin{verbatim}
@@ -213,8 +208,8 @@ On all OS futures can be installed via pip
 \end{verbatim}
 \end{enumerate}
 
-\subsection{Installation} %TODO Do we keep tar.gz?
-You have got an archive of type .tar.gz. Please unpack the archive into a directory of your choosing. Because \pt\ is a Python script you do not need to install it. It is also possible to install only the dependencies and run \pt\ by typing from within the directory: %TODO vl noch deutlicher formulieren WO man das ausführen kann
+\subsection{Installation}
+You have got an archive of type .tar.gz. Please unpack the archive into a directory of your choosing. Because \pt\ is a Python script you do not need to install it. It is also possible to install only the dependencies and run \pt\ by typing from within the directory you chose before:
 \begin{verbatim}
 	$ python run_isySUR.py [parameters]
 \end{verbatim}
@@ -230,12 +225,11 @@ Now you are able to start \pt\ any time and anywhere by typing:
 \end{verbatim}
 
 \section{Input and output}\label{sec:io}
-The input of the space usage rules was specified in the programming task as well as the output in .kml format. For more information about the decision to add a configuration file please see section \ref{sec:config}.
+The input of the space usage rules was specified in the programming task as well as the output in .kml format. For more information about the decision to add a configuration file please see section \ref{sec:data_usage}.
 
 \subsection{Space usage rules}
-The SUR file is a plain text file. The first line holds the number of space usage rules in the file, that will be used for computation. The following lines represent the SURs. A line must always start with the SUR id, followed by the latitude and longitude coordinates of the rule. The last entry is a brief description of the rule. The entries are comma separated. Decimal separator in latitude and longitude is a point. One SUR id can span several consecutive lines in order to add several rules to the same SUR.
-%TODO make clear that the line number represents number of rules not necessarily SURs. Use an example where multiple rules belong to one ID as well as to a single one.
-\\~\\
+The SUR file is a plain text file. The first line holds the number of lines in the file, that will be used for constructing SURs, which are to be computed. The following lines represent the rules. A line must always start with the SUR id, followed by the latitude and longitude coordinates of the rule. The last entry is a brief description of the rule. The entries are comma separated. Decimal separator in latitude and longitude is a point. One SUR id can span several consecutive lines in order to add several rules to the same SUR.
+\newpage
 Example file:
 \begin{verbatim}
 3
@@ -244,9 +238,10 @@ Example file:
 0062, 50.9306, 5.34366, smoking="no"
 \end{verbatim}
 
-\subsection{Configuration file}
-The configuration file is a plain text file. In this file one or more blocks starting with '[Indoor]', '[Outdoor]' or '[Both]' are found. After these headlines the names of the rules follow that belong to these categories of area of influence.
-\\~\\
+\subsection{Configuration file}\label{sec:confinput}
+The configuration file is a plain text file. In this file one or more blocks starting with `[Indoor]', `[Outdoor]' or `[Both]' are found. After these headlines the names of the rules follow that belong to these categories of area of influence.
+\\~
+
 Example file:
 \begin{verbatim}
 [Indoor]
@@ -260,12 +255,12 @@ access:dog="no"
 open_fire="no"
 \end{verbatim}
 
-These configuration files can be used to adapt the area calculation to better suite local space usage rule customs. For more details about how these categories influence the calculation see section \ref{} %TODO link!
+These configuration files can be used to adapt the area calculation to better suite local space usage rule customs. For more details about how these categories influence the calculation see section \ref{sec:data_usage}.
 
 \subsection{Keyhole Markup Language}
-Output files are in .kml format where kml stands for Keyhole Markup Language. For syntax definition and documentation please visit \url{https://developers.google.com/kml}. Kml version 2.1 is used for the produced output files.
+Output files are in .kml format where KML stands for Keyhole Markup Language. For syntax definition and documentation please visit \url{https://developers.google.com/kml}. Kml version 2.1 is used for the produced output files.
 
-The GUI version provides also the possibility to read kml files to display the areas. For this kml version 2.1 as well as 2.2 is supported.
+The GUI version provides also the possibility to read KML files to display the areas. For this KML version 2.1 as well as 2.2 is supported.
 
 \section{Command line and GUI version}\label{sec:usage}
 \pt\ comes with two versions: One for command line use and another one for users who prefer to use a graphical user interface.
@@ -275,11 +270,10 @@ For using the command line interface type:
 \end{verbatim}
 For using the graphical user interface type:
 \begin{verbatim}
-	$ run_isySUR.py
+	$ run_isySUR.py gui [parameters]
 \end{verbatim}
-%TODO auch hier würde ich für gui ruhig den gui Parameter lassen und extra auf den Fall ohne gui/cli eingehen.
 
-Notice that the gui version has more requirements than the command line version. See \ref{sec:requirements} for more details.
+Notice that the GUI version has more requirements than the command line version. See \ref{sec:requirements} for more details.
 
 \subsection{Command line version}\label{sec:cli}
 Usage of the command line version:
@@ -297,19 +291,20 @@ The parameters of \texttt{run\_isySUR.py cli} (bold arguments are required):
 \end{itemize}
 
 \subsection{GUI version}\label{sec:gui}
-Usage of the gui version:
+Usage of the GUI version:
 \begin{verbatim}
 	$ run_isySUR.py gui [-h] [-c CONFIG]
 \end{verbatim}
-If you do not want to give parameters you can also start the gui version with
+~\\
+If you do not want to give parameters you can also start the GUI version with
 \begin{verbatim}
 	$ run_isySUR.py
 \end{verbatim}
-or a simple double click on the file. %TODO sollten wir erwähnen, dass die Endung dann mit python verbunden sein muss?
+or a simple double click on the file (when .py-files are connected to python). When the GUI cannot be loaded, the command line version is started.
 
-When the gui version could not be started, e.g. because of missing requirements, you can proceed with the command line version. You will be asked for an input file and an output path, to run the program. If you do not want to use this version you can type \texttt{'exit'} to exit the program.
+When the GUI version could not be started, e.g. because of missing requirements, you can proceed with the command line version. You will be asked for an input file and an output path, to run the program. If you do not want to use this version you can type \texttt{'exit'} to exit the program.
 
-\subsubsection{Parameters} %TODO DOPPELT!!! Soll das?
+\subsubsection{Parameters}
 The parameters of \texttt{run\_isySUR.py gui}:
 \begin{itemize}
 	\item -c CONFIG (--config CONFIG) - With this parameter an optional config file with SUR classifications (indoor, outdoor, both) is used for computation. For the format of the file see \ref{sec:io}.
@@ -324,26 +319,25 @@ The parameters of \texttt{run\_isySUR.py gui}:
 \end{figure}
 On the left side you can find the menu that holds the functionality you can use. In the menu you will find the following possibilities:
 \begin{itemize}
-	\item \textbf{Load SUR} - Choose the file with the coordinates of your SURs. See section \ref{sec:io} for more information about the format. The area of application of the SURs will be calculated. An information text will inform you about the ID of the current SUR. When the kml list is open you can see that areas are added. Calculated areas are displayed on the map as well as red markers at the SUR's coordinates. After a calculation is finished you can start another one. The new areas will be added to the ones already in the kml list.
-	\item \textbf{Load KML} - Choose some kml file you have already saved during the last usage. Or maybe you made your own kml file with another program. See section \ref{sec:io} for more information about the format. The areas contained in your file are displayed on the map and added to those already in the kml list. %TODO stimmt nicht ganz, zur kml list kommt nur EIN kml eintrag, nicht jede area=placemark in der kml
-	\item \textbf{Save KML} - All kmls that are currently selected in the kml list are saved to the file or folder that you can choose here.
+	\item \textbf{Load SUR} - Choose the file with the coordinates of your SURs. See section \ref{sec:io} for more information about the format. The area of application of the SURs will be calculated. An information text will inform you about the ID of the current SUR. When the KML list is open you can see that areas are added. Calculated areas are displayed on the map as well as red markers at the SUR's coordinates. After a calculation is finished you can start another one. The new areas will be added to the ones already in the KML list.
+	\item \textbf{Load KML} - Choose some KML file you have already saved during the last usage. Or maybe you made your own KML file with another program. See section \ref{sec:io} for more information about the format. The areas contained in your file are displayed on the map and an entry for this file is added to those already in the KML list.
+	\item \textbf{Save KML} - All KMLs that are currently selected in the KML list are saved to the file or folder that you can choose here.
 	\item \textbf{SUR Position} - The red SUR markers can be hidden and shown with this button.
 	\item \textbf{Config} - With this button you can open the configuration window. If you used the \texttt{--config} parameter there is already a configuration file loaded. You can load another configuration file, add or remove some rules and save your personal configuration file. With your configuration you say if you prefer to find an area for a SUR indoor or outdoor or if you think that kind of rule can be applicable indoor as well as outdoor. The following computations will use the new configuration.
 \end{itemize}
 
 \subsubsection{KML list}
-On the right side of the window, there is the kml list. This list tells you which areas you have calculated or loaded. You can scroll the list if it is too long for the window with the mouse wheel or by dragging it with the mouse. When you click on an entry which area is not in viewport the map will jump to that area. When you click on an entry which area is already in viewport you can hide it. Hidden areas are not saved into a kml file. With another click you can make an area visible again. %TODO Was ist viewport? Hier wird vieles für dumme beschrieben, das aber nicht.
+On the right side of the window, there is the KML list. This list tells you which areas you have calculated or loaded. You can scroll the list if it is too long for the window with the mouse wheel or by dragging it with the mouse. When you click on an entry which area is not in view the map will jump to that area. When you click on an entry which area is already in view you can hide it. Hidden areas are not saved into a KML file. With another click you can make an area visible again.
 
 \subsection{Using android}\label{sec:android}
 Of course calculating SURs at home is nice but in general you would like to know the area of application a space usage rule standing in front of it. This is possible on your android device (with internet connection). In the archive you can find the isySUR\todo{name of file correct?}.apk that you can install on your device. Just copy it on the device e.g. via USB and enable the device option to install from unknown sources. Browsing to the .apk and clicking on it starts the installation. After that you will find isySUR in your apps and can use it exactly like the GUI version described in section \ref{sec:gui}.
-%TODO Problem: Auf dem android device müsste man immer noch an die txt irgendwie kommen. Sollte evtl etwas defensiver formuliert werden. Vl etwas für further impromvements: Allow clicking on map to start calculating from there?
 
 %----------------------------------------------------------------------------------------
 %	Technical and implementation details
 %----------------------------------------------------------------------------------------
 
 \chapter{Technical and implementation details}
-In this chapter the implemented algorithm to calculate the intended areas of application is explained.\todo{section?} You will gain an insight into the development and learn some implementation details. After that an evaluation of the achieved results follows.
+In this chapter the implemented algorithm to calculate the intended areas of application is explained in section \ref{sec:algorithm}. You will gain an insight into the development and learn some implementation details. After that an evaluation of the achieved results follows.
 
 \todol{Code documentation -> pydoc?}
 
@@ -354,38 +348,41 @@ This project was created using test driven development on the unittest layer. Th
 
 \pt\ was created in two steps: First the command line version was created and the first versions of the algorithm were implemented. While the algorithm was improved and reworked, it was decided to add a GUI because a lightweight tool for displaying the calculated areas was missing. Furthermore, it helped in improving the algorithm by enabling rapid testing of changes. On top of that, not all people like to use a command line tool.
 
-For the GUI the Kivy framework is used. We base the display of the OSM map on mapview from the Kivy garden\footnote{see \url{https://github.com/kivy-garden/garden.mapview}} which we adapted to suit our needs.
+For the GUI the Kivy framework is used. We base the display of the OSM map on mapview from the Kivy Garden\footnote{see \url{https://github.com/kivy-garden/garden.mapview}} which we adapted to suit our needs.
 
 At the beginning of the project the idea of an app came up and with the Kivy framework for the GUI the foundations for this was laid. With buildozer\footnote{see \url{https://github.com/kivy/buildozer}} a nice tool for packaging an apk file from our project was found.
 
-\subsection{Data usage}\label{sec:config} %TODO so far there has been no word about images...
-We deliberately do not use the images in our analysis. This is because they do not give us reliable information about the interesting polygons. The variety of possible signs, including totally unknown ones, (and their placement in/on/around the intended area) make it infeasible to perform robust image recognition or classification. Furthermore the only relevant information we think one could extract from images, refers to an inside/outside classification of the rule. However, even this classification would not be reliable and robust enough in the general use case.
+\subsection{Data usage}\label{sec:data_usage}
+In the competition intended to use as input is the SUR file as well as photos of the real signs belonging to the space usage rules. We deliberately do not use the images in our analysis. This is because they do not give us reliable information about the interesting polygons. The variety of possible signs, including totally unknown ones, (and their placement in/on/around the intended area) make it infeasible to perform robust image recognition or classification. Furthermore the only relevant information we think one could extract from images, refers to an inside/outside classification of the rule. However, even this classification would not be reliable and robust enough in the general use case.
 
 One might consider using images and compute vision techniques in the future, when the Google StreetView recordings cover virtually everything and these images are available to this program as well, but until then we do not believe we can extract useful information from the images.
 
-We do allow the usage of the rule types/names (e.g. access:21="no") to some minimal extend. We allow config files (see \ref{} for details about the format) that classify the rules to be applicable indoor, outdoor or indoor as well as outdoor (both). We use these classifications to narrow down the possible OSM elements around the target coordinates. Unknown rules will always get the "both"%TODO "" correct? 
-classification so that we do not ignore relevant information in those cases. We hope to improve our results, by complying with local space usage rule customs, and reduce computational costs by doing so. However, in a general context most rules are applicable indoors as well as outdoors, which means that these classifications will most likely only be useful in individual cases. 
-
-\todol{Maybe an image of the pipeline?}
-
-Our main focus lies upon the coordinate of the SUR. In a bounding box (currently 100m\todo{this is not up to date is it?} might be reduced further) around the given coordinates, we start by searching for the closest OSM relations and ways (we omit nodes for now, since they hardly provide any connectivity information, necessary to be able to construct reasonable polygons). We use a bounding box of limited size because we want to reduce the amount of data that we need to request from OSM and we work on the assumption that these coordinates should always relatively close to the intended area. Unfortunately some coordinates (at least in the test data) are quite far away from the intended area, which can lead to finding unintended polygons that are closer to the coordinates. Furthermore the OSM data is not complete and even some elements from the test data are not present in OSM, which means, that we have no way of ever finding the intended polygon.
-\todol{add another section with more detailed algorithm information? or expand this one?}
+We do allow the usage of the rule types/names (e.g. access:21="no") to some minimal extend. We allow config files (see \ref{sec:confinput} for details about the format) that classify the rules to be applicable indoor, outdoor or indoor as well as outdoor (both). We use these classifications to narrow down the possible OSM elements around the target coordinates. Unknown rules will always get the ``both'' classification so that we do not ignore relevant information in those cases. We hope to improve our results, by complying with local space usage rule customs, and reduce computational costs by doing so. However, in a general context most rules are applicable indoors as well as outdoors, which means that these classifications will most likely only be useful in individual cases. 
 
 \subsection{Data structure}
 In order to be able to work freely with all the data that we require when computing suitable areas for SURs we have introduced our own data structure.
 \begin{itemize}
 	\item sur: A wrapper object for the SURs. It enables us to handle the file only once at the beginning.
 	\item osmData: Wrapper for the OSM elements Node, Way and Relation. We convert the xml data we receive from OSM to these objects, so that we do not have to work on the xml for computation.
-	\item kmlData: Wrapper objects for a kml and included placemarks. These will be created by our algorithm and can be saved to a .kml file.
+	\item kmlData: Wrapper objects for a KML and included placemarks. These will be created by our algorithm and can be saved to a .kml file.
 \end{itemize}
 
 Furthermore, our data structure splits our program into nice modular chunks that can be reused independently in other project if desired.
+
+\section{Algorithm}\label{sec:algorithm}
+\todol{pseudocode}
+\todol{rework this section}
+
+Our main focus lies upon the coordinate of the SUR. In a bounding box (currently 100m\todo{this is not up to date is it?} might be reduced further) around the given coordinates, we start by searching for the closest OSM relations and ways (we omit nodes for now, since they hardly provide any connectivity information, necessary to be able to construct reasonable polygons). We use a bounding box of limited size because we want to reduce the amount of data that we need to request from OSM and we work on the assumption that these coordinates should always relatively close to the intended area. Unfortunately some coordinates (at least in the test data) are quite far away from the intended area, which can lead to finding unintended polygons that are closer to the coordinates. Furthermore the OSM data is not complete and even some elements from the test data are not present in OSM, which means, that we have no way of ever finding the intended polygon.
 
 \section{Evaluation}
 \todol{Berechnen Sie nun die Geltungsbereiche der Space Usage Rules aus Ihrer Umgebung mit Ihrer Implementierung aus der ersten Runde.
 Diskutieren Sie die Korrektheit und die Präzision der von Ihnen berechneten Lösungen für die Space
 Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie dazu die berechneten mit den intuitiv beabsichtigten Geltungsbereichen.}
 
+\section{Further Work}
+\todol{do further work}
+%TODO Problem: Auf dem android device müsste man immer noch an die txt irgendwie kommen. Sollte evtl etwas defensiver formuliert werden. Vl etwas für further impromvements: Allow clicking on map to start calculating from there?
 
 %----------------------------------------------------------------------------------------
 %	Own SURs
