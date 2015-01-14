@@ -12,6 +12,7 @@ Config.set('graphics','resizable',0)
 import os
 from threading import Thread,Lock, Event
 from Queue import Queue
+import requests
 
 from isySUR import kmlData, program
 from mapview import MapView
@@ -49,7 +50,7 @@ class Map(FloatLayout):
     
     self.lock = Lock()
     self.app = app
-    self.maps = MapView(zoom=11, lat=50.6394, lon=3.057)
+    self.maps = MapView(zoom=11, lat=50.6394, lon=3.057, toaster=Toast(self))
     self.maps.center_on(52.023368, 8.538291)
     self.add_widget(self.maps, 20)
     self.toastLabel = Label(bold=True, font_size=20, color=(1,1,1,1))
@@ -192,6 +193,11 @@ class Map(FloatLayout):
       if isinstance(item, IOError):
         toast.remove()
         self.toast("SUR file is incorrect!")
+        return
+      elif isinstance(item, requests.ConnectionError):
+        toast.remove()
+        print item
+        self.toast("No internet connection!")
         return
       elif item == 'stop':
         break

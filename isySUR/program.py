@@ -113,7 +113,12 @@ class KMLCalculator:
       if not stopCalc.empty():
         break
       kmlList.put(s.id)
-      kmlObj = self.calcKML(s)
+      try:
+        kmlObj = self.calcKML(s)
+      except Exception, e:
+        kmlList.put(e)
+        kmlList.put('stop')
+        return False
       if kmlObj != None:
         kmlList.put(kmlObj)
     kmlList.put('stop')
