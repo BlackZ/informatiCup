@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Dec 31 16:44:31 2014
 Helper class that leads known sur types (indoor, outdoor, both) from a file and
 can be queried for a certain rule.
-@author: jpoeppel
 """
+#@author: jpoeppel
+
 
 class surTypeManager():
   

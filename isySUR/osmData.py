@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov  6 12:31:52 2014
-Basic class that holds the osm-data (consisting of basing elements)
-@author: adreyer
+#Basic class that holds the osm-data (consisting of basing elements)
 """
+#@author: adreyer
+
+
 import sys
 import math
 import types
@@ -373,9 +374,6 @@ class Node(object):
   def __init__(self, identifier, lat, lon, tags):
     """
       Basic class containing an osm Node
-  
-      Parameters
-      ==========
       
       @param identifier: The id of the node.
       @type identifier: Will be parsed to string
@@ -475,10 +473,7 @@ class Way(object):
   
   def __init__(self, identifier, refs, tags, osmObj):
     """
-      Basic class containing an osm Way
-      
-      Parameters
-      ==========
+      Basic class containing an osm Way.
     
       @param identifier: The id of the way as a string
       
@@ -693,10 +688,7 @@ class Relation(object):
   
   def __init__(self, identifier, members, tags, osmObj):
     """
-      Basic class containing an osm Relation
-      
-      Parameters
-      ==========      
+      Basic class containing an osm Relation.
       
       @param identifier: The id of the relation.
       @type identifier: any type      
@@ -895,9 +887,6 @@ class distanceResult(object):
   def __init__(self, distance, nearestObj, nearestSubObj=[("-1",None)]):
     """
     Basic class containing the result of a distance calculation
-
-    Parameters
-    ==========
     
     @param distance: The distance to the nearestObj
     @type distance: float

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 13 19:35:17 2015
-
-@author: Thorsten
+Module containing util functions.
 """
+
+#@author: tschodde
+
+
 from math import cos
+
 _relativeNullPoint=(0.0,0.0)
 
 def getXYpos(relativeNullPoint,p):

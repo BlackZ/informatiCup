@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
+"""
+Base class that builds a connection to the Openstreetmap API.
+"""
+#@author: jhemming & tschodde
 
 import requests
 import osmData
 import types
 
-
-#import xml.dom.minidom as dom
 import xml.etree.cElementTree as ET
 
 class osmAPI():
   
   def __init__(self):
+    """
+    Constructor of the osmAPI making a conntection to Openstreetmap.
+    """
     self.osmurl='http://overpass-api.de/api/interpreter'
       
   def _getOsmRequestData(self, minLat, minLon, maxLat, maxLon, filterList):

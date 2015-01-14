@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Last modified on Thu Jan 01 13:05:00 2015
 Main pipeline to compute kml from a given SUR(file).
-@author: jpoeppel 
 """
+#@author: jpoeppel 
+
+
 import osmAPI as api
 import osmData
 import kmlData as kml
@@ -91,8 +92,14 @@ class KMLCalculator:
     @param inPath: Path to the file containing the SURs which areas are to be computed.
     @type inPath: String
     
+    @param kmlList: Queue for computed KMLs
+    @type kmlList: Queue.Queue
+    
+    @param stopCalc: Queue which decides if the kml calculation should be stoped.
+    @type stopCalc: Queue.Queue
+    
     @param configPath: Optional path to a config file, containing information about the classification of rules
-      (indoor, outdoor or both).
+                       (indoor, outdoor or both).
     @type configPath: String
     """
     
@@ -270,6 +277,12 @@ class KMLCalculator:
     
     
   def _createPolyString(self, way):
+    """
+    Create a string containing all vertices of the given way.
+    
+    @param way: Way which vertices will be extracted.
+    @type way: osmData.Way
+    """
     res = ""
     for ref in way.refs[:-1]:
       res += str(self.osm.nodes[ref].lat) + " " + str(self.osm.nodes[ref].lon) + " " 

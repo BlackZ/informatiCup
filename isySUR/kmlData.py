@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Nov  9 15:09:52 2014
-
-@author: jpoeppel & adreyer
+Module containg all necessary information for creating
+and parsing a kml-xml.
 """
+#@author: jpoeppel & adreyer
+
 
 import xml.etree.cElementTree as ET
 from  xml.etree.cElementTree import ParseError
@@ -11,7 +12,8 @@ import xml.sax.saxutils as xmlUtils
 import os
 
 class KMLObject():
-  """ Class representing a kml file. Holds a list of contained placemarks.
+  """
+  Class representing a kml file. Holds a list of contained placemarks.
   """
   
   def __init__(self, name, placemarks=None):
@@ -176,8 +178,6 @@ class KMLObject():
               
     
     return res
-    
-    
     
   @classmethod
   def _parseStyles(cls, root, ns, stylesToParse=[]):
