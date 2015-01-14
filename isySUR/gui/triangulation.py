@@ -5,8 +5,9 @@ Simple triangulation class. It tries to triangulate a given polygon using the
 ear clipping algorithm.
 Roughly based on Rawlyn's implementation (http://chipmunk-physics.net/forum/viewtopic.php?f=1&t=813&p=3985)
 but not using pymunk and more flexible to the polygon orientation.
-@author: jpoeppel
 """
+#@author: jpoeppel
+
 
 class Triangulator():
   """

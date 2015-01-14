@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 #!/usr/bin/kivy
+"""
+Module containg the base classes for the GUI.
+"""
+#@author: jhemming
+
 from kivy.config import Config
 Config.set('graphics','resizable',0)
 
@@ -270,6 +275,7 @@ class Menu(DropDown):
     self.isOpen = False
     self.dismiss()
     self._load_diag.content.ids.filechooser.path=self.path
+    self._load_diag.content.ids.filechooser._update_files()
     if 'KML' in obj.text:
       self._load_diag.content.load=self.load_kml
     elif 'SUR' in obj.text:
@@ -302,6 +308,7 @@ class Menu(DropDown):
         return
         
     self._save_diag.content.ids.filechooser.path = self.path
+    self._save_diag.content.ids.filechooser._update_files()
     self._save_diag.open()
   
   def show_config(self):
@@ -497,6 +504,8 @@ class CustomFileChooser(FileChooserListView):
     if os.path.isdir(newPath):
       self.path = newPath 
       self.selection = []
+      self._update_files()
+    
 
 class KMLList(DropDown):
   def __init__(self, mapview, app):

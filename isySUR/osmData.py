@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov  6 12:31:52 2014
-Basic class that holds the osm-data (consisting of basing elements)
-@author: adreyer
+#Basic class that holds the osm-data (consisting of basing elements)
 """
+#@author: adreyer
+
+
 import sys
 import math
 import types
 import copy
+from isySUR import isyUtils
 
 class OSM():
   
@@ -372,9 +374,6 @@ class Node(object):
   def __init__(self, identifier, lat, lon, tags):
     """
       Basic class containing an osm Node
-  
-      Parameters
-      ==========
       
       @param identifier: The id of the node.
       @type identifier: Will be parsed to string
@@ -465,16 +464,16 @@ class Node(object):
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
-    return distanceResult(round(math.hypot(point[0] - self.lat, point[1] - self.lon),8),(self.id,self.__class__))
+    tmpPoint=isyUtils.getXYpos(isyUtils._relativeNullPoint,point)
+    ownPoint=isyUtils.getXYpos(isyUtils._relativeNullPoint,(self.lat,self.lon))
+
+    return distanceResult(round(math.hypot(tmpPoint[0] - ownPoint[0], tmpPoint[1] - ownPoint[1]),8),(self.id,self.__class__))
   
 class Way(object):
   
   def __init__(self, identifier, refs, tags, osmObj):
     """
-      Basic class containing an osm Way
-      
-      Parameters
-      ==========
+      Basic class containing an osm Way.
     
       @param identifier: The id of the way as a string
       
@@ -624,23 +623,26 @@ class Way(object):
       @rtype: boolean
     """
     if len(vertices)==0:  
-        vertices=self._vertices()
-        if not self.isPolygon():
-            return False
+      vertices=self._vertices()
+      if not self.isPolygon():
+        return False
     else:
-        if not vertices[0]==vertices[-1]:
-            return False
+      if not vertices[0]==vertices[-1]:
+        return False
             
     cn = 0    # the crossing number counter
 
     # loop through all edges of the polygon
     for i in range(len(vertices)-1):   # edge from vertices[i] to vertices[i+1]
-        if ((vertices[i][1] <= point[1] and vertices[i+1][1] > point[1])   # an upward crossing
-            or (vertices[i][1] > point[1] and vertices[i+1][1] <= point[1])):  # a downward crossing
-            # compute the actual edge-ray intersect x-coordinate
-            vt = (point[1] - vertices[i][1]) / float(vertices[i+1][1] - vertices[i][1])
-            if point[0] < vertices[i][0] + vt * (vertices[i+1][0] - vertices[i][0]): # coords[0] < intersect
-                cn += 1  # a valid crossing of y=coords[1] right of coords[0]
+      tmpPoint=isyUtils.getXYpos(isyUtils._relativeNullPoint,point)
+      vi=isyUtils.getXYpos(isyUtils._relativeNullPoint,vertices[i])
+      vii=isyUtils.getXYpos(isyUtils._relativeNullPoint,vertices[i+1])
+      if ((vi[1] <= tmpPoint[1] and vii[1] > tmpPoint[1])   # an upward crossing
+        or (vi[1] > tmpPoint[1] and vii[1] <= tmpPoint[1])):  # a downward crossing
+        # compute the actual edge-ray intersect x-coordinate
+        vt = (tmpPoint[1] - vi[1]) / float(vii[1] - vi[1])
+        if tmpPoint[0] < vi[0] + vt * (vii[0] - vi[0]): # coords[0] < intersect
+          cn += 1  # a valid crossing of y=coords[1] right of coords[0]
 
     return cn % 2 == 1   # 0 if even (out), and 1 if odd (in)
 
@@ -671,7 +673,10 @@ class Way(object):
     
     result=distanceResult(sys.float_info.max,(self.id,self.__class__))
     for s in self._sides():
-      dist=self._distPointLine(point[0],point[1],s[0][0],s[0][1],s[1][0],s[1][1])
+      tmpPoint=isyUtils.getXYpos(isyUtils._relativeNullPoint,point)
+      s0=isyUtils.getXYpos(isyUtils._relativeNullPoint,s[0])
+      s1=isyUtils.getXYpos(isyUtils._relativeNullPoint,s[1])
+      dist=self._distPointLine(tmpPoint[0],tmpPoint[1],s0[0],s0[1],s1[0],s1[1])
       if dist<result.distance:
         result.distance=dist
         result.nearestSubObj=[(s,self.osmObj.nodes[self.refs[0]].__class__)]
@@ -683,10 +688,7 @@ class Relation(object):
   
   def __init__(self, identifier, members, tags, osmObj):
     """
-      Basic class containing an osm Relation
-      
-      Parameters
-      ==========      
+      Basic class containing an osm Relation.
       
       @param identifier: The id of the relation.
       @type identifier: any type      
@@ -836,6 +838,21 @@ class Relation(object):
       @type polyList: A list of lists that contain way Ids.
     """
     self.polygons=polyList
+    
+  def hasMember(self, memId):
+    """
+      Function to query if the given member is present in the relation
+      
+      @param memId: The member id that is to be tested.
+      @type memId: Any type
+      
+      @return: True if this relation has got a member of the given id, else False
+      @rtype: Boolean
+    """
+    for mem in self.members:
+      if mem[1] == memId:
+        return True
+    return False
    
   def __eq__(self,other):   
     """
@@ -870,9 +887,6 @@ class distanceResult(object):
   def __init__(self, distance, nearestObj, nearestSubObj=[("-1",None)]):
     """
     Basic class containing the result of a distance calculation
-
-    Parameters
-    ==========
     
     @param distance: The distance to the nearestObj
     @type distance: float

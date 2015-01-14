@@ -7,10 +7,12 @@ Created on Thu Nov  6 12:53:23 2014
 
 import unittest
 from isySUR import osmData
+from isySUR import isyUtils
 
 class TestRelationObject(unittest.TestCase):
   
   def setUp(self):
+    isyUtils._relativeNullPoint=(0.0,0.0)
     self.id = "0001"
     self.members = [("way",8125151,"outer"),("way",249285853,"inner")]
     self.tags = {"name":"Tween Pond", "natural":"water"}
@@ -158,13 +160,17 @@ class TestRelationObject(unittest.TestCase):
   def test_searchForPolygonsNoRealtion(self):
     with self.assertRaises(TypeError):
       self.testOSM6.relations[1]._searchForPolygons("asd")
+      
+  def test_hasMember(self):
+    self.assertEqual(self.testOSM5.relations[1].hasMember(2),True)
+    self.assertFalse(self.testOSM5.relations[1].hasMember("asdas"),True)
   #========================================================
   
   #========================================================
   #Tests for isInside
   #========================================================
   def test_getDistanceTwoSubObjects(self):
-    trueObj=osmData.distanceResult(1.41421356,(1,self.relType),[(1,self.wayType),(2,self.wayType)])
+    trueObj=osmData.distanceResult(157298.23724382,(1,self.relType),[(1,self.wayType),(2,self.wayType)])
     result=self.testOSM8.relations[1].getDistance((8.0,8.0))
     
     self.assertEqual(trueObj.nearestObj, result.nearestObj)
@@ -172,7 +178,7 @@ class TestRelationObject(unittest.TestCase):
     self.assertEqual(trueObj.nearestSubObj, result.nearestSubObj)
     
   def test_getDistance(self):
-    trueObj=osmData.distanceResult(0.72760688,(1,self.relType),[(1,self.wayType)])
+    trueObj=osmData.distanceResult(80869.34315684,(1,self.relType),[(1,self.wayType)])
     result=self.testOSM8.relations[1].getDistance((8.0,6.0))
     
     self.assertEqual(trueObj.nearestObj, result.nearestObj)
@@ -180,7 +186,7 @@ class TestRelationObject(unittest.TestCase):
     self.assertEqual(trueObj.nearestSubObj, result.nearestSubObj)
     
   def test_getDistanceWithSubRelation(self):
-    trueObj=osmData.distanceResult(0.72760688,(2,self.relType),[(1,self.relType)])
+    trueObj=osmData.distanceResult(80869.34315684,(2,self.relType),[(1,self.relType)])
     result=self.testOSM8.relations[2].getDistance((8.0,6.0))
     
     self.assertEqual(trueObj.nearestObj, result.nearestObj)

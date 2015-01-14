@@ -90,7 +90,7 @@ class TestKMLCalculator(unittest.TestCase):
     stop = Queue()
     self.kmlCalcObj._computeKMLs(surFilePath, kmlList, stop)
     self.assertIsNotNone(kmlList)
-    self.assertEqual(kmlList.qsize(), 4)
+    self.assertEqual(kmlList.qsize(), 5)
   
 
 if __name__ == '__main__':
