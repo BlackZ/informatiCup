@@ -1,11 +1,10 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec 22 18:36:46 2014
 Main entrance point for the informatiCup program.
-Name should change once a final name for the program has been found.
-@author: adreyer & jpoeppel
 """
+#@author: adreyer & jpoeppel
+
 
 import isySUR.program
 import argparse

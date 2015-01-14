@@ -3,7 +3,7 @@
 Module containing the osm-data classes OSM, Node, Way and Relation.  
 Furthermore provides query functionality for closest elements.
 """
-#@author: adreyer
+#@author: adreyer, tschodde, jpoeppel
 
 
 import sys

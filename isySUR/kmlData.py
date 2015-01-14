@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Module containg the KMLObject and Placemark. These classes hold all the required information for creating
+Module containing the KMLObject and Placemark. These classes hold all the required information for creating
 and parsing a kml-xml.
 """
 #@author: jpoeppel & adreyer
