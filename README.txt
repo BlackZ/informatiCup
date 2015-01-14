@@ -16,11 +16,11 @@ For the command line version type:
  
 For the GUI version type:
  $ python run_isySUR.py gui
+When GUI could not be loaded, command line version is used.
  
 When just tiping
  $ python run_isySUR.py
-the GUI version is used as default. When GUI could not be loaded, command line
-version is used.
+the GUI version is used as default.
 
 For more information about optional and required parameters (cli/gui, inPath,
 outPath) check the help parameter (-h) or the manual.
