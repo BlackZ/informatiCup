@@ -1,7 +1,7 @@
 ===============================================================================
 isySUR
 ===============================================================================
-12/01/2015
+14/01/2015
 
 -------------------------------------------------------------------------------
 General usage
@@ -14,12 +14,13 @@ tools.
 For the command line version type:
  $ python run_isySUR.py cli {inPath} {outPath}
  
-For the gui version type:
+For the GUI version type:
  $ python run_isySUR.py gui
  
 When just tiping
  $ python run_isySUR.py
-the gui version is used as default.
+the GUI version is used as default. When GUI could not be loaded, command line
+version is used.
 
 For more information about optional and required parameters (cli/gui, inPath,
 outPath) check the help parameter (-h) or the manual.
@@ -33,9 +34,9 @@ Requirements for command line version:
 - requests (HTTP library)
 - internet connection
 
-Further requirements for the gui verson:
+Further requirements for the GUI verson:
 - futures
-- kivy (http://kivy.org)
+- Kivy (http://kivy.org)
 
 Because isySUR is in Python you do not need to make an installation. Just
 browse into the directory and call the script run_isySUR.py with Python.
