@@ -25,7 +25,7 @@ class KMLCalculator:
     self.osm = None
     self.heightBBox = 60
     self.widthBBox = 60
-    self.maxDistance = 8.0
+    self.maxDistance = 10.0
     self.allObjects = {}
     self.certainStyle = {"Style":{"polyColour":"9900ff00"}}
     self.uncertainStyle = {"StyleUncertain":{"polyColour":"99ff0000"}}
@@ -179,8 +179,10 @@ class KMLCalculator:
           except:
             print "Polygon data could not be loaded."
             
-          buildings = landUseData.getNearestWay(coords, True, {"building":"*"})
-
+          if surObj.classification in ["I","IO"]:
+            buildings = landUseData.getNearestWay(coords, True, {"building":"*"})
+          else:
+            buildings = landUseData.getNearestWay(coords, True)
           if len(buildings) > 1:
             print "more than one potential building."
           
@@ -341,38 +343,28 @@ class KMLCalculator:
     if len(nearWays) == 0:
       nearWays = self.osm.getNearestWay(coords, False)
 
-    nearObj = []
+    nearObjs = nearWays[:]
     
     if len(nearRelations) > 0 and len(nearWays) >0:
       if nearRelations[0].distance == nearWays[0].distance:
-        nearObj = nearRelations
-
-##         
-#    if len(nearestLanduses) > 0:
-#      for nearLanduse in nearestLanduses:
-#        landuse = self.osm.ways[nearLanduse.nearestObj[0]]
-#        if landuse.isInside(coords):
-#          nearObj.append(nearLanduse)
-#          wayAdded = False
-#          for way in nearWays:
-#            inside = True
-#            wayObj = self.osm.ways[way.nearestObj[0]]
-#            for ref in wayObj.refs[:-1]:
-#              if not landuse.isInside((self.osm.nodes[ref].lat,self.osm.nodes[ref].lon)):
-#                inside = False
-#                break
-#            print "way distance:", wayObj.id, way.distance
-#            if inside and way.distance < self.maxDistance:
-#              nearObj.append(way)
-#              wayAdded = True
-#          if not wayAdded:
-#            nearObj.append(nearLanduse)
-#        else:
-#          nearObj += nearWays
-#    else:
-#        nearObj += nearWays    
-      
-    return nearObj + nearWays
+        nearObjs += nearRelations
+        
+    landuseObjs = []
+    for nearWay in nearWays:
+      way = self.osm.ways[nearWay.nearestObj[0]]
+      if not way.isInside(coords) and nearWay.distance > self.maxDistance*2:
+        print "way too far away", way.id, nearWay.distance
+        nearLanduses = self.osm.getNearestWay(coords, True, tags={"landuse":"*"})
+        for nearLanduse in nearLanduses:
+          landuse = self.osm.ways[nearLanduse.nearestObj[0]]
+          if landuse.isInside(coords):
+            if nearLanduse not in landuseObjs:
+              landuseObjs.append(nearLanduse)
+    
+    if len(landuseObjs) > 0:
+      return landuseObjs
+    else:      
+      return nearObjs
   
   def _createBBox(self, coords):
     """

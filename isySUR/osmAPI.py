@@ -147,6 +147,7 @@ class osmAPI():
       @rtype: osmData.OSM
     """
     print "length data", len(obj)
+#    print obj
     osmObj = osmData.OSM()
     
     root=ET.fromstring(obj)
