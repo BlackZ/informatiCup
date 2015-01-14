@@ -4,6 +4,7 @@ import requests
 import osmData
 import types
 
+
 #import xml.dom.minidom as dom
 import xml.etree.cElementTree as ET
 
@@ -145,7 +146,7 @@ class osmAPI():
       @return: The parsed osm data in the OSM data structur
       @rtype: osmData.OSM
     """
-    print obj
+#    print obj
     osmObj = osmData.OSM()
     
     root=ET.fromstring(obj)

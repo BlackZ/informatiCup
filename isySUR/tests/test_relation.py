@@ -160,6 +160,10 @@ class TestRelationObject(unittest.TestCase):
   def test_searchForPolygonsNoRealtion(self):
     with self.assertRaises(TypeError):
       self.testOSM6.relations[1]._searchForPolygons("asd")
+      
+  def test_hasMember(self):
+    self.assertEqual(self.testOSM5.relations[1].hasMember(2),True)
+    self.assertFalse(self.testOSM5.relations[1].hasMember("asdas"),True)
   #========================================================
   
   #========================================================

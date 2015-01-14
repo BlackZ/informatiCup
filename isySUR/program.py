@@ -11,6 +11,7 @@ import kmlData as kml
 import sur
 import os
 import sys
+from isySUR import isyUtils
 
 from Queue import Queue
 
@@ -24,7 +25,7 @@ class KMLCalculator:
     self.osm = None
     self.heightBBox = 60
     self.widthBBox = 60
-    self.maxDistance = 0.00010
+    self.maxDistance = 8.0
     self.allObjects = {}
     self.certainStyle = {"Style":{"polyColour":"9900ff00"}}
     self.uncertainStyle = {"StyleUncertain":{"polyColour":"99ff0000"}}
@@ -128,7 +129,7 @@ class KMLCalculator:
     print "working on sur: ", surObj.id
     coords = (surObj.latitude, surObj.longitude)
     
-
+    isyUtils._relativeNullPoint = (surObj.latitude, surObj.longitude)
     
     kmlObj = kml.KMLObject(surObj.id+".kml")
     
@@ -143,7 +144,8 @@ class KMLCalculator:
     
 
     print "number nearObjs", len(nearObjs)
-    usedStyle = self.certainStyle
+#    usedStyle = self.certainStyle
+    usedStyle = {}
     possibleWays = []
     for obj in nearObjs:
       tmpObj = obj.nearestObj
@@ -154,51 +156,53 @@ class KMLCalculator:
         for mem in tmpRel.members:
           if mem[2] == "outer":
             tmpWay = self.osm.ways[mem[1]]
+            usedStyle[tmpWay.id] = self.certainStyle
             print "using way from relation", tmpRel.id, mem[1]
       if tmpObj[1] == osmData.Way:
         tmpWay = self.osm.ways[tmpObj[0]]
+        usedStyle[tmpWay.id] = self.certainStyle
         print "using way", tmpObj[0]
         
       if tmpWay != None and tmpWay.tags.has_key("landuse"):
-
-        if tmpWay.tags["landuse"] == "commercial":
-          usedStyle = self.uncertainStyle    
+#        print "is landuse"
+        if tmpWay.tags["landuse"] in ["commercial", "industrial"]:
+          usedStyle[tmpWay.id] = self.uncertainStyle    
           
         if tmpWay.tags["landuse"] == "residential":
           print "is residential landuse, searching for buildings"
-          
+          usedStyle[tmpWay.id] = self.uncertainStyle
           polyString = self._createPolyString(tmpWay)
 #          print polyString
-          landUseData = self.osmAPI.getDataFromPoly(polyString)    
-          
+          landUseData = osmData.OSM()
+          try:
+            landUseData = self.osmAPI.getDataFromPoly(polyString)    
+          except:
+            print "Polygon data could not be loaded."
+            
           buildings = landUseData.getNearestWay(coords, True, {"building":"*"})
-#          
-#          otherWayIds = self.osm.ways.keys()
-#          otherWayIds.remove(tmpWay.id)
-#          buildings = self.osm.getNearestWay(coords, True, {"building":"*"}, otherWayIds)
 
           if len(buildings) > 1:
             print "more than one potential building."
-          usedStyle = self.uncertainStyle
+          
           for build in buildings:
             tmpBuild = build.nearestObj
-            print "tempBuild:", tmpBuild[0]
+#            print "tempBuild:", tmpBuild[0]
             if build.distance < self.maxDistance:
 #            if self.osm.ways.has_key(tmpBuild[0]):
-              print "distance below threshold, adding building:", tmpBuild[0]
+#              print "distance below threshold, adding building:", tmpBuild[0]
               tmpWay = self.osm.ways[tmpBuild[0]]
-              usedStyle = self.certainStyle
+              usedStyle[tmpWay.id] = self.certainStyle
               possibleWays.append(tmpWay)
               #Set to None to prevent adding it multiple times
               tmpWay = None    
         
-      print "tmpway:", tmpWay
-      if tmpWay != None:
-        print "tmpWay id:", tmpWay.id
+
+#      if tmpWay != None:
+#        print "tmpWay id:", tmpWay.id
                      
       
       if tmpWay != None and not tmpWay in possibleWays:
-        print "adding way:", tmpWay.id
+#        print "adding way:", tmpWay.id
         possibleWays.append(tmpWay)
 
 
@@ -215,22 +219,30 @@ class KMLCalculator:
     
     # Prefer buildings if rule is applicable indoor
     if buildingsIncluded and surObj.classification in ["I","IO"]:
+#      print "reducing possible ways"
       possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop", "landuse"}]
       
-    print "number possible ways:", len(possibleWays)
-    bestWay = None
-    closestDist = sys.float_info.max
-    for way in possibleWays:
-      dist = 0
-      for ref in way.refs:
-        dist += self.osm.nodes[ref].getDistance(coords).distance
-      dist /= len(way.refs)
-      print "dist for", way.id, dist
-      if dist < closestDist:
-        closestDist = dist
-        bestWay = way
+ 
+          
+      
+#    print "number possible ways:", len(possibleWays)
+    if len(possibleWays) > 1:
+      bestWay = None
+      closestDist = sys.float_info.max
+      
+      for way in possibleWays:
+        dist = 0
+        for ref in way.refs:
+          dist += self.osm.nodes[ref].getDistance(coords).distance
+        dist /= len(way.refs)
+#        print "dist for", way.id, dist
+        if dist < closestDist:
+          closestDist = dist
+          bestWay = way
+    else:
+      bestWay = possibleWays[0]
             
-    print "best way:", bestWay.id
+#    print "best way:", bestWay.id
     points = []  
     for ref in bestWay.refs[:-1]:
       points.append(self.osm.nodes[ref].getCoordinateString())
@@ -243,14 +255,14 @@ class KMLCalculator:
       placemark = kml.Placemark(placemarkName, surObj.id + ".jpg",
                           rule,
                           pointList=points, 
-                          style="#"+usedStyle.keys()[0],
+                          style="#"+usedStyle[bestWay.id].keys()[0],
                           ruleCoords = coords)
       kmlObj.addPlacemark(placemark)
     else:
       print "Error: No polygon found for SUR %s." % surObj.id
       return None
       
-    kmlObj.addStyles(usedStyle)
+    kmlObj.addStyles(usedStyle[bestWay.id])
     
     return kmlObj
     
@@ -321,25 +333,46 @@ class KMLCalculator:
       
       @return: A list of nearstObjects (see osmData.getNearestX for more details)
     """
-#    nearRelations = self.osm.getNearestRelation(coords, tags=tags)
+    nearRelations = self.osm.getNearestRelation(coords, tags=tags)
     nearWays = self.osm.getNearestWay(coords, True, tags=tags)
+#    nearestLanduses = self.osm.getNearestWay(coords, True, tags={"landuse":"residential"})
     if len(nearWays) == 0:
-#      print "no polygons with tags"
       nearWays = self.osm.getNearestWay(coords, True)
     if len(nearWays) == 0:
-#      print "no polygons"
       nearWays = self.osm.getNearestWay(coords, False)
-#    if nearObj.distance == "-1":    
-#      nearObj = self.osm.getNearestNode(coords)
-#      
-    return nearWays
-  
-  def _createDictionary(self):
-    self.allObjects.update({self.osm.relations.__class__:self.osm.relations})
-    self.allObjects.update({self.osm.ways[0].__class__:self.osm.ways})
-    self.allObjects.update({self.osm.nodes[0].__class__:self.osm.nodes})
+
+    nearObj = []
     
-    print self.allObjects
+    if len(nearRelations) > 0 and len(nearWays) >0:
+      if nearRelations[0].distance == nearWays[0].distance:
+        nearObj = nearRelations
+
+##         
+#    if len(nearestLanduses) > 0:
+#      for nearLanduse in nearestLanduses:
+#        landuse = self.osm.ways[nearLanduse.nearestObj[0]]
+#        if landuse.isInside(coords):
+#          nearObj.append(nearLanduse)
+#          wayAdded = False
+#          for way in nearWays:
+#            inside = True
+#            wayObj = self.osm.ways[way.nearestObj[0]]
+#            for ref in wayObj.refs[:-1]:
+#              if not landuse.isInside((self.osm.nodes[ref].lat,self.osm.nodes[ref].lon)):
+#                inside = False
+#                break
+#            print "way distance:", wayObj.id, way.distance
+#            if inside and way.distance < self.maxDistance:
+#              nearObj.append(way)
+#              wayAdded = True
+#          if not wayAdded:
+#            nearObj.append(nearLanduse)
+#        else:
+#          nearObj += nearWays
+#    else:
+#        nearObj += nearWays    
+      
+    return nearObj + nearWays
   
   def _createBBox(self, coords):
     """

@@ -846,6 +846,21 @@ class Relation(object):
       @type polyList: A list of lists that contain way Ids.
     """
     self.polygons=polyList
+    
+  def hasMember(self, memId):
+    """
+      Function to query if the given member is present in the relation
+      
+      @param memId: The member id that is to be tested.
+      @type memId: Any type
+      
+      @return: True if this relation has got a member of the given id, else False
+      @rtype: Boolean
+    """
+    for mem in self.members:
+      if mem[1] == memId:
+        return True
+    return False
    
   def __eq__(self,other):   
     """
