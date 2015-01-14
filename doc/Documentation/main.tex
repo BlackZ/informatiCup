@@ -116,7 +116,7 @@ Welcome to isySUR (pronounce isy as ['i:zi]), a tool helping you to find the are
 \section{Quick start}
 First decide if you like to use the command line version of \pt\ or if you prefer a graphical user interface. Please proceed with section \ref{sec:QuickstartTerminal} or section \ref{sec:QuickstartWindow} depending on your choice.
 
-You can leave out \texttt{python} if you have installed the program before. For installation instructions see section \ref{sec:installation}. For additional parameters see section \ref{sec:cli}.
+For installation instructions see section \ref{sec:installation}. For additional parameters see section \ref{sec:cli}.
 
 For information about input and output file types see section \ref{sec:io}.
 
@@ -200,7 +200,7 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 		\item Kivy
 		\item concurrent.futures
 	\end{itemize}
-	For the graphical user interface Kivy is used. Kivy\footnote{\url{http://kivy.org}} is a cross-platform Python Framework for NUI Development. For installation on Ubuntu we recommend the installation with apt-get as described on their web page. For use on Windows and starting Kivy applications from the command line we recommend to install Kivy and pygame (needed for Kivy) with the unofficial precompiled binaries\footnote{Kivy: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#kivy}}\footnote{pygame: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#pygame}} On MacOSX the easiest way to run Kivy is as Launcher as mentioned on the Kivy web site\footnote{\url{http://kivy.org/docs/installation/installation-macosx.html}}.
+	For the graphical user interface Kivy is used. Kivy\footnote{\url{http://kivy.org}} is a cross-platform Python Framework for NUI Development. For installation on Ubuntu we recommend the installation with apt-get as described on their web page. For use on Windows and starting Kivy applications from the command line we recommend to install Kivy and pygame (needed for Kivy) with the unofficial precompiled binaries\footnote{Kivy: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#kivy}}\footnote{pygame: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#pygame}}. On MacOSX the easiest way to run Kivy applications, like \pt, is with the Kivy launcher as mentioned on the Kivy web site\footnote{\url{http://kivy.org/docs/installation/installation-macosx.html}}.
 	
 On all OS futures can be installed via pip
 \begin{verbatim}
@@ -337,7 +337,7 @@ Of course calculating SURs at home is nice but in general you would like to know
 %----------------------------------------------------------------------------------------
 
 \chapter{Technical and implementation details}
-In this chapter the implemented algorithm to calculate the intended areas of application is explained in section \ref{sec:algorithm}. You will gain an insight into the development and learn some implementation details. After that an evaluation of the achieved results follows.
+In this chapter you will gain an insight into the development and learn some implementation details. The implemented algorithm to calculate the intended areas of application is explained in section \ref{sec:algorithm}. After that an evaluation of the achieved results follows in section \ref{sec:evaluation}.
 
 \todol{Code documentation -> pydoc?}
 
@@ -375,14 +375,20 @@ Furthermore, our data structure splits our program into nice modular chunks that
 
 Our main focus lies upon the coordinate of the SUR. In a bounding box (currently 100m\todo{this is not up to date is it?} might be reduced further) around the given coordinates, we start by searching for the closest OSM relations and ways (we omit nodes for now, since they hardly provide any connectivity information, necessary to be able to construct reasonable polygons). We use a bounding box of limited size because we want to reduce the amount of data that we need to request from OSM and we work on the assumption that these coordinates should always relatively close to the intended area. Unfortunately some coordinates (at least in the test data) are quite far away from the intended area, which can lead to finding unintended polygons that are closer to the coordinates. Furthermore the OSM data is not complete and even some elements from the test data are not present in OSM, which means, that we have no way of ever finding the intended polygon.
 
-\section{Evaluation}
+\section{Evaluation}\label{sec:evaluation}
 \todol{Berechnen Sie nun die Geltungsbereiche der Space Usage Rules aus Ihrer Umgebung mit Ihrer Implementierung aus der ersten Runde.
 Diskutieren Sie die Korrektheit und die Präzision der von Ihnen berechneten Lösungen für die Space
 Usage Rules des Testdatensatzes und denen aus Ihrer Umgebung. Vergleichen Sie dazu die berechneten mit den intuitiv beabsichtigten Geltungsbereichen.}
 
 \section{Further Work}
-\todol{do further work}
-%TODO Problem: Auf dem android device müsste man immer noch an die txt irgendwie kommen. Sollte evtl etwas defensiver formuliert werden. Vl etwas für further impromvements: Allow clicking on map to start calculating from there?
+Our major focus of future work will be the development of the GUI. Most of all we like to implement a possibility to list up all placemarks of one KML similar to Google Earth, so that the user can jump to every placemark on the map he or she likes and not only to the last one of each KML. Furthermore the user should be able to display the rules that are applied in any polygon when clicking on it.
+Another improvement of the GUI should be the opportunity to load several KMLs at once, because currently the user can only load one KML file at a time.
+
+For a better usability on mobile devices it should be implemented that a click anywhere on the map adds a new SUR and the program calculates the corresponding area. 
+
+To improve the calculation of our KMLs we think about using multiple data sources because OpenStreetMap sometimes has a lack of data information.
+
+In order to improve \pt\ and make it available for others, we are going to make our repository public after the competition.
 
 %----------------------------------------------------------------------------------------
 %	Own SURs
