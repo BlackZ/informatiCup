@@ -283,6 +283,9 @@ class KMLCalculator:
     
     @param way: Way which vertices will be extracted.
     @type way: osmData.Way
+    
+    @return: A string containing all the vertices coordinates of the polygon as lat1 lon1 lat2 lon2...
+    @rtype: String
     """
     res = ""
     for ref in way.refs[:-1]:
