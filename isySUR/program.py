@@ -14,8 +14,6 @@ import os
 import sys
 from isySUR import isyUtils
 
-from Queue import Queue
-
 class KMLCalculator:
   def __init__(self):
     """
