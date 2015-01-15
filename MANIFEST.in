@@ -2,10 +2,13 @@ recursive-include isySUR/tests test_*.py
 include run_tests.py
 include surConfig.cfg
 
-# TODO chance this to manual.pdf in main directory when finished
+# TODO manual.pdf in doc directory when finished
 include doc/Documentation/main.pdf
+# TODO add pydoc file in doc directory
 
 recursive-include data *.txt *.jpg *.truth.kml
 
 recursive-include testData/dataOnlyForTests *
 include testData/Data.txt
+
+recursive-include android *
