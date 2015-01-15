@@ -2,9 +2,8 @@ recursive-include isySUR/tests test_*.py
 include run_tests.py
 include surConfig.cfg
 
-# TODO manual.pdf in doc directory when finished
-include doc/Documentation/main.pdf
-# TODO add pydoc file in doc directory
+include doc/isySUR_Manual.pdf
+include doc/isySUR_API.pdf
 
 recursive-include testData/dataOnlyForTests *
 include testData/Data.txt
