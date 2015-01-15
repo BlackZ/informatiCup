@@ -76,7 +76,7 @@ def dealWithImportError():
   pathout = raw_input("Path for output: ")
   if (pathout=="exit"):
     sys.exit()
-  if (os.path.exists(pathout) or (os.path.exists(os.path.basename(pathout)))):
+  if (os.path.exists(pathout) or (os.path.exists(os.path.dirname(pathout))) or (os.path.dirname(pathout)=="")):
     isySUR.program.KMLCalculator().computeKMLsAndStore(pathin, pathout)
   else:
     print "output directory does not exist." 
@@ -89,7 +89,7 @@ def cli(args):
     @type argparse.Namespace
   """
   if os.path.isfile(args.input):
-    if (os.path.exists(args.output) or (os.path.exists(os.path.basename(args.output)))):
+    if (os.path.exists(args.output) or (os.path.exists(os.path.dirname(args.output))) or (os.path.dirname(args.output)=="")):
       isySUR.program.KMLCalculator().computeKMLsAndStore(args.input, args.output, args.config)
     else:
       print "output directory does not exist."
