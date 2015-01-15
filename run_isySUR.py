@@ -68,6 +68,7 @@ def dealWithImportError():
   """
   print "You can still use the command line version. Just give the SUR file and output path. Or type 'exit' to close."
   pathin = raw_input("SUR file: ")
+  pathin = os.path.expanduser(pathin)
   if (pathin=="exit"):
     sys.exit()
   if not (os.path.isfile(pathin)):
