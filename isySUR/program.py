@@ -157,6 +157,7 @@ class KMLCalculator:
     for obj in nearObjs:
       tmpObj = obj.nearestObj
       tmpWay = None
+      #Only relations that provide outer boundaries for polygons are useful
       if tmpObj[1] == osmData.Relation:
         tmpRel = self.osm.relations[tmpObj[0]]
         for mem in tmpRel.members:
@@ -168,24 +169,31 @@ class KMLCalculator:
         
         usedStyle[tmpWay.id] = self.certainStyle
 
+      #When we find landuse ways we analyse further
       if tmpWay != None and tmpWay.tags.has_key("landuse"):
+        #Commercial and industrials landuses seem unlikely-> mark with uncertain style
         if tmpWay.tags["landuse"] in ["commercial", "industrial"]:
           usedStyle[tmpWay.id] = self.uncertainStyle    
           
+        #Residential areas are searched for ways inside the residential area 
         if tmpWay.tags["landuse"] == "residential":
           usedStyle[tmpWay.id] = self.uncertainStyle
           polyString = self._createPolyString(tmpWay)
           landUseData = osmData.OSM()
           try:
+            #Query osm inside the polygon
             landUseData = self.osmAPI.getDataFromPoly(polyString)    
           except:
             print "Polygon data could not be loaded."
             
+          #Search for closest ways according to rule classification
           if surObj.classification in ["I","IO"]:
             buildings = landUseData.getNearestWay(coords, True, {"building":"*"})
           else:
             buildings = landUseData.getNearestWay(coords, True)
           
+          #If closest buildings inside the polygon are close enough to SUR coordinates, we take
+          #them over the landuse area
           for build in buildings:
             tmpBuild = build.nearestObj
             if build.distance < self.maxDistance:
@@ -215,6 +223,8 @@ class KMLCalculator:
     if buildingsIncluded and surObj.classification in ["I","IO"]:
       possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop"}]
       
+    #Use a disciminating size feature that favours smaller polygons
+    #to decide in the end
     if len(possibleWays) > 1:
       bestWay = None
       closestDist = sys.float_info.max
@@ -230,6 +240,7 @@ class KMLCalculator:
     else:
       bestWay = possibleWays[0]
             
+    #Build the placemark and assamble the kml
     points = []  
     for ref in bestWay.refs[:-1]:
       points.append(self.osm.nodes[ref].getCoordinateString())
@@ -339,18 +350,21 @@ class KMLCalculator:
 
     nearObjs = nearWays[:]
     
+    #Only use relations that share ways to the closest ways, identified by their distance.
     if len(nearRelations) > 0 and len(nearWays) > 0:
       if nearRelations[0].distance == nearWays[0].distance:
         nearObjs += nearRelations
         
+    #We search for landuses if we are not inside the closest way and the closest way is further than a
+    #threshold away.
     landuseObjs = []
     for nearWay in nearWays:
       way = self.osm.ways[nearWay.nearestObj[0]]
       if not way.isInside(coords) and nearWay.distance > self.maxDistance*2:
-        print "way too far away", way.id, nearWay.distance
         nearLanduses = self.osm.getNearestWay(coords, True, tags={"landuse":"*"})
         for nearLanduse in nearLanduses:
           landuse = self.osm.ways[nearLanduse.nearestObj[0]]
+          #Only use closest landuse if we are inside of them
           if landuse.isInside(coords):
             if nearLanduse not in landuseObjs:
               landuseObjs.append(nearLanduse)
