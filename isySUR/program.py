@@ -143,9 +143,10 @@ class KMLCalculator:
     isyUtils._relativeNullPoint = (surObj.latitude, surObj.longitude)
     
     kmlObj = kml.KMLObject(surObj.id+".kml")
-    
+    #Request osm data
     self.osm = self._getOSMData(surObj, coords)  
-
+    
+    #Search for closest osm objects
     if surObj.classification in ["I"]:
       nearObjs = self._getNearestObj(coords, {"building":"*"})
     else:
@@ -154,6 +155,7 @@ class KMLCalculator:
 
     print "number nearObjs", len(nearObjs)
 
+    #Analyse closest elements
     usedStyle = {}
     possibleWays = []
     for obj in nearObjs:
