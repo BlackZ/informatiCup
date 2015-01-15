@@ -1,0 +1,46 @@
+===============================================================================
+Building an apk
+===============================================================================
+
+For building an apk, buildozer is used. Buildozer needs python-for-android. For
+more information see http://buildozer.readthedocs.org/en/latest/.
+
+The needed files are found in this directory:
+- buildozer.spec
+- main.py
+- recipe.sh
+- setup.py
+
+-------------------------------------------------------------------------------
+buildozer.spec
+-------------------------------------------------------------------------------
+This is the file uses to configurate buildozer. For packaging it should be in
+the main directory where buildozer is called.
+
+-------------------------------------------------------------------------------
+main.py
+-------------------------------------------------------------------------------
+This is the entry point for android. It replaces run_isySUR.py (entry point for
+running on computer) in the main directory.
+
+-------------------------------------------------------------------------------
+recipe.sh
+-------------------------------------------------------------------------------
+To include Python packages into an apk they must be known to
+python-for-android. To use own packages like isySUR python-for-android has to
+learn them. For this a recipe file is necessary. The recipe.sh and the sources
+have to been put into the recipes directory of python-for-android.
+
+-------------------------------------------------------------------------------
+setup.py
+-------------------------------------------------------------------------------
+This file is also needed in the recipes directory of python-for-android to tell
+the system how to build the package.
+
+===============================================================================
+
+When putting every file in the right place, an apk is build with
+$ buildozer android debug
+or
+$buildozer android release
+and can be installed to any android device with android 2.2 or higher.
