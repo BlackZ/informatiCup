@@ -167,8 +167,7 @@ class KMLCalculator:
         tmpWay = self.osm.ways[tmpObj[0]]
         
         usedStyle[tmpWay.id] = self.certainStyle
-        print "using way", tmpObj[0]
-        
+
       if tmpWay != None and tmpWay.tags.has_key("landuse"):
         if tmpWay.tags["landuse"] in ["commercial", "industrial"]:
           usedStyle[tmpWay.id] = self.uncertainStyle    

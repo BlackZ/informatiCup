@@ -36,6 +36,18 @@ class KMLObject():
         self.addPlacemark(p)
         
   def getStyle(self, styleName):
+    """
+      Function to get the style with the given name of this kmlObject. If the
+      kml does not have a style of the given name, a default style (white) is returned.
+      
+      @param styleName: Name of the style to be returned.
+      @type styleName: String
+      
+      @return: A dictionary containing the polygon Colour, the lineColour and the lineWidth of the 
+              requested style, or of the default style if there is no style of the given name.
+      @rtype: {"polyColour": String, "lineColour": String, "lineWidth": String}
+      
+    """
     if self.styles.has_key(styleName):
       return self.styles[styleName]
     else:
