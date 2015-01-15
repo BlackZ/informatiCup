@@ -6,9 +6,8 @@ include surConfig.cfg
 include doc/Documentation/main.pdf
 # TODO add pydoc file in doc directory
 
-recursive-include data *.txt *.jpg *.truth.kml
-
 recursive-include testData/dataOnlyForTests *
 include testData/Data.txt
+include testData/isyData.txt
 
 recursive-include android *
