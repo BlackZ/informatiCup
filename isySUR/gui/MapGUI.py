@@ -40,11 +40,10 @@ class Map(FloatLayout):
   
   def __init__(self, app):
     """
-    Initializies the GUI.
-    
-    @param app: Reference to the Application
-    @type app: kivy.app
-    
+      Initializies the GUI.
+      
+      @param app: Reference to the Application
+      @type app: kivy.app
     """
     super(Map, self).__init__()
     
@@ -60,30 +59,33 @@ class Map(FloatLayout):
   
   def setStop(self):
     """
-    Indicator for stopping the SUR calculation Thread.
+      Indicator for stopping the SUR calculation Thread.
     """
     self.stop.put(True)
   
   def cleanUpCache(self):
     """
-    Triggers function to delete cache folder.
+      Triggers function to delete cache folder.
     """
     self.maps.cleanUpCache()
   
   def toast(self, text, long_duration=False):
     """
-    Shows a toast.
-    
-    @param duration: If paramter is True the toast is
-                     visible for a long time. Otherwise
-                     it has a shorter duration.
-    @type duration: Boolean
+      Shows a toast.
+      
+      @param text: The text, which should be displayed.
+      @type text: str
+      
+      @param long_duration: If paramter is True the toast is
+                       visible for a long time. Otherwise
+                       it has a shorter duration.
+      @type long_duration: Boolean
     """
     Toast(self).show(text, long_duration)
       
   def open_menu(self):
     """
-    Opens and closes the Main Menu.
+      Opens and closes the Main Menu.
     """
     if self.menu.isOpen:
       self.menu.dismiss(self.ids.menuBut)
@@ -93,7 +95,7 @@ class Map(FloatLayout):
     
   def open_kmlList(self):
     """
-    Opens and closes the KML List.
+      Opens and closes the KML List.
     """
     if len(self.app.loaded_kmls) == 0:
       self.toast("No KML files loaded!")
@@ -106,11 +108,11 @@ class Map(FloatLayout):
   
   def showPolygons(self, names):
     """
-    Shows all polygones represented by names.
-    
-    @param names: Namelist of Polygons to be displayed
-                  on the GUI Map.
-    @type names: [str]
+      Shows all polygones represented by names.
+      
+      @param names: Namelist of Polygons to be displayed
+                    on the GUI Map.
+      @type names: [str]
     """
     for name in names:
       move_to = name
@@ -119,35 +121,36 @@ class Map(FloatLayout):
   
   def hidePolygons(self, names):
     """
-    Hides all polygones represented by names.
-    
-    @param names: Namelist of Polygons to be removed
-                  from the GUI Map.
-    @type names: [str]
+      Hides all polygones represented by names.
+      
+      @param names: Namelist of Polygons to be removed
+                    from the GUI Map.
+      @type names: [str]
     """
     for name in names:
       self.maps.hidePolygon(name)
    
   def addPolygon(self, kmlObj, kmlName, first=True):
     """
-    Adds all Polygon from one KML Object to the Map.
-    
-    @param kmlObj: KML Data with Placemarks which will be displayed
-                   on the Map.
-    @type kmlObj: kmlData.KMLObject
-    
-    @param kmlName: Name of the kmlObj.
-    @type kmlName: str
-    
-    @param first:  Decides whether to jump to the first or last added
-                   Polygon. If there is only one Polygon in the KML
-                   Object and first is True, the Map moves to the Polygon.
-                   If first is False, the Map moves to the last added
-                   Polygon.
-    @type first: Boolean
-    
-    @return: Returns whether the map already moved to a polygon and the
-             name of the added Polygon to which the map moves if moved is False.
+      Adds all Polygon from one KML Object to the Map.
+      
+      @param kmlObj: KML Data with Placemarks which will be displayed
+                     on the Map.
+      @type kmlObj: kmlData.KMLObject
+      
+      @param kmlName: Name of the kmlObj.
+      @type kmlName: str
+      
+      @param first:  Decides whether to jump to the first or last added
+                     Polygon. If there is only one Polygon in the KML
+                     Object and first is True, the Map moves to the Polygon.
+                     If first is False, the Map moves to the last added
+                     Polygon.
+      @type first: Boolean
+      
+      @return: Returns whether the map already moved to a polygon and the
+               name of the added Polygon to which the map moves if moved is False.
+      @rtype: str,boolean
     """
     for placemark in kmlObj.placemarks:
       name = placemark.name
@@ -169,17 +172,17 @@ class Map(FloatLayout):
   
   def computeAndShowKmls(self, path, queue):
     """
-    Calculates all KMLs from a loaded SUR file. The names of the KMLs
-    are added to the KMLList to display all loaded KMLs. And each
-    calculated Polygon of the Placemarks in the KMLs are added to
-    the Map Layer to be displayed. When the calculation is finished,
-    the Map moves to the last added Placemark.
-    
-    @param path: Path to the SUR file
-    @type path: str
-    
-    @param queue: Queue in which all calculated KMLs are added (Thread Output)
-    @type queue: Queue.Queue
+      Calculates all KMLs from a loaded SUR file. The names of the KMLs
+      are added to the KMLList to display all loaded KMLs. And each
+      calculated Polygon of the Placemarks in the KMLs are added to
+      the Map Layer to be displayed. When the calculation is finished,
+      the Map moves to the last added Placemark.
+      
+      @param path: Path to the SUR file
+      @type path: str
+      
+      @param queue: Queue in which all calculated KMLs are added (Thread Output)
+      @type queue: Queue.Queue
     """
     toast = Toast(self)
     toast.stayVisible("Calculating ... ")
@@ -222,13 +225,13 @@ class Menu(DropDown):
   
   def __init__(self, mapview, app):
     """
-    Initializes the main menu of the GUI.
-    
-    @param mapview: Reference to the main GUI widget.
-    @type mapview: kivy.floatlayout
-    
-    @param app: Reference to the main application.
-    @type app: kivy.app
+      Initializes the main menu of the GUI.
+      
+      @param mapview: Reference to the main GUI widget.
+      @type mapview: kivy.floatlayout
+      
+      @param app: Reference to the main application.
+      @type app: kivy.app
     """
     super(Menu, self).__init__()
     self.text_input = TextInput()
@@ -252,30 +255,30 @@ class Menu(DropDown):
 
   def dismiss_load(self):
     """
-    Dismisses the load popup.
+      Dismisses the load popup.
     """
     self._load_diag.dismiss()
   
   def dismiss_save(self):
     """
-    Dismisses the save popup.
+      Dismisses the save popup.
     """
     self._save_diag.dismiss()
   
   def dismiss_config(self):
     """
-    Dismisses the config popup.
+      Dismisses the config popup.
     """
     self._cfg_diag.dismiss()    
 
   
   def show_load(self, obj):
     """
-    Creates a load popup and displays it.
-    
-    @param obj: Reference to the button which was clicked to
-                open the load popup.
-    @type obj: kivy.uix.button
+      Creates a load popup and displays it.
+      
+      @param obj: Reference to the button which was clicked to
+                  open the load popup.
+      @type obj: kivy.uix.button
     """
     self.isOpen = False
     self.dismiss()
@@ -295,11 +298,11 @@ class Menu(DropDown):
   
   def show_save(self, isConfig=False):
     """
-    Creates a save popup and displayes it.
-    
-    @param obj: Reference to the Button which was clicked to
-                open the save popup.
-    @type obj: kivy.uix.button
+      Creates a save popup and displayes it.
+      
+      @param obj: Reference to the Button which was clicked to
+                  open the save popup.
+      @type obj: kivy.uix.button
     """
     self.isOpen = False
     self.dismiss()
@@ -318,7 +321,7 @@ class Menu(DropDown):
   
   def show_config(self):
     """
-    Creates a config popup and displayes it.
+      Creates a config popup and displayes it.
     """
     self.isOpen = False
     self.dismiss()
@@ -327,13 +330,13 @@ class Menu(DropDown):
   
   def load_kml(self, path, filename):
     """
-    Loads a given kml file.
-    
-    @param path: Path to the selected files.
-    @type path: str
-    
-    @param filename: Names of selected files.
-    @type filename: [Str]
+      Loads a given kml file.
+      
+      @param path: Path to the selected files.
+      @type path: str
+      
+      @param filename: Names of selected files.
+      @type filename: [Str]
     """
     if filename != []:
       path = filename[0]
@@ -350,13 +353,13 @@ class Menu(DropDown):
   
   def load_sur(self, path, filename):
     """
-    Loads a given SUR file.
-    
-    @param path: Path to the selected files.
-    @type path: str
-    
-    @param filename: Names of selected files.
-    @type filename: [Str]
+      Loads a given SUR file.
+      
+      @param path: Path to the selected files.
+      @type path: str
+      
+      @param filename: Names of selected files.
+      @type filename: [Str]
     """
     if filename != []:
       path = filename[0]
@@ -368,13 +371,13 @@ class Menu(DropDown):
   
   def load_cfg(self, path, filename):
     """
-    Loads a given config file.
-    
-    @param path: Path to the selected files.
-    @type path: str
-    
-    @param filename: Names of selected files.
-    @type filename: [Str]
+      Loads a given config file.
+      
+      @param path: Path to the selected files.
+      @type path: str
+      
+      @param filename: Names of selected files.
+      @type filename: [Str]
     """
     if filename != []:
       path = filename[0]
@@ -384,13 +387,13 @@ class Menu(DropDown):
       
   def saveConfig(self, path, filename):
     """
-    Saves the config to the given path and filename.
-    
-    @param path: Path to store location.
-    @type path: str
-    
-    @param filename: Name of the new file.
-    @type filename: str
+      Saves the config to the given path and filename.
+      
+      @param path: Path to store location.
+      @type path: str
+      
+      @param filename: Name of the new file.
+      @type filename: str
     """
     if filename != "":
     
@@ -425,18 +428,18 @@ class Menu(DropDown):
   
   def saveKML(self, path, filename):
     """
-    Saves selected KMLs. If the given path is a directory
-    all selected KMLs are saved separately to the directory.
-    Additional a complete KML containing all KMLs is stored
-    there too.
-    When the store location is a file, all KMLs will be added
-    to one complete KML and stored with the given filename.
-    
-    @param path: Path to store location.
-    @type path: str
-    
-    @param filename: Name of the new file.
-    @type filename: str
+      Saves selected KMLs. If the given path is a directory
+      all selected KMLs are saved separately to the directory.
+      Additional a complete KML containing all KMLs is stored
+      there too.
+      When the store location is a file, all KMLs will be added
+      to one complete KML and stored with the given filename.
+      
+      @param path: Path to store location.
+      @type path: str
+      
+      @param filename: Name of the new file.
+      @type filename: str
     """
     isDir = os.path.isdir(os.path.join(path, filename))
     completeKML = kmlData.KMLObject("complete")
@@ -470,10 +473,10 @@ class Menu(DropDown):
   
   def switchMarkers(self, obj):
     """
-    Shows or unshows markers on SUR position.
-    
-    @param obj: Button which changes the marker behaviour.
-    @type obj: kivy.uix.button
+      Shows or unshows markers on SUR position.
+      
+      @param obj: Button which changes the marker behaviour.
+      @type obj: kivy.uix.button
     """
     if self.map_view.maps.markers:
       obj.background_color = (1,1,1,1)
@@ -492,11 +495,11 @@ class CustomFileChooser(FileChooserListView):
  
   def open_entry(self, entry):
     """
-    Builds the path to the selected item. If it's
-    a directory the filechooser opens it.
-    
-    @param entry: Entry to open
-    @type entry: str
+      Builds the path to the selected item. If it's
+      a directory the filechooser opens it.
+      
+      @param entry: Entry to open
+      @type entry: str
     """
     newPath = ''
     entry_path = entry.path.replace('\\', '/')
@@ -515,14 +518,14 @@ class CustomFileChooser(FileChooserListView):
 class KMLList(DropDown):
   def __init__(self, mapview, app):
     """
-    Initializes the KMLList menu, which displays
-    all loaded KML files.
-    
-    @param mapview: Reference to the main GUI Widget
-    @type mapview: kivy.floatlayout
-    
-    @param app: Reference to the main Application
-    @type app: kivy.app
+      Initializes the KMLList menu, which displays
+      all loaded KML files.
+      
+      @param mapview: Reference to the main GUI Widget
+      @type mapview: kivy.floatlayout
+      
+      @param app: Reference to the main Application
+      @type app: kivy.app
     """
     super(KMLList, self).__init__()
     self.map_view = mapview
@@ -533,7 +536,7 @@ class KMLList(DropDown):
   
   def createList(self):
     """
-    Creates the KML List.
+      Creates the KML List.
     """
     if len(self.app.loaded_kmls) != 0:
       for kml in self.app.loaded_kmls:
@@ -543,10 +546,10 @@ class KMLList(DropDown):
     
   def selectBut(self, obj):
     """
-    Hides or shows the selected KML on the Map.
-    
-    @param obj: Button which represents a loaded KML.
-    @type obj: kivy.uix.button
+      Hides or shows the selected KML on the Map.
+      
+      @param obj: Button which represents a loaded KML.
+      @type obj: kivy.uix.button
     """
     isSelected = self.app.loaded_kmls[obj.text]['selected']
     polygons = self.app.loaded_kmls[obj.text]['polygons']
@@ -565,10 +568,10 @@ class KMLList(DropDown):
         
   def addItem(self, name):
     """
-    Adds an item to the KML List.
-    
-    @param name: Name of the new item.
-    @type name: str
+      Adds an item to the KML List.
+      
+      @param name: Name of the new item.
+      @type name: str
     """
     btn = Button(text=name, size_hint_y=None, height=44,background_color=(0,0,2,1))
     btn.bind(on_release=self.selectBut)
@@ -580,20 +583,20 @@ class Toast(Label):
   
   def __init__(self, mapview):
     """
-    Initializes a new Toast.
-    
-    @param mapview: Reference to the main GUI Widget
-    @type mapview: kivy.floatlayout
+      Initializes a new Toast.
+      
+      @param mapview: Reference to the main GUI Widget
+      @type mapview: kivy.floatlayout
     """
     super(Toast, self).__init__()
     self.map_view = mapview
   
   def stayVisible(self, text):
     """
-    Displayes the toast for an unkown duration.
-    
-    @param text: Text of the toast.
-    @type text: str
+      Displayes the toast for an unkown duration.
+      
+      @param text: Text of the toast.
+      @type text: str
     """
     self.text = text
     self.texture_update()
@@ -611,7 +614,7 @@ class Toast(Label):
     
   def remove(self):
     """
-    Removes a toast after stayVisible() was called.
+      Removes a toast after stayVisible() was called.
     """
     self._duration = 100
     self._rampdown = 100
@@ -620,15 +623,15 @@ class Toast(Label):
 
   def show(self, text, length_long):
     """
-    Displayes a toast for the short or long duration.
-    
-    @param text: Text of the toast.
-    @type text: str
-    
-    @param length_long: When length_long is True, the toast
-                        is visible for a long duration, otherwise
-                        it is only visible for a short duration.
-    @type length_long: Boolean
+      Displayes a toast for the short or long duration.
+      
+      @param text: Text of the toast.
+      @type text: str
+      
+      @param length_long: When length_long is True, the toast
+                          is visible for a long duration, otherwise
+                          it is only visible for a short duration.
+      @type length_long: Boolean
     """
     duration = 5000 if length_long else 2500
     rampdown = duration * 0.1
@@ -655,10 +658,10 @@ class Toast(Label):
   
   def _in_out(self, dt):
     """
-    Decreases the time for displaying the toast.
-    
-    @param dt: Decreasing factor and clock timeout.
-    @type dt: float
+      Decreases the time for displaying the toast.
+      
+      @param dt: Decreasing factor and clock timeout.
+      @type dt: float
     """
     self._duration -= dt*1000
     if self._duration <= 0:
@@ -681,19 +684,19 @@ class ConfigDialog(FloatLayout):
   
   def __init__(self, app, save, load, cancel):
     """
-    Initilizes the config dialog.
-    
-    @param app: Reference to the main Application
-    @type app: kivy.app
-    
-    @param save: Reference to save function.
-    @type save: kivy.uix.property.ObjectProperty
-    
-    @param load: Reference to load function.
-    @type load: kivy.uix.property.ObjectProperty
-    
-    @param cancel: Reference to cancel function.
-    @type cancel: kivy.uix.property.ObjectProperty
+      Initilizes the config dialog.
+      
+      @param app: Reference to the main Application
+      @type app: kivy.app
+      
+      @param save: Reference to save function.
+      @type save: kivy.uix.property.ObjectProperty
+      
+      @param load: Reference to load function.
+      @type load: kivy.uix.property.ObjectProperty
+      
+      @param cancel: Reference to cancel function.
+      @type cancel: kivy.uix.property.ObjectProperty
     """
     super(ConfigDialog, self).__init__()
     self.auto_dismiss = False
@@ -720,7 +723,7 @@ class ConfigDialog(FloatLayout):
     
   def addConfigContent(self):
     """
-    Adds the loaded config to the Config Popup.
+      Adds the loaded config to the Config Popup.
     """
     if not self.app.isConfigEmpty():
       if self.info.parent != None:
@@ -738,7 +741,7 @@ class ConfigDialog(FloatLayout):
   
   def addContentHeader(self):
     """
-    Adds the ruleAreas to the Config Popup.
+      Adds the ruleAreas to the Config Popup.
     """
     self.layout.clear_widgets()
     label1 = Label(text='', size_hint=(.4, None))      
@@ -755,13 +758,13 @@ class ConfigDialog(FloatLayout):
   
   def addConfigEntry(self, ruleArea, rule):
     """
-    Adds one config rule to the Config Popup.
-    
-    @param ruleArea: Field of application of the rule.
-    @type ruleArea: str
-    
-    @param rule: SUR Rule of this entry.
-    @type rule: str
+      Adds one config rule to the Config Popup.
+      
+      @param ruleArea: Field of application of the rule.
+      @type ruleArea: str
+      
+      @param rule: SUR Rule of this entry.
+      @type rule: str
     """
     self.ids.save.disabled = False
     active={"[Indoor]":False,"[Outdoor]":False,"[Both]":False}
@@ -790,11 +793,11 @@ class ConfigDialog(FloatLayout):
   
   def changeRuleArea(self, *args):
     """
-    Changes the field of application of a rule.
-    
-    @param args: List of arguments from the kivy.uix.checkbox,
-                 when selecting the new rule area.
-    @type args: []
+      Changes the field of application of a rule.
+      
+      @param args: List of arguments from the kivy.uix.checkbox,
+                   when selecting the new rule area.
+      @type args: []
     """
     for value in args:
       if isinstance(value, CheckBox):
@@ -809,15 +812,15 @@ class ConfigDialog(FloatLayout):
     
   def action(self, obj):
     """
-    Changes the action of the Action Button in the Config Popup.
-    
-    Possible actions:
-      - Create new rule
-      - Add new rule to config
-      - Delete selected rules
-    
-    @param obj: Actionbutton
-    @type obj: kivy.uix.button
+      Changes the action of the Action Button in the Config Popup.
+      
+      Possible actions:
+        - Create new rule
+        - Add new rule to config
+        - Delete selected rules
+      
+      @param obj: Actionbutton
+      @type obj: kivy.uix.button
     """
     if "New" in obj.text:
       if self.app.isConfigEmpty():
@@ -880,7 +883,7 @@ class ConfigDialog(FloatLayout):
   
   def clearConfig(self):
     """
-    Clears the config popup.
+      Clears the config popup.
     """
     self.ids.save.disabled = True
     if self.app.isConfigEmpty():
@@ -890,10 +893,10 @@ class ConfigDialog(FloatLayout):
         
   def deleteEntry(self, *args):
     """
-    Adds or removes rule from the deletion list.
-    
-    @param args: List of arguments from the Checkbox when clicked.
-    @type args: []
+      Adds or removes rule from the deletion list.
+      
+      @param args: List of arguments from the Checkbox when clicked.
+      @type args: []
     """
     for value in args:
       if isinstance(value, CheckBox):
@@ -915,11 +918,11 @@ class MapApp(App):
   
   def __init__(self, configPath=""):
     """
-    Initializes main application class.
-    
-    @param configPath: Path to the config, when loaded on
-                       start up.
-    @type configPath: str
+      Initializes main application class.
+      
+      @param configPath: Path to the config, when loaded on
+                         start up.
+      @type configPath: str
     """
     super(MapApp, self).__init__()
     self.map = None
@@ -934,8 +937,8 @@ class MapApp(App):
 
   def on_stop(self):
     """
-    Stops the SUR calculation if one is running and cleans up the cache
-    when program is closed.
+      Stops the SUR calculation if one is running and cleans up the cache
+      when program is closed.
     """
     if self.map != None:
       self.map.setStop()
@@ -943,7 +946,7 @@ class MapApp(App):
   
   def on_start(self):
     """
-    Sets the icon and title of the program on start up.
+      Sets the icon and title of the program on start up.
     """
     self.map.cleanUpCache()
     self.icon = 'logo.png'
@@ -955,10 +958,10 @@ class MapApp(App):
   
   def loadConfig(self, configPath):
     """
-    Load the given config.
-    
-    @param configPath: Path to the config
-    @type configPath: str
+      Load the given config.
+      
+      @param configPath: Path to the config
+      @type configPath: str
     """
     if configPath != '':
       self.configPath = configPath
@@ -983,28 +986,30 @@ class MapApp(App):
   
   def clearConfig(self):
     """
-    Empties the config.
+      Empties the config.
     """
     for key in self.configContent.keys():
       self.configContent[key] = []
   
   def isConfigEmpty(self):
     """
-    Checks whether the config is empty.
-    
-    @return: Return True, when config is empty, otherwise False.
+      Checks whether the config is empty.
+      
+      @return: Return True, when config is empty, otherwise False.
+      @rtype: boolean
     """
     return len([y for x in self.configContent.values() for y in x])==0
             
   def addKML(self, kmlObj):
     """
-    Adds a KML to the application. and returns the stored name of the
-    kmlObj.
-    
-    @param kmlObj: KML data to be added.
-    @type kmlObj: kmlData.KMLObject
-    
-    @return: Name of the kmlObj under which it is stored.
+      Adds a KML to the application. and returns the stored name of the
+      kmlObj.
+      
+      @param kmlObj: KML data to be added.
+      @type kmlObj: kmlData.KMLObject
+      
+      @return: Name of the kmlObj under which it is stored.
+      @rtype: str
     """
     name = kmlObj.name
     i = 1
@@ -1018,12 +1023,13 @@ class MapApp(App):
           
   def getPolygonFromPlacemark(self, placemark):
     """
-    Returns the Polygon of a Placemark.
-    
-    @param placemark: Placemark from which the polygon is returned.
-    @type placemark: kmlData.Placemark
-    
-    @return: List of Polygon coords
+      Returns the Polygon of a Placemark.
+      
+      @param placemark: Placemark from which the polygon is returned.
+      @type placemark: kmlData.Placemark
+      
+      @return: List of Polygon coords
+      @rtype: [Tupel(float,float),..]
     """
     polygon = []
     for i in range(len(placemark.polygon)):
@@ -1034,9 +1040,10 @@ class MapApp(App):
   
   def getSelectedPolygons(self):
     """
-    Get all active KMLObjects of the application.
-    
-    @return: Returns a list of selected KMLObjects.
+      Get all active KMLObjects of the application.
+      
+      @return: Returns a list of selected KMLObjects.
+      @rtype:[kmlData.KMLObject]
     """
     selection = {}
     for kml in self.loaded_kmls:

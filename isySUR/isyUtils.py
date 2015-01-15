@@ -3,9 +3,7 @@
 Module containing utility functions. We provide a function to convert a point in latitude, longitude
 to equidistant X,Y coordinates given a relative null point.
 """
-
 #@author: tschodde
-
 
 from math import cos
 from math import pi

@@ -27,7 +27,6 @@ class SUR():
       @param surClassification: Optional parameter to determine whether this sur can be applied indoor ("I"),
           Outdoor ("O") or indoor as well as outdoor ("IO"). Default is "IO".
       @type surClassification: String  
-          
     """
     self.id = surID
     self.longitude = lon

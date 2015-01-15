@@ -176,7 +176,6 @@ class KMLObject():
             if tmpStyles.has_key(styleId):
               res[styleMapId] = tmpStyles[styleId]
               
-    
     return res
     
   @classmethod
@@ -274,6 +273,7 @@ class KMLObject():
       Function to return the XML representation for this kml as string.
       
       @return: The String-XML representation of this kml object.
+      @rtype: str
     """
     root = ET.Element("kml")
     root.attrib = {"xmlns":"http://earth.google.com/kml/2.1"}
@@ -434,5 +434,3 @@ class Placemark():
     coordinates.text += "\n" + self.polygon[0]
     
     return root
-    
-  

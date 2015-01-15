@@ -44,7 +44,6 @@ def gui(args=None):
     @param args: the arguments to give to the gui version.
     @type argparse.Namespace
   """
-  print type(args)
   mapApp = None
   try:
     sys.argv = ['']
@@ -60,8 +59,6 @@ def gui(args=None):
   except BaseException:
     if mapApp != None:
       mapApp.on_stop()
-    import traceback
-    traceback.print_exc()
     sys.exit('Program stopped unexpected!')
   
 def dealWithImportError():

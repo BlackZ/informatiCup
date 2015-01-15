@@ -44,8 +44,7 @@ class surTypeManager():
           self.ruleTypes[line] = curType
       configFile.close()
     except IOError:
-      raise IOError("TypeConfigError: The config file: " +configPath + " could not be opened.")
-        
+      raise IOError("TypeConfigError: The config file: " +configPath + " could not be opened.")     
       
     
   def getSURType(self, ruleString):

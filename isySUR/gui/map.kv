@@ -19,7 +19,6 @@
         bold: True
         
         on_release: root.open_kmlList()
-    
 
 <Menu>:
     id: menue
@@ -104,8 +103,7 @@
 
             Button:
                 text: "Load"
-                on_release: root.load(filechooser.path, filechooser.selection)
-                
+                on_release: root.load(filechooser.path, filechooser.selection)           
  
 <SaveDialog>:
     text_input: text_input

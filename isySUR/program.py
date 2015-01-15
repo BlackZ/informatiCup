@@ -46,8 +46,7 @@ class KMLCalculator:
       
       @param configPath: Optional path to a config file, containing information about the classification of rules
         (indoor, outdoor or both).
-      @type configPath: String
-            
+      @type configPath: String    
     """
     isOutputDir = os.path.isdir(outPath)
     surFile = open(inPath,'r')
@@ -86,20 +85,20 @@ class KMLCalculator:
   
   def _computeKMLs(self, inPath, kmlList, stopCalc, configPath=''):
     """
-    Function to compute kmls from a given file of SURs. Only needed for GUI.
-    
-    @param inPath: Path to the file containing the SURs which areas are to be computed.
-    @type inPath: String
-    
-    @param kmlList: Queue for computed KMLs
-    @type kmlList: Queue.Queue
-    
-    @param stopCalc: Queue which decides if the kml calculation should be stoped.
-    @type stopCalc: Queue.Queue
-    
-    @param configPath: Optional path to a config file, containing information about the classification of rules
-                       (indoor, outdoor or both).
-    @type configPath: String
+      Function to compute kmls from a given file of SURs. Only needed for GUI.
+      
+      @param inPath: Path to the file containing the SURs which areas are to be computed.
+      @type inPath: String
+      
+      @param kmlList: Queue for computed KMLs
+      @type kmlList: Queue.Queue
+      
+      @param stopCalc: Queue which decides if the kml calculation should be stoped.
+      @type stopCalc: Queue.Queue
+      
+      @param configPath: Optional path to a config file, containing information about the classification of rules
+                         (indoor, outdoor or both).
+      @type configPath: String
     """
     
     try:
@@ -151,9 +150,6 @@ class KMLCalculator:
       nearObjs = self._getNearestObj(coords, {"building":"*"})
     else:
       nearObjs = self._getNearestObj(coords)
-    
-
-    print "number nearObjs", len(nearObjs)
 
     #Analyse closest elements
     usedStyle = {}
@@ -174,14 +170,12 @@ class KMLCalculator:
         print "using way", tmpObj[0]
         
       if tmpWay != None and tmpWay.tags.has_key("landuse"):
-#        print "is landuse"
         if tmpWay.tags["landuse"] in ["commercial", "industrial"]:
           usedStyle[tmpWay.id] = self.uncertainStyle    
           
         if tmpWay.tags["landuse"] == "residential":
           usedStyle[tmpWay.id] = self.uncertainStyle
           polyString = self._createPolyString(tmpWay)
-#          print polyString
           landUseData = osmData.OSM()
           try:
             landUseData = self.osmAPI.getDataFromPoly(polyString)    
@@ -192,8 +186,6 @@ class KMLCalculator:
             buildings = landUseData.getNearestWay(coords, True, {"building":"*"})
           else:
             buildings = landUseData.getNearestWay(coords, True)
-          if len(buildings) > 1:
-            print "more than one potential building."
           
           for build in buildings:
             tmpBuild = build.nearestObj
@@ -222,10 +214,8 @@ class KMLCalculator:
     
     # Prefer buildings if rule is applicable indoor
     if buildingsIncluded and surObj.classification in ["I","IO"]:
-#      print "reducing possible ways"
       possibleWays = [x for x in possibleWays if x.tags.viewkeys() & {"building", "shop"}]
       
-#    print "number possible ways:", len(possibleWays)
     if len(possibleWays) > 1:
       bestWay = None
       closestDist = sys.float_info.max
@@ -235,14 +225,12 @@ class KMLCalculator:
         for ref in way.refs:
           dist += self.osm.nodes[ref].getDistance(coords).distance
         dist /= len(way.refs)
-#        print "dist for", way.id, dist
         if dist < closestDist:
           closestDist = dist
           bestWay = way
     else:
       bestWay = possibleWays[0]
             
-#    print "best way:", bestWay.id
     points = []  
     for ref in bestWay.refs[:-1]:
       points.append(self.osm.nodes[ref].getCoordinateString())
@@ -344,7 +332,7 @@ class KMLCalculator:
     """
     nearRelations = self.osm.getNearestRelation(coords, tags=tags)
     nearWays = self.osm.getNearestWay(coords, True, tags=tags)
-#    nearestLanduses = self.osm.getNearestWay(coords, True, tags={"landuse":"residential"})
+
     if len(nearWays) == 0:
       nearWays = self.osm.getNearestWay(coords, True)
     if len(nearWays) == 0:
@@ -375,18 +363,19 @@ class KMLCalculator:
   
   def _createBBox(self, coords):
     """
-    The given coords mark the center of a bounding box
-    with the given height and width.
-    
-    @param coords:  Central point coordinates - (lat, long) - of the
-                    calculated bounding box
-    @type coords:   Tuple(float, float)
-    
-    @return:        Returns a list of the lower left and upper right coordinates
-                    for the bounding box
+      The given coords mark the center of a bounding box
+      with the given height and width.
+      
+      @param coords:  Central point coordinates - (lat, long) - of the
+                      calculated bounding box
+      @type coords:   Tuple(float, float)
+      
+      @return:        Returns a list of the lower left and upper right coordinates
+                      for the bounding box
+      @rtype:         [float,float,float,float]
     """
-    #Breitengrad: 0.00001 -> 1.11m
-    #Längengrad: 0.00001 -> 0.66 m
+    #latitude: 0.00001 -> 1.11m
+    #longitude: 0.00001 -> 0.66 m
     
     midLat = float(coords[0])
     midLon = float(coords[1])

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 13 00:15:11 2015
 Simple triangulation class. It tries to triangulate a given polygon using the
 ear clipping algorithm.
 Roughly based on Rawlyn's implementation (http://chipmunk-physics.net/forum/viewtopic.php?f=1&t=813&p=3985)

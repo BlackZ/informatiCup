@@ -465,6 +465,7 @@ class Node(object):
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
     if not isinstance(point[0], float) or not isinstance(point[1], float) :
       raise TypeError("distToNode only accepts Tupels from type types.TupelType with 2 Entries from type float")
+      
     tmpPoint=isyUtils.getXYpos(isyUtils._relativeNullPoint,point)
     ownPoint=isyUtils.getXYpos(isyUtils._relativeNullPoint,(self.lat,self.lon))
 
@@ -873,7 +874,7 @@ class Relation(object):
       and self.members == other.members 
       and self.tags == other.tags)
    
-  def __ne__(self,other):
+  def __ne__(self, other):
     """
       Override of the not equal method for relations.
       
@@ -887,18 +888,18 @@ class Relation(object):
 class distanceResult(object):
   def __init__(self, distance, nearestObj, nearestSubObj=[("-1",None)]):
     """
-    Basic class containing the result of a distance calculation
-    
-    @param distance: The distance to the nearestObj
-    @type distance: float
-    
-    @param nearestObj: the ID and type of the nearest object e.g. ("1",osmData.Relation)
-    @type nearestObj: Tuple(str,type)
-    
-    @param nearestSubObj: (optional) the nearest subobject of the current
-                          nearest object (a way which is a subobject of a relation)
-                          e.g. [("2",osmData.Way),...]
-    @type nearestSubObj: [Tuple(str,str)]
+      Basic class containing the result of a distance calculation
+      
+      @param distance: The distance to the nearestObj
+      @type distance: float
+      
+      @param nearestObj: the ID and type of the nearest object e.g. ("1",osmData.Relation)
+      @type nearestObj: Tuple(str,type)
+      
+      @param nearestSubObj: (optional) the nearest subobject of the current
+                            nearest object (a way which is a subobject of a relation)
+                            e.g. [("2",osmData.Way),...]
+      @type nearestSubObj: [Tuple(str,str)]
     """
     self.distance = distance
     self.nearestObj = nearestObj
