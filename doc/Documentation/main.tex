@@ -37,9 +37,6 @@
 %\usepackage{makeidx} % Required to make an index
 %\makeindex % Tells LaTeX to create the files required for indexing
 
-\usepackage{todonotes} %to be deleated in the end
-\newcommand{\todol}{\todo[inline]} %to be deleated in the end
-
 \newcommand{\ProjectTitle}{isySUR}
 \newcommand{\pt}{\ProjectTitle}
 
@@ -136,7 +133,7 @@ The menu allows you to load a SUR input file. After calculating you can save the
 \includegraphics[width=0.75\textwidth]{screenshot.png}
 \caption{\pt\ in GUI version}
 \end{figure}
-\pt\ is a program that tries to calculate the intuitive area of application of a space usage rule (e.g. no smoking) by its coordinates and data from OpenStreetMap\footnote{\url{http://www.openstreetmap.org}}. It was developed as part of the informatiCup, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called ISY and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `Intelligent Systems' at Bielefeld University.
+\pt\ is a program that tries to calculate the intuitive area of application of a space usage rule (e.g. no smoking) by its coordinates and data from OpenStreetMap\footnote{\url{http://www.openstreetmap.org}}. It was developed as part of the informatiCup 2015, a programming competition for students organized by the German Informatics Society (Gesellschaft für Informatik e.V.). Our team is called ISY and consists of Adriana-Victoria Dreyer, Jacqueline Hemminghaus, Jan Pöppel and Thorsten Schodde, four students of the master study course `Intelligent Systems' at Bielefeld University.
 
 Using \pt\ is very easy. You give an input file with the coordinates of the SURs and the intended area of application is computed. Optionally, you can add a configuration file that classifies SURs in those that are applicable only indoor, those that are applicable only outdoor or those that are applicable indoor as well as outdoor (both) to get a better result. In the GUI version the calculated areas are shown on a map and you can choose which ones you want to have displayed. They can be saved into a file to reload them whenever you want to have a look at them.
 
@@ -154,9 +151,9 @@ In the archive you can find the following data (bold printed files will be insta
 		\item \textbf{gui} (directory) - source files for GUI version
 		\item tests (directory) - \pt\ was developed using test driven development. In this directory you will find the test files.
 	\end{itemize}
-	\item testData (directory) - data for tests and test data sets
+	\item testData (directory) - data for tests and test datasets
 	\begin{itemize}
-		\item dataOnlyForTests (directory) - Some of the test files need data that is stored in this directory
+		\item dataOnlyForTests (directory) - Some of the test files need data that is stored in this directory.
 		\item Data.txt - a possible input file (provided test data)
 		\item isyData.txt - a possible input file\footnote{see chapter \ref{sec:surs}}
 	\end{itemize}
@@ -176,7 +173,7 @@ In the archive you can find the following data (bold printed files will be insta
 In this chapter the usage of \pt\ is described in detail. First you can find installation instructions in section \ref{sec:installation}, detailed usage instruction for both program versions are following in section \ref{sec:usage}.
 
 \section{Requirements and installation}\label{sec:installation}
-\pt\ is written in Python so you get a Python script, which starts the main program, and a package with the tools. For running the command line version you do not need much more than basic Python. If you prefer to use a graphical user interface you will have to install some more packages.
+\pt\ is written in Python therefore you get a Python script, which starts the main program, and a package with the tools. For running the command line version you do not need much more than basic Python. If you prefer to use a graphical user interface you will have to install some more packages.
 \subsection{Requirements}\label{sec:requirements}
 \begin{enumerate}
 	\item \textbf{basic requirements:}
@@ -186,7 +183,7 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 		\item internet connection
 	\end{itemize}
 	~\\
-	To run a Python script you need Python. Python comes with most Linux distributions. For the use on Windows machines you will have to install Python manually\footnote{get Python here: \url{https://www.python.org}}. \pt\ uses data from OpenStreetMap\footnote{\url{http://www.openstreetmap.org}} to calculate the area of application. Therefore an internet connection is required. The data transfer in Python is realised with the requests\footnote{\url{http://docs.python-requests.org}\label{fn:requests}} library. You can easily install it using pip\footnote{\url{https://pip.pypa.io}}, a Python installation tool
+	To run a Python script you need Python. Python comes with most Linux distributions. For the use on Windows machines you will have to install Python manually\footnote{get Python here: \url{https://www.python.org}}. \pt\ uses data from OpenStreetMap\footnote{\url{http://www.openstreetmap.org}} to calculate the area of application. Therefore an internet connection is required. The OSM queries are realised with the requests\footnote{\url{http://docs.python-requests.org}\label{fn:requests}} library. You can easily install it using pip\footnote{\url{https://pip.pypa.io}}, a Python installation tool
 	\begin{verbatim}
 		$ pip install requests
 	\end{verbatim}
@@ -197,7 +194,7 @@ In this chapter the usage of \pt\ is described in detail. First you can find ins
 		\item Kivy
 		\item concurrent.futures
 	\end{itemize}
-	For the graphical user interface Kivy is used. Kivy\footnote{\url{http://kivy.org}\label{fn:kivy}} is a cross-platform Python Framework for NUI Development. For installation on Ubuntu we recommend the installation with apt-get as described on their web page\footref{fn:kivy}. For use on Windows and starting Kivy applications from the command line we recommend to install Kivy and pygame (needed for Kivy) with the unofficial precompiled binaries\footnote{Kivy: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#kivy}}\footnote{pygame: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#pygame}}. On MacOSX the easiest way to run Kivy applications, like \pt, is with the Kivy launcher as mentioned on the Kivy web site\footnote{\url{http://kivy.org/docs/installation/installation-macosx.html}}.
+	For the graphical user interface Kivy is used. Kivy\footnote{\url{http://kivy.org}\label{fn:kivy}} is a cross-platform Python Framework for NUI Development. For installation on Ubuntu we recommend the installation with apt-get as described on their web page\footnote{\url{http://kivy.org/docs/installation/installation-linux.html}}. For use on Windows and starting Kivy applications from the command line we recommend to install Kivy and pygame (needed for Kivy) with the unofficial precompiled binaries\footnote{Kivy: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#kivy}}\footnote{pygame: \url{http://www.lfd.uci.edu/\%7Egohlke/pythonlibs/\#pygame}}. On MacOSX the easiest way to run Kivy applications, like \pt, is with the Kivy launcher as mentioned on the Kivy web site\footnote{\url{http://kivy.org/docs/installation/installation-macosx.html}}.
 	
 On all operating systems futures can be installed via pip
 \begin{verbatim}
@@ -404,15 +401,15 @@ The last remaining way and its reference nodes are finally used to construct a p
 \label{fic:23}
 \end{figure}
 
-The quality of our results greatly depends on how detailed the OSM data is for the requested area. As mentioned in the sections \ref{sec:data_usage} and \ref{sec:algorithm} we mainly focus on the coordinates of a given SUR to compute its intended area of application. \todol{discuss quality of coordinates} Therefore, our results are good for areas where the OSM data is detailed and less optimal when the OSM data is sparse. 
+The quality of our results greatly depends on how detailed the OSM data is for the requested area. As mentioned in the sections \ref{sec:data_usage} and \ref{sec:algorithm} we mainly focus on the coordinates of a given SUR to compute its intended area of application. We are aware of the uncertainty and vast variability in the accuracy of the coordinates, however since we do not have any other positional information we could use to correct the location of the SUR, we still use the given coordinates as they are. Obviously, this often results in us identifying areas, that are different from the actually intended areas, when the given coordinates stray too far away from the intended area. Therefore, our results are good for areas where the OSM data is detailed and the given coordinates are accurate, while they are less optimal when the OSM data is sparse or the given coordinates are too inaccurate. 
 
-A good example for this is the number 0038 of the provided test dataset, that is shown in figure \ref{fic:38}: The intended area is a building which is however not mapped in OpenStreetMap yet. Since there is no information about the intended polygon area in the OSM data, we cannot build the polygon. In this case we find the entire residential block and mark it with a different colour to show our uncertainty. Another example for insufficient information is that the received data does not include parts of a building, for example in SUR 0024 from the test data set. In cases like this we find the whole building and not the intended part of the truth files. Once the OSM data gets updated further we would identify the correct areas as well.
+A good example for this is the number 0038 of the provided test dataset, that is shown in figure \ref{fic:38}: The intended area is a building which is however not mapped in OpenStreetMap yet. Since there is no information about the intended polygon area in the OSM data, we cannot build the polygon. In this case we find the entire residential block and mark it with a different colour to show our uncertainty. Another example for insufficient information is that the received data does not include parts of a building, for example in SUR 0024 from the test dataset. In cases like this we find the whole building and not the intended part of the truth files. Once the OSM data gets updated further we would identify the correct areas as well.
 
 In other cases (e.g. figure \ref{fic:23}) the provided coordinate positions would indicate completely different areas than the ones that were intended. When just judging by the OSM data and the coordinates, we would usually rate our results to be more accurate then the provided truth areas in such cases. We therefore would not usually rate these results poorly. 
 
 In a few cases (e.g. figure \ref{fic:16}), the test data intends a combination of multiple connected buildings where we apply the rule only to one building. Since in these cases, the buildings are different, we do not think it is justified to extend the area of application to the other buildings as well. 
 
-\begin{figure}[h]
+\begin{figure}
 \includegraphics[width=0.5\textwidth]{16.png}
 \includegraphics[width=0.5\textwidth]{16truth.png}
 \caption{Left: found area for example SUR 0016; Right: given truth file of SUR 0016}
@@ -425,7 +422,7 @@ In a few cases (e.g. figure \ref{fic:16}), the test data intends a combination o
 \label{fic:56}
 \end{figure}
 
-Of course there are some cases, where we compute areas, that we do not deem to be intuitive areas of application of the given rules. One example would be the number 0056 from the test dataset, that is shown in figure \ref{fic:56}. The intended area is not present in the osm data and the residential area spans such a big area (covering several blocks) that we find a different building on the other side of the road. 
+Of course there are some cases, where we compute areas, that we do not deem to be intuitive areas of application of the given rules. One example would be the number 0056 from the test dataset, that is shown in figure \ref{fic:56}. The intended area is not present in the OSM data and the residential area spans such a big area (covering several blocks) that we find a different building on the other side of the road. 
 A more detailed analysis of our actual results when comparing with our SURs and the ones provided by the test data can be found in table \ref{tab:results}.
 
 \begin{table}[h]
@@ -436,7 +433,7 @@ A more detailed analysis of our actual results when comparing with our SURs and 
 \hline 
  & \rr calculated = truth & \rr calculated \mbox{intuitively} correct & calculation \mbox{uncertain} & calculation \mbox{unintuitive} \\ 
 \hline 
-given SURs & \cc 44,16\% & \cc 21,12\% & \cc 13,44\% & \hfil 21,28\% \hfil \\
+given SURs & \cc 51,04\% & \cc 20,8\% & \cc 14,89\% & \hfil 13,54\% \hfil \\
 \hline 
 own SURs & \cc 75\% & \cc 0\% & \cc 0\% & \hfil 25\% \hfil \\ 
 \hline 
@@ -445,21 +442,23 @@ own SURs & \cc 75\% & \cc 0\% & \cc 0\% & \hfil 25\% \hfil \\
 \label{tab:results}
 \end{table}
 
-Overall, we are quite pleased with our results in most cases. \todol{sowas wie jacquis und thorstens satz} Although the organizers of the competition did not want us to find suitable OSM elements that would represent the intended areas, we found that most space usage rules are intended to be applicable to certain meaningful areas, such as buildings, parks, forests, courtyards etc. Such meaningful areas are often explicitly included and labelled in OSM and the community intends to improve the level of detail even further in the future. It is for that reason, that we believe our approach of finding suitable OSM elements around the given coordinates is justified and already provides useful results. 
+Overall, we are quite pleased with our results in most cases. In almost all cases where our algorithm provides improvable or poor results the OSM data is incomplete (e.g. entire buildings are not mapped). Over time, it is very likely that these missing elements will be added by the ambitious community, which would greatly improve our results. The problem of finding different areas based on inaccurate coordinates is not something we believe is addressable considering the available data. As mentioned in section \ref{sec:future_work}, using additional information, e.g. the direction from the coordinates to the sign, could greatly reduce the effect of the uncertainty in the coordinates.
 
-\section{Further Work}
-\todol{restructure - this looks ugly}
-Our major focus of future work will be the development of the GUI. Most of all we like to implement a possibility to list up all placemarks of one KML similar to Google Earth, so that the user can jump to every placemark on the map he or she likes and not only to the last one of each KML. Furthermore the user should be able to display the rules that are applied in any polygon when clicking on it.
-Another improvement of the GUI should be the opportunity to load several KMLs at once, because currently the user can only load one KML file at a time.
+Although the organizers of the competition did not want us to find suitable OSM elements that would represent the intended areas, we found that most space usage rules are intended to be applicable to certain meaningful areas, such as buildings, parks, forests, courtyards etc. Such meaningful areas are often explicitly included and labelled in OSM and the community intends to improve the level of detail even further in the future. It is for that reason, that we believe our approach of finding suitable OSM elements around the given coordinates is justified and already provides useful results. 
 
-\todol{Try using the actual area or the area of the bounding box of a polygon instead of the average vertex distance.}
-\todol{Incorporate more data, e.g. direction (should be relatively easy considering the mobile origin of the task to get the orientation when taking the foto)}
+\section{Further Work}\label{sec:future_work}
+Although we are quite pleased with our program, there is a range of possible improvements we can think of:
+First of all, we believe that incorporating other sources of information in the calculation. One could for example think of incorporating the direction in which the SUR sign is located relative to the given coordinates. When querying the coordinates of the sign, getting the orientation as well should not be too much additional work while providing valuable information for the actual location of the intended area. Since the OSM data is still incomplete, allowing other map sources could also improve the results.
 
-For a better usability on mobile devices it should be implemented that a click anywhere on the map adds a new SUR and the program calculates the corresponding area. 
+Furthermore, we would like to improve the performance of our program further, since some mobile devices are still overtaxed. 
 
-To improve the calculation of our KMLs we think about using multiple data sources because OpenStreetMap sometimes has a lack of data information.
+On top of that, we can think of a range of improvements for our graphical user interface:
+Most of all we like to implement the possibility to list up all placemarks including in one KML similar to Google Earth, so that the user can jump to every placemark and not only to the last of each KML. Furthermore, we would like the user to be able to view additional information about a polygon, like the rules belonging to this polygon, by clicking on it.
+Another improvement to the GUI should be the opportunity to load several KMLs at once, because currently the user can only load one KML file at a time.
 
-In order to improve \pt\ and make it available for others, we are going to make our repository public after the competition.
+For a better usability on mobile devices it would further be desirable if the user could add a new space usage rule by clicking on the map and the program calculates the corresponding area. 
+
+In order to improve \pt\ and make it available for others, we are going to make our repository public on github after the competition.
 
 %----------------------------------------------------------------------------------------
 %	Own SURs
@@ -519,10 +518,4 @@ For the competition at least ten new space usage rules should be found. Here our
 \sur{isy0019.jpg}{isy0019.jpg}{access:bicycle="no"} & \area{isy0019.png}{isy0019.jpg} & \sur{isy0020.jpg}{isy0020.jpg}{access:dog="no", access:skate="no"} & \area{isy0020.png}{isy0020.jpg}
 \end{tabular}
 
-%----------------------------------------------------------------------------------------
-%	List of TODOS
-%----------------------------------------------------------------------------------------
-
-\listoftodos  %to be deleated in the end
-
-\end{document}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+\end{document}
