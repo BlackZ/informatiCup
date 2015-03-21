@@ -4,6 +4,13 @@ isySUR
 14/01/2015
 
 -------------------------------------------------------------------------------
+Description
+-------------------------------------------------------------------------------
+isySUR is a tool to automatically compute the area of application for space
+usage rules (SURs). This was developed as part of the informatiCup 2015. 
+We would appreciate if you would give us some feedback if this is useful for you.
+
+-------------------------------------------------------------------------------
 General usage
 -------------------------------------------------------------------------------
 
