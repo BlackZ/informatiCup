@@ -9,7 +9,10 @@ Description
 isySUR is a tool to automatically compute the area of application for space
 usage rules (SURs). This was developed as part of the informatiCup 2015. 
 We would appreciate if you would give us some feedback if this is useful for you.
-
+The Data directory contains the testdata that was provided by the competition.
+We were also povided with images of the SUR signs but they were not used in this
+program. All provided data can be found here:
+http://informaticup.gi.de/fileadmin/testdaten-sur-20102014.zip
 -------------------------------------------------------------------------------
 General usage
 -------------------------------------------------------------------------------
