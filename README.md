@@ -70,4 +70,5 @@ Authors
  - Jacqueline Hemminghaus	jhemming@techfak.uni-bielefeld.de
  - Jan Pöppel		jpoeppel@techfak.uni-bielefeld.de
  - Thorsten Schodde	tschodde@techfak.uni-bielefeld.de
+ 
 ===============================================================================
