@@ -66,8 +66,8 @@ version and implementation details see manual in doc/manual.pdf.
 ===============================================================================
 Authors
 ===============================================================================
-Adriana-Victoria Dreyer	adreyer@techfak.uni-bielefeld.de
-Jacqueline Hemminghaus	jhemming@techfak.uni-bielefeld.de
-Jan Pöppel		jpoeppel@techfak.uni-bielefeld.de
-Thorsten Schodde	tschodde@techfak.uni-bielefeld.de
+ - Adriana-Victoria Dreyer	adreyer@techfak.uni-bielefeld.de
+ - Jacqueline Hemminghaus	jhemming@techfak.uni-bielefeld.de
+ - Jan Pöppel		jpoeppel@techfak.uni-bielefeld.de
+ - Thorsten Schodde	tschodde@techfak.uni-bielefeld.de
 ===============================================================================
